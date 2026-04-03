@@ -15,7 +15,8 @@ Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for
 
 ## Installation
 
-### Claude Desktop
+<details>
+<summary><strong>Claude Desktop</strong></summary>
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -36,7 +37,10 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 
 Restart Claude Desktop after saving.
 
-### Claude Code (CLI)
+</details>
+
+<details>
+<summary><strong>Claude Code (CLI)</strong></summary>
 
 ```bash
 claude mcp add metabase \
@@ -63,7 +67,10 @@ Or add to `.claude/mcp.json`:
 }
 ```
 
-### Cursor
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
 
 Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
 
@@ -84,7 +91,10 @@ Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
 
 Restart Cursor after saving.
 
-### Windsurf
+</details>
+
+<details>
+<summary><strong>Windsurf</strong></summary>
 
 Add to `~/.codeium/windsurf/mcp_config.json`:
 
@@ -103,7 +113,10 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 }
 ```
 
-### Cline (VS Code)
+</details>
+
+<details>
+<summary><strong>Cline (VS Code)</strong></summary>
 
 Add to your Cline MCP settings (accessible via the MCP Servers icon):
 
@@ -122,7 +135,10 @@ Add to your Cline MCP settings (accessible via the MCP Servers icon):
 }
 ```
 
-### Continue (VS Code)
+</details>
+
+<details>
+<summary><strong>Continue (VS Code)</strong></summary>
 
 Add to `.continue/config.yaml`:
 
@@ -138,7 +154,10 @@ mcpServers:
       METABASE_API_KEY: "mb_xxx"
 ```
 
-### Zed
+</details>
+
+<details>
+<summary><strong>Zed</strong></summary>
 
 Add to your Zed `settings.json`:
 
@@ -156,6 +175,8 @@ Add to your Zed `settings.json`:
   }
 }
 ```
+
+</details>
 
 ## Configuration
 
