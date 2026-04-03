@@ -1,0 +1,19 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: docker compose up -d
+      - run: ./tests/ci/wait-for-metabase.sh
+      - run: bun test
+      - run: docker compose down
+        if: always()
