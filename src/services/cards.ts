@@ -95,14 +95,43 @@ export const copyCard = async (
 export const executeCardQuery = async (
   client: MetabaseClient,
   cardId: number,
-  params?: { parameters?: Record<string, unknown> }
+  params?: { parameter_values?: Record<string, unknown> }
 ) => {
+  let parameters: unknown[] | undefined;
+
+  if (params?.parameter_values && Object.keys(params.parameter_values).length > 0) {
+    // Fetch the card to get template tag metadata
+    const card = (await getCard(client, cardId)) as any;
+    const templateTags = card?.dataset_query?.native?.["template-tags"] || {};
+
+    parameters = Object.entries(params.parameter_values).map(([name, value]) => {
+      const tag = templateTags[name];
+      const tagType = tag?.type || "text";
+
+      // Map template tag types to Metabase parameter types
+      let paramType = "category";
+      if (tagType === "date" || tag?.["widget-type"]?.includes("date")) {
+        paramType = tag?.["widget-type"] || "date/single";
+      } else if (tagType === "number") {
+        paramType = "number/=";
+      } else if (tagType === "text") {
+        paramType = "category";
+      }
+
+      return {
+        type: paramType,
+        target: ["variable", ["template-tag", name]],
+        value,
+      };
+    });
+  }
+
   const { data, error } = await client.POST("/api/card/{card-id}/query", {
     params: { path: { "card-id": cardId } },
     body: {
       ignore_cache: false,
-      parameters: params?.parameters as any,
-    },
+      parameters,
+    } as any,
   });
   if (error) throw new Error(`Execute card query failed: ${JSON.stringify(error)}`);
   return data;

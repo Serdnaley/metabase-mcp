@@ -15,11 +15,11 @@ export const registerCardTools = (server: McpServer, client: MetabaseClient, con
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 
-  server.tool("execute_card_query", "Run a saved question and return results", {
+  server.tool("execute_card_query", "Run a saved question and return results. For parameterized cards, pass template tag values as key-value pairs (e.g. { fromDate: '2024-01-01', toDate: '2024-12-31' })", {
     card_id: z.number().describe("Card ID"),
-    parameters: z.record(z.string(), z.unknown()).optional().describe("Query parameters as key-value pairs"),
-  }, async ({ card_id, parameters }) => {
-    const result = await executeCardQuery(client, card_id, { parameters });
+    parameter_values: z.record(z.string(), z.unknown()).optional().describe("Template tag parameter values as { paramName: value } pairs, e.g. { fromDate: '2024-01-01', toDate: '2024-12-31' }"),
+  }, async ({ card_id, parameter_values }) => {
+    const result = await executeCardQuery(client, card_id, { parameter_values });
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 

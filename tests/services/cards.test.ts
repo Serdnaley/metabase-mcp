@@ -72,6 +72,91 @@ describe("cards service", () => {
     expect(result.data.rows.length).toBeGreaterThan(0);
   });
 
+  test("executeCardQuery with date parameters", async () => {
+    const client = await getTestClient();
+    // Create a card with required date template tags
+    const card = (await createCard(client, {
+      name: testName("date-param-card"),
+      display: "table",
+      dataset_query: {
+        type: "native",
+        native: {
+          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{fromDate}} AND CREATED_AT < {{toDate}}",
+          "template-tags": {
+            fromDate: { id: "from", name: "fromDate", "display-name": "From Date", type: "date" },
+            toDate: { id: "to", name: "toDate", "display-name": "To Date", type: "date" },
+          },
+        },
+        database: SAMPLE_DB_ID,
+      },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    // Execute with date parameter values
+    const result = (await executeCardQuery(client, card.id, {
+      parameter_values: { fromDate: "2024-01-01", toDate: "2025-01-01" },
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+  });
+
+  test("executeCardQuery with text parameter", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("text-param-card"),
+      display: "table",
+      dataset_query: {
+        type: "native",
+        native: {
+          query: "SELECT * FROM ORDERS WHERE TOTAL > {{minTotal}}",
+          "template-tags": {
+            minTotal: { id: "min", name: "minTotal", "display-name": "Min Total", type: "number" },
+          },
+        },
+        database: SAMPLE_DB_ID,
+      },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await executeCardQuery(client, card.id, {
+      parameter_values: { minTotal: 100 },
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+    expect(result.data.rows.length).toBeGreaterThan(0);
+  });
+
+  test("executeCardQuery with multiple mixed parameters", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("multi-param-card"),
+      display: "table",
+      dataset_query: {
+        type: "native",
+        native: {
+          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{fromDate}} AND TOTAL > {{minTotal}} LIMIT 10",
+          "template-tags": {
+            fromDate: { id: "from", name: "fromDate", "display-name": "From Date", type: "date" },
+            minTotal: { id: "min", name: "minTotal", "display-name": "Min Total", type: "number" },
+          },
+        },
+        database: SAMPLE_DB_ID,
+      },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await executeCardQuery(client, card.id, {
+      parameter_values: { fromDate: "2020-01-01", minTotal: 50 },
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+    expect(result.data.rows.length).toBeGreaterThan(0);
+    expect(result.data.rows.length).toBeLessThanOrEqual(10);
+  });
+
   test("copyCard copies the card", async () => {
     const client = await getTestClient();
     const copy = (await copyCard(client, createdCardId, { collection_id: testCollectionId })) as any;
