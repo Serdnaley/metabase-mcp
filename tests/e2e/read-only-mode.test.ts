@@ -23,14 +23,30 @@ const WRITE_TOOLS = [
   "create_action", "update_action", "delete_action", "execute_action",
 ];
 
+const getToolNames = (server: McpServer): string[] => {
+  // McpServer stores tools internally — try known property names
+  const internal = (server as any)._registeredTools
+    ?? (server as any)._tools
+    ?? (server as any).tools;
+  if (!internal) {
+    throw new Error(
+      "Cannot access registered tools from McpServer. " +
+      "The SDK's internal structure may have changed."
+    );
+  }
+  return Object.keys(internal);
+};
+
 describe("E2E: read-only mode", () => {
   test("readOnly=true registers only read tools", async () => {
     const client = await getTestClient();
     const server = new McpServer({ name: "test", version: "0.0.1" });
     registerAllTools(server, client, { metabaseUrl: "http://localhost:3000", readOnly: true });
 
-    const registeredTools = (server as any)._registeredTools;
-    const toolNames = Object.keys(registeredTools || {});
+    const toolNames = getToolNames(server);
+
+    // Guard: ensure we actually found tools (prevents vacuous pass)
+    expect(toolNames.length).toBe(READ_ONLY_TOOLS.length);
 
     for (const tool of READ_ONLY_TOOLS) {
       expect(toolNames).toContain(tool);
@@ -45,10 +61,13 @@ describe("E2E: read-only mode", () => {
     const server = new McpServer({ name: "test", version: "0.0.1" });
     registerAllTools(server, client, { metabaseUrl: "http://localhost:3000", readOnly: false });
 
-    const registeredTools = (server as any)._registeredTools;
-    const toolNames = Object.keys(registeredTools || {});
+    const toolNames = getToolNames(server);
 
     const allTools = [...READ_ONLY_TOOLS, ...WRITE_TOOLS];
+
+    // Guard: ensure we found the expected total
+    expect(toolNames.length).toBe(allTools.length);
+
     for (const tool of allTools) {
       expect(toolNames).toContain(tool);
     }

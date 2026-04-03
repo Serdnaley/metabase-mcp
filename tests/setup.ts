@@ -12,17 +12,25 @@ const checkHealth = async (): Promise<boolean> => {
   }
 };
 
-const getSetupToken = async (): Promise<string | null> => {
+const isSetupComplete = async (): Promise<boolean> => {
   try {
     const res = await fetch(`${METABASE_URL}/api/session/properties`);
     const data = (await res.json()) as Record<string, unknown>;
-    return (data["setup-token"] as string) || null;
+    return data["has-user-setup"] === true;
   } catch {
-    return null;
+    return false;
   }
 };
 
-const completeSetup = async (setupToken: string): Promise<void> => {
+const completeSetup = async (): Promise<void> => {
+  // Get a fresh setup token
+  const propsRes = await fetch(`${METABASE_URL}/api/session/properties`);
+  const props = (await propsRes.json()) as Record<string, unknown>;
+  const setupToken = props["setup-token"] as string;
+  if (!setupToken) {
+    throw new Error("No setup token available");
+  }
+
   const res = await fetch(`${METABASE_URL}/api/setup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -70,7 +78,7 @@ const createApiKey = async (sessionToken: string): Promise<string> => {
       "X-Metabase-Session": sessionToken,
     },
     body: JSON.stringify({
-      name: "test-api-key",
+      name: `test-api-key-${Date.now()}`,
       group_id: 2, // Administrators group
     }),
   });
@@ -83,6 +91,24 @@ const createApiKey = async (sessionToken: string): Promise<string> => {
 };
 
 const main = async () => {
+  // Skip if state file already exists (re-run without restart)
+  try {
+    const existing = await Bun.file(SETUP_STATE_FILE).text();
+    const state = JSON.parse(existing);
+    if (state.apiKey && state.metabaseUrl) {
+      // Verify the API key still works
+      const healthRes = await fetch(`${state.metabaseUrl}/api/database`, {
+        headers: { "X-API-Key": state.apiKey },
+      });
+      if (healthRes.ok) {
+        console.log("Test setup: using existing credentials");
+        return;
+      }
+    }
+  } catch {
+    // State file doesn't exist or is invalid — proceed with setup
+  }
+
   console.log("Checking Metabase health...");
   const healthy = await checkHealth();
   if (!healthy) {
@@ -93,11 +119,11 @@ const main = async () => {
   }
   console.log("Metabase is healthy");
 
-  // Check if setup is needed
-  const setupToken = await getSetupToken();
-  if (setupToken) {
+  // Check if initial setup is needed
+  const setupDone = await isSetupComplete();
+  if (!setupDone) {
     console.log("Completing initial Metabase setup...");
-    await completeSetup(setupToken);
+    await completeSetup();
     console.log("Setup complete");
   }
 
