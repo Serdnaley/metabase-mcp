@@ -1,0 +1,25 @@
+{
+  "name": "metabase-mcp",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "generate-types": "bun run scripts/generate-types.ts",
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "dev": "bun run src/index.ts"
+  },
+  "bin": {
+    "metabase-mcp": "dist/index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.5.2",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "openapi-fetch": "^0.17.0",
+    "zod": "^4.3.6"
+  }
+}
