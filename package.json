@@ -7,7 +7,9 @@
     "generate-types": "bun run scripts/generate-types.ts",
     "build": "bun build src/index.ts --outdir dist --target node",
     "dev": "bun run src/index.ts",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "test": "bun test",
+    "test:setup": "bun run tests/setup.ts"
   },
   "bin": {
     "metabase-mcp": "dist/index.js"
