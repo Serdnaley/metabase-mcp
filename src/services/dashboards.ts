@@ -48,15 +48,16 @@ export const updateDashboard = async (
     parameters?: Record<string, unknown>[];
   }
 ) => {
+  const body: Record<string, unknown> = {};
+  if (params.name !== undefined) body.name = params.name;
+  if (params.description !== undefined) body.description = params.description;
+  if (params.collection_id !== undefined) body.collection_id = params.collection_id;
+  if (params.archived !== undefined) body.archived = params.archived;
+  if (params.parameters !== undefined) body.parameters = params.parameters;
+
   const { data, error } = await client.PUT("/api/dashboard/{id}", {
     params: { path: { id } },
-    body: {
-      name: params.name ?? null,
-      description: params.description ?? null,
-      collection_id: params.collection_id ?? null,
-      archived: params.archived ?? null,
-      parameters: (params.parameters as any) ?? null,
-    },
+    body: body as any,
   });
   if (error) throw new Error(`Update dashboard failed: ${JSON.stringify(error)}`);
   return data;
@@ -111,9 +112,16 @@ export const updateDashboardCards = async (
     series?: Record<string, unknown>[];
   }>
 ) => {
+  // New cards need a negative temporary ID for Metabase to accept them
+  let tempId = -1;
+  const cardsWithIds = cards.map((card) => ({
+    ...card,
+    id: card.id ?? tempId--,
+  }));
+
   const { data, error } = await client.PUT("/api/dashboard/{id}/cards", {
     params: { path: { id } },
-    body: { cards: cards as any },
+    body: { cards: cardsWithIds as any },
   });
   if (error) throw new Error(`Update dashboard cards failed: ${JSON.stringify(error)}`);
   return data;

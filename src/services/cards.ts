@@ -54,17 +54,18 @@ export const updateCard = async (
     archived?: boolean;
   }
 ) => {
+  const body: Record<string, unknown> = {};
+  if (params.name !== undefined) body.name = params.name;
+  if (params.dataset_query !== undefined) body.dataset_query = params.dataset_query;
+  if (params.display !== undefined) body.display = params.display;
+  if (params.description !== undefined) body.description = params.description;
+  if (params.collection_id !== undefined) body.collection_id = params.collection_id;
+  if (params.visualization_settings !== undefined) body.visualization_settings = params.visualization_settings;
+  if (params.archived !== undefined) body.archived = params.archived;
+
   const { data, error } = await client.PUT("/api/card/{id}", {
     params: { path: { id } },
-    body: {
-      name: params.name ?? null,
-      dataset_query: (params.dataset_query as any) ?? null,
-      display: (params.display as any) ?? null,
-      description: params.description ?? null,
-      collection_id: params.collection_id ?? null,
-      visualization_settings: (params.visualization_settings as any) ?? null,
-      archived: params.archived ?? null,
-    },
+    body: body as any,
   });
   if (error) throw new Error(`Update card failed: ${JSON.stringify(error)}`);
   return data;

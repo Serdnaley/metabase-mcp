@@ -44,6 +44,7 @@ describe("actions service", () => {
     try {
       const result = (await createAction(client, {
         name: testName("test-action"), type: "query", model_id: modelCardId,
+        database_id: SAMPLE_DB_ID,
         dataset_query: { type: "native", native: { query: "SELECT 1" }, database: SAMPLE_DB_ID },
       })) as any;
       expect(result).toBeDefined();

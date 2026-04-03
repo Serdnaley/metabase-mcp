@@ -64,14 +64,14 @@ export const updateCollection = async (
   id: number,
   params: { name?: string; description?: string; parent_id?: number; archived?: boolean }
 ) => {
+  const body: Record<string, unknown> = { archived: params.archived ?? false };
+  if (params.name !== undefined) body.name = params.name;
+  if (params.description !== undefined) body.description = params.description;
+  if (params.parent_id !== undefined) body.parent_id = params.parent_id;
+
   const { data, error } = await client.PUT("/api/collection/{id}", {
     params: { path: { id } },
-    body: {
-      name: params.name ?? null,
-      description: params.description ?? null,
-      parent_id: params.parent_id ?? null,
-      archived: params.archived ?? false,
-    },
+    body: body as any,
   });
   if (error) throw new Error(`Update collection failed: ${JSON.stringify(error)}`);
   return data;
