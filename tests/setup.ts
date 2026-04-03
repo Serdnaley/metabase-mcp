@@ -133,9 +133,11 @@ const main = async () => {
   const apiKey = await createApiKey(sessionToken);
   console.log("API key created");
 
-  // Write state for tests to read
+  // Write state for tests to read (owner-only permissions)
   const state = { metabaseUrl: METABASE_URL, apiKey };
   await Bun.write(SETUP_STATE_FILE, JSON.stringify(state));
+  const { chmodSync } = await import("node:fs");
+  chmodSync(SETUP_STATE_FILE, 0o600);
   console.log("Test setup complete");
 };
 

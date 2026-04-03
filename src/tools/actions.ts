@@ -18,18 +18,31 @@ export const registerActionTools = (server: McpServer, client: MetabaseClient, c
   });
 
   if (!config.readOnly) {
-    server.tool("create_action", "Create a new action (HTTP, query, or implicit)", {
-      action: z.record(z.string(), z.unknown()).describe('Action definition. Must include "type" (http, query, or implicit), "name", "model_id", and type-specific fields'),
-    }, async ({ action }) => {
-      const result = await createAction(client, action as Record<string, unknown>);
+    server.tool("create_action", "Create a new action (query or implicit only — HTTP actions are not supported)", {
+      name: z.string().describe("Action name"),
+      type: z.enum(["query", "implicit"]).describe("Action type (query or implicit)"),
+      model_id: z.number().describe("Model card ID this action belongs to"),
+      database_id: z.number().optional().describe("Database ID (required for query actions)"),
+      dataset_query: z.record(z.string(), z.unknown()).optional().describe("Query definition for query-type actions"),
+      description: z.string().optional().describe("Action description"),
+    }, async (params) => {
+      const result = await createAction(client, params as Record<string, unknown>);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     });
 
-    server.tool("update_action", "Update an action", {
+    server.tool("update_action", "Update an action (cannot change type to http)", {
       id: z.number().describe("Action ID"),
-      action: z.record(z.string(), z.unknown()).describe("Fields to update"),
-    }, async ({ id, action }) => {
-      const result = await updateAction(client, id, action as Record<string, unknown>);
+      name: z.string().optional().describe("New action name"),
+      description: z.string().optional().describe("New description"),
+      dataset_query: z.record(z.string(), z.unknown()).optional().describe("New query definition"),
+      database_id: z.number().optional().describe("New database ID"),
+    }, async ({ id, ...params }) => {
+      const body: Record<string, unknown> = {};
+      if (params.name !== undefined) body.name = params.name;
+      if (params.description !== undefined) body.description = params.description;
+      if (params.dataset_query !== undefined) body.dataset_query = params.dataset_query;
+      if (params.database_id !== undefined) body.database_id = params.database_id;
+      const result = await updateAction(client, id, body);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     });
 
