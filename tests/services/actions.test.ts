@@ -156,6 +156,10 @@ describe("actions service", () => {
   });
 
   test("listActions with model_id filter", async () => {
+    if (!actionsEnabled) {
+      console.log("Skipped: actions not enabled");
+      return;
+    }
     const client = await getTestClient();
     const result = await listActions(client, { model_id: 999999 });
     expect(result).toBeDefined();

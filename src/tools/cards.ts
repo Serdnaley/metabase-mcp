@@ -15,9 +15,9 @@ export const registerCardTools = (server: McpServer, client: MetabaseClient, con
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 
-  server.tool("execute_card_query", "Run a saved question and return results. For parameterized cards, pass template tag values as key-value pairs. For date/range parameters, pass value as 'start~end' (e.g. '2024-01-01~2024-12-31')", {
+  server.tool("execute_card_query", "Run a saved question and return results. For parameterized cards, pass template tag values as key-value pairs (e.g. { fromDate: '2024-01-01', toDate: '2024-12-31' }). For date ranges in native queries, use two separate date/single parameters.", {
     card_id: z.number().describe("Card ID"),
-    parameter_values: z.record(z.string(), z.unknown()).optional().describe("Template tag parameter values as { paramName: value } pairs. For date: '2024-01-01'. For date/range: '2024-01-01~2024-12-31'. For number: 100. For text: 'value'."),
+    parameter_values: z.record(z.string(), z.unknown()).optional().describe("Template tag parameter values as { paramName: value } pairs. For date: '2024-01-01'. For date/month-year: '2024-01'. For number: 100. For text: 'value'. For date ranges, use two separate date parameters (fromDate + toDate)."),
   }, async ({ card_id, parameter_values }) => {
     const result = await executeCardQuery(client, card_id, { parameter_values });
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

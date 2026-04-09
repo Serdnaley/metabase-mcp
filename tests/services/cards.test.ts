@@ -157,19 +157,19 @@ describe("cards service", () => {
     expect(result.data.rows.length).toBeLessThanOrEqual(10);
   });
 
-  test("executeCardQuery with date/range parameter", async () => {
+  test("executeCardQuery with date/month-year widget-type parameter", async () => {
     const client = await getTestClient();
     const card = (await createCard(client, {
-      name: testName("date-range-card"),
+      name: testName("date-month-year-card"),
       display: "table",
       dataset_query: {
         type: "native",
         native: {
-          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{dateRange}}",
+          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{dateMonth}}",
           "template-tags": {
-            dateRange: {
-              id: "dr", name: "dateRange", "display-name": "Date Range",
-              type: "date", "widget-type": "date/range",
+            dateMonth: {
+              id: "dm", name: "dateMonth", "display-name": "Date Month",
+              type: "date", "widget-type": "date/month-year",
             },
           },
         },
@@ -179,7 +179,7 @@ describe("cards service", () => {
     cleanupCardIds.push(card.id);
 
     const result = (await executeCardQuery(client, card.id, {
-      parameter_values: { dateRange: "2024-01-01~2025-01-01" },
+      parameter_values: { dateMonth: "2024-01" },
     })) as any;
     expect(result).toBeDefined();
     expect(result.data).toBeDefined();
