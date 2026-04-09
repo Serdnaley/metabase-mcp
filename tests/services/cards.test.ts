@@ -1,6 +1,6 @@
 import { describe, test, expect, afterAll } from "bun:test";
 import { getTestClient, testName, SAMPLE_DB_ID } from "../helpers.js";
-import { listCards, getCard, createCard, updateCard, deleteCard, copyCard, executeCardQuery } from "../../src/services/cards.js";
+import { listCards, getCard, createCard, updateCard, deleteCard, copyCard, executeCardQuery, createCardPublicLink, deleteCardPublicLink } from "../../src/services/cards.js";
 import { createCollection, updateCollection } from "../../src/services/collections.js";
 
 const cleanupCardIds: number[] = [];
@@ -155,6 +155,63 @@ describe("cards service", () => {
     expect(result.data.rows).toBeDefined();
     expect(result.data.rows.length).toBeGreaterThan(0);
     expect(result.data.rows.length).toBeLessThanOrEqual(10);
+  });
+
+  test("executeCardQuery with date/range parameter", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("date-range-card"),
+      display: "table",
+      dataset_query: {
+        type: "native",
+        native: {
+          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{dateRange}}",
+          "template-tags": {
+            dateRange: {
+              id: "dr", name: "dateRange", "display-name": "Date Range",
+              type: "date", "widget-type": "date/range",
+            },
+          },
+        },
+        database: SAMPLE_DB_ID,
+      },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await executeCardQuery(client, card.id, {
+      parameter_values: { dateRange: "2024-01-01~2025-01-01" },
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+  });
+
+  test("createCardPublicLink generates a public link", async () => {
+    const client = await getTestClient();
+    // Enable public sharing first
+    try {
+      await client.PUT("/api/setting/{key}", {
+        params: { path: { key: "enable-public-sharing" } },
+        body: { value: true } as any,
+      });
+    } catch {}
+
+    const card = (await createCard(client, {
+      name: testName("public-link-card"),
+      display: "table",
+      dataset_query: { type: "native", native: { query: "SELECT 1" }, database: SAMPLE_DB_ID },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await createCardPublicLink(client, card.id)) as any;
+    expect(result).toBeDefined();
+    const uuid = result.uuid ?? result.public_uuid;
+    expect(uuid).toBeDefined();
+    expect(typeof uuid).toBe("string");
+
+    // Clean up: delete the public link
+    const deleteResult = await deleteCardPublicLink(client, card.id);
+    expect(deleteResult).toEqual({ success: true });
   });
 
   test("copyCard copies the card", async () => {

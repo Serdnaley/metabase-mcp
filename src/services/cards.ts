@@ -92,6 +92,22 @@ export const copyCard = async (
   return data;
 };
 
+export const createCardPublicLink = async (client: MetabaseClient, cardId: number) => {
+  const { data, error } = await client.POST("/api/card/{card-id}/public_link", {
+    params: { path: { "card-id": cardId } },
+  });
+  if (error) throw new Error(`Create card public link failed: ${JSON.stringify(error)}`);
+  return data;
+};
+
+export const deleteCardPublicLink = async (client: MetabaseClient, cardId: number) => {
+  const { error } = await client.DELETE("/api/card/{card-id}/public_link", {
+    params: { path: { "card-id": cardId } },
+  });
+  if (error) throw new Error(`Delete card public link failed: ${JSON.stringify(error)}`);
+  return { success: true };
+};
+
 export const executeCardQuery = async (
   client: MetabaseClient,
   cardId: number,
@@ -110,7 +126,7 @@ export const executeCardQuery = async (
 
       // Map template tag types to Metabase parameter types
       let paramType = "category";
-      if (tagType === "date" || tag?.["widget-type"]?.includes("date")) {
+      if (tagType === "date" || tag?.["widget-type"]?.startsWith("date")) {
         paramType = tag?.["widget-type"] || "date/single";
       } else if (tagType === "number") {
         paramType = "number/=";

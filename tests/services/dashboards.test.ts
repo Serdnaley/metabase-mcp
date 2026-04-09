@@ -1,6 +1,6 @@
 import { describe, test, expect, afterAll } from "bun:test";
 import { getTestClient, testName, SAMPLE_DB_ID } from "../helpers.js";
-import { listDashboards, getDashboard, createDashboard, updateDashboard, deleteDashboard, copyDashboard, updateDashboardCards } from "../../src/services/dashboards.js";
+import { listDashboards, getDashboard, createDashboard, updateDashboard, deleteDashboard, copyDashboard, updateDashboardCards, createDashboardPublicLink, deleteDashboardPublicLink } from "../../src/services/dashboards.js";
 import { createCard, deleteCard } from "../../src/services/cards.js";
 import { createCollection, updateCollection } from "../../src/services/collections.js";
 
@@ -86,6 +86,30 @@ describe("dashboards service", () => {
     expect(copy).toBeDefined();
     expect(copy.id).not.toBe(createdDashboardId);
     cleanupDashboardIds.push(copy.id);
+  });
+
+  test("createDashboardPublicLink generates a public link", async () => {
+    const client = await getTestClient();
+    // Enable public sharing first
+    try {
+      await client.PUT("/api/setting/{key}", {
+        params: { path: { key: "enable-public-sharing" } },
+        body: { value: true } as any,
+      });
+    } catch {}
+
+    const dash = (await createDashboard(client, { name: testName("public-link-dash"), collection_id: testCollectionId })) as any;
+    cleanupDashboardIds.push(dash.id);
+
+    const result = (await createDashboardPublicLink(client, dash.id)) as any;
+    expect(result).toBeDefined();
+    const uuid = result.uuid ?? result.public_uuid;
+    expect(uuid).toBeDefined();
+    expect(typeof uuid).toBe("string");
+
+    // Clean up: delete the public link
+    const deleteResult = await deleteDashboardPublicLink(client, dash.id);
+    expect(deleteResult).toEqual({ success: true });
   });
 
   test("deleteDashboard deletes a dashboard", async () => {

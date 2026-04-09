@@ -97,6 +97,22 @@ export const copyDashboard = async (
   return data;
 };
 
+export const createDashboardPublicLink = async (client: MetabaseClient, dashboardId: number) => {
+  const { data, error } = await client.POST("/api/dashboard/{dashboard-id}/public_link", {
+    params: { path: { "dashboard-id": dashboardId } },
+  });
+  if (error) throw new Error(`Create dashboard public link failed: ${JSON.stringify(error)}`);
+  return data;
+};
+
+export const deleteDashboardPublicLink = async (client: MetabaseClient, dashboardId: number) => {
+  const { error } = await client.DELETE("/api/dashboard/{dashboard-id}/public_link", {
+    params: { path: { "dashboard-id": dashboardId } },
+  });
+  if (error) throw new Error(`Delete dashboard public link failed: ${JSON.stringify(error)}`);
+  return { success: true };
+};
+
 export const updateDashboardCards = async (
   client: MetabaseClient,
   id: number,

@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
-import { listDashboards, getDashboard, createDashboard, updateDashboard, deleteDashboard, copyDashboard, updateDashboardCards } from "../services/dashboards.js";
+import { listDashboards, getDashboard, createDashboard, updateDashboard, deleteDashboard, copyDashboard, updateDashboardCards, createDashboardPublicLink, deleteDashboardPublicLink } from "../services/dashboards.js";
 
 export const registerDashboardTools = (server: McpServer, client: MetabaseClient, config: Config) => {
   server.tool("list_dashboards", "List all dashboards", {}, async () => {
@@ -64,11 +64,27 @@ export const registerDashboardTools = (server: McpServer, client: MetabaseClient
         size_x: z.number().describe("Width in grid units"),
         size_y: z.number().describe("Height in grid units"),
         parameter_mappings: z.array(z.record(z.string(), z.unknown())).optional().describe("Parameter mappings for filters"),
-        visualization_settings: z.record(z.string(), z.unknown()).optional().describe("Per-card visualization overrides"),
+        visualization_settings: z.record(z.string(), z.unknown()).optional().describe("Per-card visualization overrides. For pie: { \"pie.dimension\": \"COLUMN\", \"pie.metric\": \"COLUMN\" }. For bar/line/area: { \"graph.dimensions\": [\"COLUMN\"], \"graph.metrics\": [\"COLUMN\"] }. Column names must match SQL aliases or structured query field names."),
         series: z.array(z.record(z.string(), z.unknown())).optional().describe("Additional series for multi-series cards"),
       })).describe("Array of card positions and settings"),
     }, async ({ id, cards }) => {
       const result = await updateDashboardCards(client, id, cards);
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    });
+
+    server.tool("create_dashboard_public_link", "Generate a public sharing link for a dashboard. Returns the dashboard with a public_uuid field. The public URL is {metabase_url}/public/dashboard/{uuid}. Public sharing must be enabled in Metabase admin settings.", {
+      dashboard_id: z.number().describe("Dashboard ID"),
+    }, async ({ dashboard_id }) => {
+      const result = await createDashboardPublicLink(client, dashboard_id);
+      const uuid = (result as any)?.uuid ?? (result as any)?.public_uuid;
+      const publicUrl = uuid ? `${config.metabaseUrl}/public/dashboard/${uuid}` : undefined;
+      return { content: [{ type: "text", text: JSON.stringify({ ...result as any, public_url: publicUrl }, null, 2) }] };
+    });
+
+    server.tool("delete_dashboard_public_link", "Remove the public sharing link from a dashboard", {
+      dashboard_id: z.number().describe("Dashboard ID"),
+    }, async ({ dashboard_id }) => {
+      const result = await deleteDashboardPublicLink(client, dashboard_id);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     });
   }
