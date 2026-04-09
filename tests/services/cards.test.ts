@@ -214,6 +214,131 @@ describe("cards service", () => {
     expect(deleteResult).toEqual({ success: true });
   });
 
+  // --- Display type & visualization_settings tests ---
+
+  test("createCard with pie display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("pie-chart"),
+      display: "pie",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT PRODUCT_ID, COUNT(*) AS cnt FROM ORDERS GROUP BY PRODUCT_ID LIMIT 10" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "pie.dimension": "PRODUCT_ID",
+        "pie.metric": "CNT",
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("pie");
+    expect(card.visualization_settings).toBeDefined();
+    expect(card.visualization_settings["pie.dimension"]).toBe("PRODUCT_ID");
+    expect(card.visualization_settings["pie.metric"]).toBe("CNT");
+  });
+
+  test("createCard with bar display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("bar-chart"),
+      display: "bar",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT PRODUCT_ID, SUM(TOTAL) AS revenue FROM ORDERS GROUP BY PRODUCT_ID LIMIT 10" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "graph.dimensions": ["PRODUCT_ID"],
+        "graph.metrics": ["REVENUE"],
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("bar");
+    expect(card.visualization_settings["graph.dimensions"]).toEqual(["PRODUCT_ID"]);
+    expect(card.visualization_settings["graph.metrics"]).toEqual(["REVENUE"]);
+  });
+
+  test("createCard with line display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("line-chart"),
+      display: "line",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT EXTRACT(MONTH FROM CREATED_AT) AS month, COUNT(*) AS cnt FROM ORDERS GROUP BY month ORDER BY month" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "graph.dimensions": ["MONTH"],
+        "graph.metrics": ["CNT"],
+        "graph.x_axis.title_text": "Month",
+        "graph.y_axis.title_text": "Order Count",
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("line");
+    expect(card.visualization_settings["graph.x_axis.title_text"]).toBe("Month");
+  });
+
+  test("updateCard updates visualization_settings", async () => {
+    const client = await getTestClient();
+    await updateCard(client, createdCardId, {
+      visualization_settings: { "table.pivot_column": "PRODUCT_ID" },
+    });
+    const fetched = (await getCard(client, createdCardId)) as any;
+    expect(fetched.visualization_settings["table.pivot_column"]).toBe("PRODUCT_ID");
+  });
+
+  // --- executeCardQuery edge cases ---
+
+  test("executeCardQuery with empty parameter_values", async () => {
+    const client = await getTestClient();
+    // Empty parameter_values should work the same as no parameters
+    const result = (await executeCardQuery(client, createdCardId, {
+      parameter_values: {},
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+  });
+
+  test("executeCardQuery with undefined parameter_values", async () => {
+    const client = await getTestClient();
+    const result = (await executeCardQuery(client, createdCardId, {
+      parameter_values: undefined,
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+  });
+
+  test("executeCardQuery without params object", async () => {
+    const client = await getTestClient();
+    const result = (await executeCardQuery(client, createdCardId)) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+  });
+
+  // --- Error handling tests ---
+
+  test("getCard throws for non-existent card", async () => {
+    const client = await getTestClient();
+    expect(getCard(client, 999999)).rejects.toThrow();
+  });
+
+  test("deleteCard throws for non-existent card", async () => {
+    const client = await getTestClient();
+    expect(deleteCard(client, 999999)).rejects.toThrow();
+  });
+
+  test("executeCardQuery throws for non-existent card", async () => {
+    const client = await getTestClient();
+    expect(executeCardQuery(client, 999999)).rejects.toThrow();
+  });
+
   test("copyCard copies the card", async () => {
     const client = await getTestClient();
     const copy = (await copyCard(client, createdCardId, { collection_id: testCollectionId })) as any;

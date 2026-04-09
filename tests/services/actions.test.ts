@@ -132,4 +132,35 @@ describe("actions service", () => {
     expect(result).toEqual({ success: true });
     cleanupActionIds.splice(cleanupActionIds.indexOf(createdActionId), 1);
   });
+
+  test("createAction with http type is rejected by Metabase", async () => {
+    if (!actionsEnabled) {
+      console.log("Skipped: actions not enabled");
+      return;
+    }
+    const client = await getTestClient();
+    // HTTP actions should be rejected — Metabase doesn't allow them via API
+    // or the service should throw because it's an invalid type
+    expect(
+      createAction(client, {
+        name: testName("http-action"),
+        type: "http",
+        model_id: modelCardId,
+      })
+    ).rejects.toThrow();
+  });
+
+  test("getAction throws for non-existent action", async () => {
+    const client = await getTestClient();
+    expect(getAction(client, 999999)).rejects.toThrow();
+  });
+
+  test("listActions with model_id filter", async () => {
+    const client = await getTestClient();
+    const result = await listActions(client, { model_id: 999999 });
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+    // Non-existent model should return empty array
+    expect((result as any[]).length).toBe(0);
+  });
 });
