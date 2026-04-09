@@ -1,6 +1,6 @@
 import { describe, test, expect, afterAll } from "bun:test";
 import { getTestClient, testName, SAMPLE_DB_ID } from "../helpers.js";
-import { listCards, getCard, createCard, updateCard, deleteCard, copyCard, executeCardQuery } from "../../src/services/cards.js";
+import { listCards, getCard, createCard, updateCard, deleteCard, copyCard, executeCardQuery, createCardPublicLink, deleteCardPublicLink } from "../../src/services/cards.js";
 import { createCollection, updateCollection } from "../../src/services/collections.js";
 
 const cleanupCardIds: number[] = [];
@@ -155,6 +155,188 @@ describe("cards service", () => {
     expect(result.data.rows).toBeDefined();
     expect(result.data.rows.length).toBeGreaterThan(0);
     expect(result.data.rows.length).toBeLessThanOrEqual(10);
+  });
+
+  test("executeCardQuery with date/month-year widget-type parameter", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("date-month-year-card"),
+      display: "table",
+      dataset_query: {
+        type: "native",
+        native: {
+          query: "SELECT * FROM ORDERS WHERE CREATED_AT >= {{dateMonth}}",
+          "template-tags": {
+            dateMonth: {
+              id: "dm", name: "dateMonth", "display-name": "Date Month",
+              type: "date", "widget-type": "date/month-year",
+            },
+          },
+        },
+        database: SAMPLE_DB_ID,
+      },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await executeCardQuery(client, card.id, {
+      parameter_values: { dateMonth: "2024-01" },
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+  });
+
+  test("createCardPublicLink generates a public link", async () => {
+    const client = await getTestClient();
+    // Enable public sharing first
+    try {
+      await client.PUT("/api/setting/{key}", {
+        params: { path: { key: "enable-public-sharing" } },
+        body: { value: true } as any,
+      });
+    } catch {}
+
+    const card = (await createCard(client, {
+      name: testName("public-link-card"),
+      display: "table",
+      dataset_query: { type: "native", native: { query: "SELECT 1" }, database: SAMPLE_DB_ID },
+    })) as any;
+    cleanupCardIds.push(card.id);
+
+    const result = (await createCardPublicLink(client, card.id)) as any;
+    expect(result).toBeDefined();
+    const uuid = result.uuid ?? result.public_uuid;
+    expect(uuid).toBeDefined();
+    expect(typeof uuid).toBe("string");
+
+    // Clean up: delete the public link
+    const deleteResult = await deleteCardPublicLink(client, card.id);
+    expect(deleteResult).toEqual({ success: true });
+  });
+
+  // --- Display type & visualization_settings tests ---
+
+  test("createCard with pie display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("pie-chart"),
+      display: "pie",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT PRODUCT_ID, COUNT(*) AS cnt FROM ORDERS GROUP BY PRODUCT_ID LIMIT 10" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "pie.dimension": "PRODUCT_ID",
+        "pie.metric": "CNT",
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("pie");
+    expect(card.visualization_settings).toBeDefined();
+    expect(card.visualization_settings["pie.dimension"]).toBe("PRODUCT_ID");
+    expect(card.visualization_settings["pie.metric"]).toBe("CNT");
+  });
+
+  test("createCard with bar display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("bar-chart"),
+      display: "bar",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT PRODUCT_ID, SUM(TOTAL) AS revenue FROM ORDERS GROUP BY PRODUCT_ID LIMIT 10" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "graph.dimensions": ["PRODUCT_ID"],
+        "graph.metrics": ["REVENUE"],
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("bar");
+    expect(card.visualization_settings["graph.dimensions"]).toEqual(["PRODUCT_ID"]);
+    expect(card.visualization_settings["graph.metrics"]).toEqual(["REVENUE"]);
+  });
+
+  test("createCard with line display and visualization_settings", async () => {
+    const client = await getTestClient();
+    const card = (await createCard(client, {
+      name: testName("line-chart"),
+      display: "line",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT EXTRACT(MONTH FROM CREATED_AT) AS month, COUNT(*) AS cnt FROM ORDERS GROUP BY month ORDER BY month" },
+        database: SAMPLE_DB_ID,
+      },
+      visualization_settings: {
+        "graph.dimensions": ["MONTH"],
+        "graph.metrics": ["CNT"],
+        "graph.x_axis.title_text": "Month",
+        "graph.y_axis.title_text": "Order Count",
+      },
+      collection_id: testCollectionId,
+    })) as any;
+    cleanupCardIds.push(card.id);
+    expect(card.display).toBe("line");
+    expect(card.visualization_settings["graph.x_axis.title_text"]).toBe("Month");
+  });
+
+  test("updateCard updates visualization_settings", async () => {
+    const client = await getTestClient();
+    await updateCard(client, createdCardId, {
+      visualization_settings: { "table.pivot_column": "PRODUCT_ID" },
+    });
+    const fetched = (await getCard(client, createdCardId)) as any;
+    expect(fetched.visualization_settings["table.pivot_column"]).toBe("PRODUCT_ID");
+  });
+
+  // --- executeCardQuery edge cases ---
+
+  test("executeCardQuery with empty parameter_values", async () => {
+    const client = await getTestClient();
+    // Empty parameter_values should work the same as no parameters
+    const result = (await executeCardQuery(client, createdCardId, {
+      parameter_values: {},
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect(result.data.rows).toBeDefined();
+  });
+
+  test("executeCardQuery with undefined parameter_values", async () => {
+    const client = await getTestClient();
+    const result = (await executeCardQuery(client, createdCardId, {
+      parameter_values: undefined,
+    })) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+  });
+
+  test("executeCardQuery without params object", async () => {
+    const client = await getTestClient();
+    const result = (await executeCardQuery(client, createdCardId)) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+  });
+
+  // --- Error handling tests ---
+
+  test("getCard throws for non-existent card", async () => {
+    const client = await getTestClient();
+    await expect(getCard(client, 999999)).rejects.toThrow();
+  });
+
+  test("deleteCard throws for non-existent card", async () => {
+    const client = await getTestClient();
+    await expect(deleteCard(client, 999999)).rejects.toThrow();
+  });
+
+  test("executeCardQuery throws for non-existent card", async () => {
+    const client = await getTestClient();
+    await expect(executeCardQuery(client, 999999)).rejects.toThrow();
   });
 
   test("copyCard copies the card", async () => {

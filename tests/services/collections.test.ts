@@ -75,6 +75,33 @@ describe("collections service", () => {
     expect(found).toBeDefined();
   });
 
+  test("listCollectionItems with model filter", async () => {
+    const client = await getTestClient();
+    // Should return empty when filtering for a model type that doesn't exist in the collection
+    const result = (await listCollectionItems(client, createdId, { models: ["dashboard"] })) as any;
+    expect(result).toBeDefined();
+    const data = (result as any).data || result;
+    const items = Array.isArray(data) ? data : [];
+    // All items should be dashboards (or empty)
+    for (const item of items) {
+      expect(item.model).toBe("dashboard");
+    }
+  });
+
+  test("listCollectionItems with sort parameters", async () => {
+    const client = await getTestClient();
+    const result = (await listCollectionItems(client, createdId, {
+      sort_column: "name",
+      sort_direction: "asc",
+    })) as any;
+    expect(result).toBeDefined();
+  });
+
+  test("getCollection throws for non-existent collection", async () => {
+    const client = await getTestClient();
+    await expect(getCollection(client, 999999)).rejects.toThrow();
+  });
+
   test("updateCollection archives the collection", async () => {
     const client = await getTestClient();
     await updateCollection(client, createdId, { archived: true });

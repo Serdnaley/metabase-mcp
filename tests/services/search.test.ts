@@ -28,4 +28,35 @@ describe("search service", () => {
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(0);
   });
+
+  test("search with empty query returns results", async () => {
+    const client = await getTestClient();
+    // Empty query should still return results (all items)
+    const result = (await search(client, { q: "" })) as any;
+    expect(result).toBeDefined();
+    const data = result.data || result;
+    expect(Array.isArray(data)).toBe(true);
+  });
+
+  test("search with multiple model filters", async () => {
+    const client = await getTestClient();
+    const result = (await search(client, { q: "orders", models: ["table", "card"] })) as any;
+    expect(result).toBeDefined();
+    const data = result.data || result;
+    expect(Array.isArray(data)).toBe(true);
+    // All results should be either tables or cards
+    for (const item of data) {
+      expect(["table", "card"]).toContain(item.model);
+    }
+  });
+
+  test("search with card model filter", async () => {
+    const client = await getTestClient();
+    const result = (await search(client, { q: "orders", models: ["card"] })) as any;
+    const data = result.data || result;
+    expect(Array.isArray(data)).toBe(true);
+    for (const item of data) {
+      expect(item.model).toBe("card");
+    }
+  });
 });

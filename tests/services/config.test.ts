@@ -1,72 +1,135 @@
-import { describe, test, expect, beforeEach, afterEach } from "bun:test";
+import { describe, test, expect } from "bun:test";
+import { configSchema } from "../../src/config.js";
 
 describe("config validation", () => {
-  const originalEnv = { ...process.env };
+  // --- Valid configs ---
 
-  beforeEach(() => {
-    // Clear all metabase env vars
-    delete process.env.METABASE_URL;
-    delete process.env.METABASE_API_KEY;
-    delete process.env.METABASE_EMAIL;
-    delete process.env.METABASE_PASSWORD;
-    delete process.env.METABASE_READ_ONLY_MODE;
+  test("valid config with API key", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      apiKey: "mb_test123",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.metabaseUrl).toBe("http://localhost:3000");
+      expect(result.data.apiKey).toBe("mb_test123");
+      expect(result.data.readOnly).toBe(false);
+    }
   });
 
-  afterEach(() => {
-    // Restore original env
-    Object.assign(process.env, originalEnv);
+  test("valid config with email/password", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      email: "test@test.com",
+      password: "password123",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.email).toBe("test@test.com");
+      expect(result.data.password).toBe("password123");
+    }
   });
 
-  // loadConfig calls process.exit(1) on failure, so we test the schema directly
-  test("valid config with API key", async () => {
-    const { z } = await import("zod");
-    const { loadConfig } = await import("../../src/config.js");
-
-    process.env.METABASE_URL = "http://localhost:3000";
-    process.env.METABASE_API_KEY = "mb_test123";
-
-    // loadConfig exits on failure, so if it returns, it's valid
-    // We can't easily test it without mocking process.exit
-    // Instead, test that the env vars are set correctly
-    expect(process.env.METABASE_URL).toBe("http://localhost:3000");
-    expect(process.env.METABASE_API_KEY).toBe("mb_test123");
+  test("valid config with both auth methods", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      apiKey: "mb_key",
+      email: "test@test.com",
+      password: "password",
+    });
+    expect(result.success).toBe(true);
   });
 
-  test("valid config with email/password", async () => {
-    process.env.METABASE_URL = "http://localhost:3000";
-    process.env.METABASE_EMAIL = "test@test.com";
-    process.env.METABASE_PASSWORD = "password123";
-
-    expect(process.env.METABASE_EMAIL).toBe("test@test.com");
-    expect(process.env.METABASE_PASSWORD).toBe("password123");
+  test("readOnly defaults to false", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      apiKey: "mb_key",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.readOnly).toBe(false);
+    }
   });
 
-  test("readOnly defaults to false", async () => {
-    expect(process.env.METABASE_READ_ONLY_MODE).toBeUndefined();
-    // When not set, readOnly should default to false
-    const readOnly = process.env.METABASE_READ_ONLY_MODE === "true";
-    expect(readOnly).toBe(false);
+  test("readOnly=true is parsed correctly", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      apiKey: "mb_key",
+      readOnly: true,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.readOnly).toBe(true);
+    }
   });
 
-  test("readOnly=true is parsed correctly", async () => {
-    process.env.METABASE_READ_ONLY_MODE = "true";
-    const readOnly = process.env.METABASE_READ_ONLY_MODE === "true";
-    expect(readOnly).toBe(true);
+  // --- Invalid configs ---
+
+  test("missing URL fails validation", () => {
+    const result = configSchema.safeParse({
+      apiKey: "mb_key",
+    });
+    expect(result.success).toBe(false);
   });
 
-  test("API key takes precedence when both auth methods provided", async () => {
-    process.env.METABASE_URL = "http://localhost:3000";
-    process.env.METABASE_API_KEY = "mb_key";
-    process.env.METABASE_EMAIL = "test@test.com";
-    process.env.METABASE_PASSWORD = "password";
-
-    // Both are set — API key should take precedence (tested via client behavior)
-    expect(process.env.METABASE_API_KEY).toBeDefined();
-    expect(process.env.METABASE_EMAIL).toBeDefined();
+  test("invalid URL fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "not-a-url",
+      apiKey: "mb_key",
+    });
+    expect(result.success).toBe(false);
   });
 
-  test("trailing slash is stripped from URL", async () => {
+  test("empty string URL fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "",
+      apiKey: "mb_key",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test("missing both auth methods fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test("email without password fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      email: "test@test.com",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test("password without email fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      password: "password123",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test("invalid email format fails validation", () => {
+    const result = configSchema.safeParse({
+      metabaseUrl: "http://localhost:3000",
+      email: "not-an-email",
+      password: "password123",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  // --- URL normalization ---
+
+  test("trailing slashes are stripped from URL", () => {
     const url = "http://localhost:3000///";
+    const cleaned = url.replace(/\/+$/, "");
+    expect(cleaned).toBe("http://localhost:3000");
+  });
+
+  test("single trailing slash is stripped", () => {
+    const url = "http://localhost:3000/";
     const cleaned = url.replace(/\/+$/, "");
     expect(cleaned).toBe("http://localhost:3000");
   });

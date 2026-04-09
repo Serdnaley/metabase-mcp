@@ -18,8 +18,10 @@ const READ_ONLY_TOOLS = [
 const WRITE_TOOLS = [
   "create_collection", "update_collection",
   "create_card", "update_card", "delete_card", "copy_card",
+  "create_card_public_link", "delete_card_public_link",
   "create_dashboard", "update_dashboard", "delete_dashboard",
   "copy_dashboard", "update_dashboard_cards",
+  "create_dashboard_public_link", "delete_dashboard_public_link",
   "create_action", "update_action", "delete_action", "execute_action",
 ];
 

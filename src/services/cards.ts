@@ -92,6 +92,30 @@ export const copyCard = async (
   return data;
 };
 
+export const createCardPublicLink = async (client: MetabaseClient, cardId: number) => {
+  // The OpenAPI spec defines content?: never for this response, so openapi-fetch
+  // won't parse the body (data is undefined). We use the raw response instead.
+  const { error, response } = await client.POST("/api/card/{card-id}/public_link", {
+    params: { path: { "card-id": cardId } },
+  });
+  if (error) throw new Error(`Create card public link failed: ${JSON.stringify(error)}`);
+  try {
+    return await response.clone().json();
+  } catch {
+    // Fallback: fetch the card to get the public_uuid
+    const card = await getCard(client, cardId);
+    return card;
+  }
+};
+
+export const deleteCardPublicLink = async (client: MetabaseClient, cardId: number) => {
+  const { error } = await client.DELETE("/api/card/{card-id}/public_link", {
+    params: { path: { "card-id": cardId } },
+  });
+  if (error) throw new Error(`Delete card public link failed: ${JSON.stringify(error)}`);
+  return { success: true };
+};
+
 export const executeCardQuery = async (
   client: MetabaseClient,
   cardId: number,
@@ -110,7 +134,7 @@ export const executeCardQuery = async (
 
       // Map template tag types to Metabase parameter types
       let paramType = "category";
-      if (tagType === "date" || tag?.["widget-type"]?.includes("date")) {
+      if (tagType === "date" || tag?.["widget-type"]?.startsWith("date")) {
         paramType = tag?.["widget-type"] || "date/single";
       } else if (tagType === "number") {
         paramType = "number/=";
