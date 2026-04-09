@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2026-04-09
+
+### Changed
+
+- Updated CHANGELOG with missing entries for 0.1.3 and 0.1.4
+- Updated README: tool count 35 → 39, added public link tools to tools table
+
 ## [0.1.4] - 2026-04-09
 
 ### Added
