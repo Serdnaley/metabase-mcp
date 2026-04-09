@@ -6,7 +6,7 @@ Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for
 
 ## Features
 
-- **35 MCP tools** across 7 domains: search, databases, tables, collections, cards (questions), dashboards, actions
+- **39 MCP tools** across 8 domains: search, databases, tables, collections, cards (questions), dashboards, actions, dataset
 - **Full CRUD**: Create, read, update, delete, and copy dashboards, questions, and collections
 - **Read-only mode**: Restrict to read-only tools via a single env var
 - **Type-safe**: HTTP client generated from Metabase's OpenAPI spec
@@ -259,11 +259,15 @@ The AI assistant will:
 | `update_card` | Update a question |
 | `delete_card` | Delete a question |
 | `copy_card` | Copy a question to a collection |
+| `create_card_public_link` | Generate a public sharing link for a card |
+| `delete_card_public_link` | Remove the public sharing link from a card |
 | `create_dashboard` | Create a dashboard |
 | `update_dashboard` | Update dashboard properties |
 | `delete_dashboard` | Delete a dashboard |
 | `copy_dashboard` | Copy a dashboard |
 | `update_dashboard_cards` | Add, remove, or reposition cards on a dashboard |
+| `create_dashboard_public_link` | Generate a public sharing link for a dashboard |
+| `delete_dashboard_public_link` | Remove the public sharing link from a dashboard |
 | `create_action` | Create a query or implicit action |
 | `update_action` | Update an action |
 | `delete_action` | Delete an action |

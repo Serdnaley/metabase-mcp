@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2026-04-09
+
+### Added
+
+- **Public link tools** — 4 new tools for sharing cards and dashboards publicly:
+  - `create_card_public_link` / `delete_card_public_link` — generate or remove public sharing links for saved questions
+  - `create_dashboard_public_link` / `delete_dashboard_public_link` — generate or remove public sharing links for dashboards
+  - Public link tools return the full public URL (`{metabase_url}/public/question/{uuid}` or `/public/dashboard/{uuid}`)
+- Comprehensive test coverage for edge cases, error handling, and visualization settings
+
+### Fixed
+
+- `date_range` parameter handling — date ranges in native queries now correctly use two separate `date/single` parameters
+- Public link response parsing — handle OpenAPI spec `content?: never` responses via raw response fallback
+- Config schema now exported for external use
+- Improved visualization settings descriptions in tool schemas (pie, bar, line, scatter, funnel chart guidance)
+
+### Changed
+
+- Tool count increased from 35 to 39 across 8 domains
+
+## [0.1.3] - 2026-04-04
+
+### Fixed
+
+- CI: use Node 24 for Trusted Publishing compatibility
+- CI: fix npm publish workflow authentication
+
 ## [0.1.2] - 2026-04-03
 
 ### Added
