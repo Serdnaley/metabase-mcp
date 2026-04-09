@@ -326,17 +326,17 @@ describe("cards service", () => {
 
   test("getCard throws for non-existent card", async () => {
     const client = await getTestClient();
-    expect(getCard(client, 999999)).rejects.toThrow();
+    await expect(getCard(client, 999999)).rejects.toThrow();
   });
 
   test("deleteCard throws for non-existent card", async () => {
     const client = await getTestClient();
-    expect(deleteCard(client, 999999)).rejects.toThrow();
+    await expect(deleteCard(client, 999999)).rejects.toThrow();
   });
 
   test("executeCardQuery throws for non-existent card", async () => {
     const client = await getTestClient();
-    expect(executeCardQuery(client, 999999)).rejects.toThrow();
+    await expect(executeCardQuery(client, 999999)).rejects.toThrow();
   });
 
   test("copyCard copies the card", async () => {

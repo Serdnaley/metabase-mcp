@@ -99,7 +99,7 @@ describe("collections service", () => {
 
   test("getCollection throws for non-existent collection", async () => {
     const client = await getTestClient();
-    expect(getCollection(client, 999999)).rejects.toThrow();
+    await expect(getCollection(client, 999999)).rejects.toThrow();
   });
 
   test("updateCollection archives the collection", async () => {

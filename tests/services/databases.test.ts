@@ -67,6 +67,6 @@ describe("databases service", () => {
 
   test("getDatabase throws for non-existent database", async () => {
     const client = await getTestClient();
-    expect(getDatabase(client, 999999)).rejects.toThrow("Get database failed");
+    await expect(getDatabase(client, 999999)).rejects.toThrow("Get database failed");
   });
 });

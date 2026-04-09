@@ -197,12 +197,12 @@ describe("dashboards service", () => {
 
   test("getDashboard throws for non-existent dashboard", async () => {
     const client = await getTestClient();
-    expect(getDashboard(client, 999999)).rejects.toThrow();
+    await expect(getDashboard(client, 999999)).rejects.toThrow();
   });
 
   test("deleteDashboard throws for non-existent dashboard", async () => {
     const client = await getTestClient();
-    expect(deleteDashboard(client, 999999)).rejects.toThrow();
+    await expect(deleteDashboard(client, 999999)).rejects.toThrow();
   });
 
   test("copyDashboard copies the dashboard", async () => {

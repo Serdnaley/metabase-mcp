@@ -1,19 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { z } from "zod";
-
-// Replicate the config schema so we can test validation without process.exit
-const configSchema = z
-  .object({
-    metabaseUrl: z.string().url(),
-    apiKey: z.string().optional(),
-    email: z.string().email().optional(),
-    password: z.string().optional(),
-    readOnly: z.boolean().default(false),
-  })
-  .refine(
-    (c) => c.apiKey || (c.email && c.password),
-    "Either METABASE_API_KEY or METABASE_EMAIL + METABASE_PASSWORD must be set"
-  );
+import { configSchema } from "../../src/config.js";
 
 describe("config validation", () => {
   // --- Valid configs ---

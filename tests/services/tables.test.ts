@@ -68,6 +68,6 @@ describe("tables service", () => {
 
   test("getTable throws for non-existent table", async () => {
     const client = await getTestClient();
-    expect(getTable(client, 999999)).rejects.toThrow("Get table failed");
+    await expect(getTable(client, 999999)).rejects.toThrow("Get table failed");
   });
 });

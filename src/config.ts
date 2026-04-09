@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const configSchema = z
+export const configSchema = z
   .object({
     metabaseUrl: z.string().url(),
     apiKey: z.string().optional(),

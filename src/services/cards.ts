@@ -93,11 +93,19 @@ export const copyCard = async (
 };
 
 export const createCardPublicLink = async (client: MetabaseClient, cardId: number) => {
-  const { data, error } = await client.POST("/api/card/{card-id}/public_link", {
+  // The OpenAPI spec defines content?: never for this response, so openapi-fetch
+  // won't parse the body (data is undefined). We use the raw response instead.
+  const { error, response } = await client.POST("/api/card/{card-id}/public_link", {
     params: { path: { "card-id": cardId } },
   });
   if (error) throw new Error(`Create card public link failed: ${JSON.stringify(error)}`);
-  return data;
+  try {
+    return await response.clone().json();
+  } catch {
+    // Fallback: fetch the card to get the public_uuid
+    const card = await getCard(client, cardId);
+    return card;
+  }
 };
 
 export const deleteCardPublicLink = async (client: MetabaseClient, cardId: number) => {

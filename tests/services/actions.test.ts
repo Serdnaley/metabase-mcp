@@ -141,7 +141,7 @@ describe("actions service", () => {
     const client = await getTestClient();
     // HTTP actions should be rejected — Metabase doesn't allow them via API
     // or the service should throw because it's an invalid type
-    expect(
+    await expect(
       createAction(client, {
         name: testName("http-action"),
         type: "http",
@@ -152,7 +152,7 @@ describe("actions service", () => {
 
   test("getAction throws for non-existent action", async () => {
     const client = await getTestClient();
-    expect(getAction(client, 999999)).rejects.toThrow();
+    await expect(getAction(client, 999999)).rejects.toThrow();
   });
 
   test("listActions with model_id filter", async () => {

@@ -98,11 +98,19 @@ export const copyDashboard = async (
 };
 
 export const createDashboardPublicLink = async (client: MetabaseClient, dashboardId: number) => {
-  const { data, error } = await client.POST("/api/dashboard/{dashboard-id}/public_link", {
+  // The OpenAPI spec defines content?: never for this response, so openapi-fetch
+  // won't parse the body (data is undefined). We use the raw response instead.
+  const { error, response } = await client.POST("/api/dashboard/{dashboard-id}/public_link", {
     params: { path: { "dashboard-id": dashboardId } },
   });
   if (error) throw new Error(`Create dashboard public link failed: ${JSON.stringify(error)}`);
-  return data;
+  try {
+    return await response.clone().json();
+  } catch {
+    // Fallback: fetch the dashboard to get the public_uuid
+    const dashboard = await getDashboard(client, dashboardId);
+    return dashboard;
+  }
 };
 
 export const deleteDashboardPublicLink = async (client: MetabaseClient, dashboardId: number) => {
