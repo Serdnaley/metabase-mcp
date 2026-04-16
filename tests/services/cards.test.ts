@@ -357,4 +357,24 @@ describe("cards service", () => {
     const result = await deleteCard(client, card.id);
     expect(result).toEqual({ success: true });
   });
+
+  test("createCard with type model creates a model", async () => {
+    const client = await getTestClient();
+    const name = testName("model");
+    const result = await createCard(client, {
+      name,
+      type: "model",
+      dataset_query: {
+        type: "native",
+        native: { query: "SELECT 1 AS id, 'test' AS name" },
+        database: SAMPLE_DB_ID,
+      },
+      display: "table",
+    }) as any;
+    expect(result).toBeDefined();
+    expect(result.id).toBeDefined();
+    expect(result.type).toBe("model");
+    // Cleanup
+    await deleteCard(client, result.id);
+  });
 });

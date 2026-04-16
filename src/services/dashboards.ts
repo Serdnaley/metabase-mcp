@@ -46,6 +46,7 @@ export const updateDashboard = async (
     collection_id?: number;
     archived?: boolean;
     parameters?: Record<string, unknown>[];
+    enable_embedding?: boolean;
   }
 ) => {
   const body: Record<string, unknown> = {};
@@ -54,6 +55,7 @@ export const updateDashboard = async (
   if (params.collection_id !== undefined) body.collection_id = params.collection_id;
   if (params.archived !== undefined) body.archived = params.archived;
   if (params.parameters !== undefined) body.parameters = params.parameters;
+  if (params.enable_embedding !== undefined) body.enable_embedding = params.enable_embedding;
 
   const { data, error } = await client.PUT("/api/dashboard/{id}", {
     params: { path: { id } },

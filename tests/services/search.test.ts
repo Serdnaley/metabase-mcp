@@ -59,4 +59,11 @@ describe("search service", () => {
       expect(item.model).toBe("card");
     }
   });
+
+  test("search with archived filter", async () => {
+    const client = await getTestClient();
+    const result = await search(client, { q: "Orders", archived: true }) as any;
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+  });
 });

@@ -33,6 +33,7 @@ export const registerDashboardTools = (server: McpServer, client: MetabaseClient
       collection_id: z.number().optional().describe("Move to collection"),
       archived: z.boolean().optional().describe("Archive the dashboard"),
       parameters: z.array(z.record(z.string(), z.unknown())).optional().describe("Updated filter parameters"),
+      enable_embedding: z.boolean().optional().describe("Enable static embedding for this dashboard (Pro/Enterprise)"),
     }, async ({ id, ...params }) => {
       const result = await updateDashboard(client, id, params);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

@@ -1,6 +1,6 @@
 import { describe, test, expect, afterAll } from "bun:test";
 import { getTestClient, testName } from "../helpers.js";
-import { listCollections, getCollection, listCollectionItems, createCollection, updateCollection } from "../../src/services/collections.js";
+import { listCollections, getCollection, listCollectionItems, createCollection, updateCollection, getCollectionTree } from "../../src/services/collections.js";
 
 const cleanupIds: number[] = [];
 
@@ -95,6 +95,13 @@ describe("collections service", () => {
       sort_direction: "asc",
     })) as any;
     expect(result).toBeDefined();
+  });
+
+  test("getCollectionTree returns tree structure", async () => {
+    const client = await getTestClient();
+    const result = await getCollectionTree(client) as any;
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
   });
 
   test("getCollection throws for non-existent collection", async () => {

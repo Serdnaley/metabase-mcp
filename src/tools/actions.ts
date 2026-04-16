@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
-import { listActions, getAction, createAction, updateAction, deleteAction, executeAction } from "../services/actions.js";
+import { listActions, getAction, createAction, updateAction, deleteAction, executeAction, createActionPublicLink, deleteActionPublicLink } from "../services/actions.js";
 
 export const registerActionTools = (server: McpServer, client: MetabaseClient, config: Config) => {
   server.tool("list_actions", "List all actions", {
@@ -56,6 +56,20 @@ export const registerActionTools = (server: McpServer, client: MetabaseClient, c
       parameters: z.record(z.string(), z.unknown()).optional().describe("Action parameters as key-value pairs"),
     }, async ({ id, parameters }) => {
       const result = await executeAction(client, id, { parameters: parameters as Record<string, unknown> | undefined });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    });
+
+    server.tool("create_action_public_link", "Generate a public link for an action form", {
+      action_id: z.number().describe("Action ID"),
+    }, async ({ action_id }) => {
+      const result = await createActionPublicLink(client, action_id);
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    });
+
+    server.tool("delete_action_public_link", "Remove the public link from an action", {
+      action_id: z.number().describe("Action ID"),
+    }, async ({ action_id }) => {
+      const result = await deleteActionPublicLink(client, action_id);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     });
   }

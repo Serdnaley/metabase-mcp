@@ -25,6 +25,7 @@ export const createCard = async (
     description?: string;
     collection_id?: number;
     visualization_settings?: Record<string, unknown>;
+    type?: "question" | "model" | "metric";
   }
 ) => {
   const { data, error } = await client.POST("/api/card", {
@@ -35,6 +36,7 @@ export const createCard = async (
       description: params.description ?? null,
       collection_id: params.collection_id ?? null,
       visualization_settings: (params.visualization_settings ?? {}) as any,
+      type: (params.type ?? "question") as any,
     },
   });
   if (error) throw new Error(`Create card failed: ${JSON.stringify(error)}`);
@@ -52,6 +54,9 @@ export const updateCard = async (
     collection_id?: number;
     visualization_settings?: Record<string, unknown>;
     archived?: boolean;
+    type?: "question" | "model" | "metric";
+    result_metadata?: Record<string, unknown>[];
+    enable_embedding?: boolean;
   }
 ) => {
   const body: Record<string, unknown> = {};
@@ -62,6 +67,9 @@ export const updateCard = async (
   if (params.collection_id !== undefined) body.collection_id = params.collection_id;
   if (params.visualization_settings !== undefined) body.visualization_settings = params.visualization_settings;
   if (params.archived !== undefined) body.archived = params.archived;
+  if (params.type !== undefined) body.type = params.type;
+  if (params.result_metadata !== undefined) body.result_metadata = params.result_metadata;
+  if (params.enable_embedding !== undefined) body.enable_embedding = params.enable_embedding;
 
   const { data, error } = await client.PUT("/api/card/{id}", {
     params: { path: { id } },

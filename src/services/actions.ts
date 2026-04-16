@@ -63,3 +63,23 @@ export const executeAction = async (
   if (error) throw new Error(`Execute action failed: ${JSON.stringify(error)}`);
   return data;
 };
+
+export const createActionPublicLink = async (client: MetabaseClient, actionId: number) => {
+  const { error, response } = await client.POST("/api/action/{id}/public_link" as any, {
+    params: { path: { id: actionId } },
+  } as any);
+  if (error) throw new Error(`Create action public link failed: ${JSON.stringify(error)}`);
+  try {
+    return await response.clone().json();
+  } catch {
+    return { success: true };
+  }
+};
+
+export const deleteActionPublicLink = async (client: MetabaseClient, actionId: number) => {
+  const { error } = await (client as any).DELETE("/api/action/{id}/public_link", {
+    params: { path: { id: actionId } },
+  });
+  if (error) throw new Error(`Delete action public link failed: ${JSON.stringify(error)}`);
+  return { success: true };
+};

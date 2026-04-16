@@ -31,6 +31,7 @@ export const registerCardTools = (server: McpServer, client: MetabaseClient, con
       description: z.string().optional().describe("Question description"),
       collection_id: z.number().optional().describe("Collection to save in"),
       visualization_settings: z.record(z.string(), z.unknown()).optional().describe("Visualization settings — must be configured for charts to render correctly. For pie: { \"pie.dimension\": \"COLUMN\", \"pie.metric\": \"COLUMN\" }. For bar/line/area: { \"graph.dimensions\": [\"COLUMN\"], \"graph.metrics\": [\"COLUMN\"] }. For scatter: { \"graph.dimensions\": [\"X_COL\"], \"graph.metrics\": [\"Y_COL\"] }. For funnel: { \"funnel.dimension\": \"COLUMN\", \"funnel.metric\": \"COLUMN\" }. For table: { \"table.pivot_column\": \"COL\", \"table.cell_column\": \"COL\" }. Column names must match SQL aliases or structured query field names."),
+      type: z.enum(["question", "model", "metric"]).optional().describe('Card type: "question" (default), "model" (curated dataset), or "metric" (published metric definition)'),
     }, async (params) => {
       const result = await createCard(client, params);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -45,6 +46,9 @@ export const registerCardTools = (server: McpServer, client: MetabaseClient, con
       collection_id: z.number().optional().describe("Move to collection"),
       visualization_settings: z.record(z.string(), z.unknown()).optional().describe("Visualization settings — must be configured for charts to render correctly. For pie: { \"pie.dimension\": \"COLUMN\", \"pie.metric\": \"COLUMN\" }. For bar/line/area: { \"graph.dimensions\": [\"COLUMN\"], \"graph.metrics\": [\"COLUMN\"] }. For scatter: { \"graph.dimensions\": [\"X_COL\"], \"graph.metrics\": [\"Y_COL\"] }. For funnel: { \"funnel.dimension\": \"COLUMN\", \"funnel.metric\": \"COLUMN\" }. Column names must match SQL aliases or structured query field names."),
       archived: z.boolean().optional().describe("Archive the card"),
+      type: z.enum(["question", "model", "metric"]).optional().describe('Change card type: "question", "model", or "metric"'),
+      result_metadata: z.array(z.record(z.string(), z.unknown())).optional().describe("Column metadata array for models. Each entry: { name, display_name, description, semantic_type, base_type, ... }. Use to set per-column display names, descriptions, and semantic types on model columns."),
+      enable_embedding: z.boolean().optional().describe("Enable static embedding for this card (Pro/Enterprise)"),
     }, async ({ id, ...params }) => {
       const result = await updateCard(client, id, params);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

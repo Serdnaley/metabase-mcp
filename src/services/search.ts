@@ -2,7 +2,7 @@ import type { MetabaseClient } from "../client.js";
 
 export const search = async (
   client: MetabaseClient,
-  params: { q: string; models?: string[]; collection?: string }
+  params: { q: string; models?: string[]; collection?: string; archived?: boolean }
 ) => {
   const { data, error } = await client.GET("/api/search", {
     params: {
@@ -10,7 +10,7 @@ export const search = async (
         q: params.q,
         models: params.models as any,
         collection: params.collection as any,
-        archived: false,
+        archived: params.archived ?? false,
         model_ancestors: false,
         include_dashboard_questions: false,
         include_metadata: false,

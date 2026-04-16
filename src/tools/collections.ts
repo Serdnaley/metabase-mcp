@@ -2,11 +2,18 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
-import { listCollections, getCollection, listCollectionItems, createCollection, updateCollection } from "../services/collections.js";
+import { listCollections, getCollection, listCollectionItems, createCollection, updateCollection, getCollectionTree } from "../services/collections.js";
 
 export const registerCollectionTools = (server: McpServer, client: MetabaseClient, config: Config) => {
-  server.tool("list_collections", "List all collections", {}, async () => {
-    const result = await listCollections(client);
+  server.tool("get_collection_tree", "Get the full collection hierarchy as a tree", {}, async () => {
+    const result = await getCollectionTree(client);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  });
+
+  server.tool("list_collections", "List all collections", {
+    personal_only: z.boolean().optional().describe("Only return personal collections (default: false)"),
+  }, async (params) => {
+    const result = await listCollections(client, params);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 
@@ -20,6 +27,7 @@ export const registerCollectionTools = (server: McpServer, client: MetabaseClien
     models: z.array(z.enum(["card", "dashboard", "collection", "snippet", "pulse", "timeline"])).optional().describe("Filter by item types"),
     sort_column: z.enum(["name", "last_edited_at", "last_edited_by", "model"]).optional().describe("Column to sort by"),
     sort_direction: z.enum(["asc", "desc"]).optional().describe("Sort direction"),
+    archived: z.boolean().optional().describe("Include archived items (default: false)"),
   }, async ({ id, ...params }) => {
     const result = await listCollectionItems(client, id, params);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
