@@ -1,7 +1,7 @@
 {
   "name": "@serdnaley/metabase-mcp",
-  "version": "0.1.5",
-  "description": "MCP server for Metabase — extends the built-in MCP with write tools for managing dashboards, questions, collections, and actions",
+  "version": "0.2.0",
+  "description": "MCP server for Metabase — 128 tools for full API coverage: dashboards, questions, collections, users, permissions, alerts, settings, and more",
   "type": "module",
   "scripts": {
     "generate-types": "bun run scripts/generate-types.ts",

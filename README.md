@@ -1,13 +1,14 @@
 # @serdnaley/metabase-mcp
 
-MCP server for Metabase — extends the built-in MCP with write tools for managing dashboards, questions, collections, and actions.
+MCP server for Metabase — comprehensive coverage of the Metabase REST API for AI assistants.
 
-Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project adds the missing piece: **creating and managing content** — dashboards, saved questions, collections, and actions — so AI assistants can build things in Metabase, not just read from it.
+Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **128 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
 
 ## Features
 
-- **39 MCP tools** across 8 domains: search, databases, tables, collections, cards (questions), dashboards, actions, dataset
-- **Full CRUD**: Create, read, update, delete, and copy dashboards, questions, and collections
+- **128 MCP tools** across 26 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads
+- **Full CRUD**: Create, read, update, delete across all domains
+- **Admin automation**: User/group management, permissions, settings, database connections
 - **Read-only mode**: Restrict to read-only tools via a single env var
 - **Type-safe**: HTTP client generated from Metabase's OpenAPI spec
 - **Two auth modes**: API key (recommended) or email/password session
@@ -223,55 +224,58 @@ The AI assistant will:
 
 ## Tools
 
-### Read tools (always available)
+### Read tools (50 — always available)
 
-| Tool | Description |
+| Domain | Tools |
 |---|---|
-| `search` | Search across all Metabase entities |
-| `list_databases` | List all accessible databases |
-| `get_database` | Get database details |
-| `get_database_metadata` | Get tables, fields, types, relationships |
-| `list_database_schemas` | List schemas in a database |
-| `get_database_schema` | Get tables in a schema |
-| `get_table` | Get table details |
-| `get_table_query_metadata` | Get query metadata (fields, FKs) |
-| `get_field` | Get field details |
-| `get_field_values` | Get sample field values |
-| `list_collections` | List all collections |
-| `get_collection` | Get collection details |
-| `list_collection_items` | List items in a collection |
-| `list_cards` | List all saved questions |
-| `get_card` | Get question details |
-| `execute_card_query` | Run a saved question |
-| `list_dashboards` | List all dashboards |
-| `get_dashboard` | Get dashboard with layout |
-| `list_actions` | List all actions |
-| `get_action` | Get action details |
-| `execute_query` | Run ad-hoc SQL or structured queries |
+| **Search** | `search` |
+| **Databases** | `list_databases`, `get_database`, `get_database_metadata`, `list_database_schemas`, `get_database_schema` |
+| **Tables & Fields** | `get_table`, `get_table_query_metadata`, `get_field`, `get_field_values` |
+| **Collections** | `list_collections`, `get_collection`, `list_collection_items`, `get_collection_tree` |
+| **Cards** | `list_cards`, `get_card`, `execute_card_query` |
+| **Dashboards** | `list_dashboards`, `get_dashboard` |
+| **Actions** | `list_actions`, `get_action` |
+| **Dataset** | `execute_query` |
+| **Users & Groups** | `list_users`, `get_user`, `get_current_user`, `list_groups` |
+| **Permissions** | `get_permissions_graph`, `get_collection_permissions` |
+| **Segments** | `list_segments`, `get_segment` |
+| **Revisions** | `list_revisions` |
+| **Settings** | `list_settings`, `get_setting` |
+| **Alerts** | `list_alerts`, `get_alert`, `list_dashboard_subscriptions` |
+| **Activity** | `get_activity`, `list_tasks`, `get_task` |
+| **Snippets** | `list_snippets`, `get_snippet` |
+| **Glossary** | `list_glossary_terms`, `get_glossary_term` |
+| **Documents** | `list_documents`, `get_document` |
+| **Timelines** | `list_timelines`, `get_timeline` |
+| **Bookmarks** | `list_bookmarks` |
+| **X-Rays** | `generate_xray` |
+| **EID Translation** | `translate_entity_ids` |
 
-### Write tools (disabled in read-only mode)
+### Write tools (78 — disabled in read-only mode)
 
-| Tool | Description |
+| Domain | Tools |
 |---|---|
-| `create_collection` | Create a collection |
-| `update_collection` | Update collection properties |
-| `create_card` | Create a question (native SQL or structured) |
-| `update_card` | Update a question |
-| `delete_card` | Delete a question |
-| `copy_card` | Copy a question to a collection |
-| `create_card_public_link` | Generate a public sharing link for a card |
-| `delete_card_public_link` | Remove the public sharing link from a card |
-| `create_dashboard` | Create a dashboard |
-| `update_dashboard` | Update dashboard properties |
-| `delete_dashboard` | Delete a dashboard |
-| `copy_dashboard` | Copy a dashboard |
-| `update_dashboard_cards` | Add, remove, or reposition cards on a dashboard |
-| `create_dashboard_public_link` | Generate a public sharing link for a dashboard |
-| `delete_dashboard_public_link` | Remove the public sharing link from a dashboard |
-| `create_action` | Create a query or implicit action |
-| `update_action` | Update an action |
-| `delete_action` | Delete an action |
-| `execute_action` | Run an action |
+| **Collections** | `create_collection`, `update_collection` |
+| **Cards** | `create_card`, `update_card`, `delete_card`, `copy_card`, `create_card_public_link`, `delete_card_public_link` |
+| **Dashboards** | `create_dashboard`, `update_dashboard`, `delete_dashboard`, `copy_dashboard`, `update_dashboard_cards`, `create_dashboard_public_link`, `delete_dashboard_public_link` |
+| **Actions** | `create_action`, `update_action`, `delete_action`, `execute_action`, `create_action_public_link`, `delete_action_public_link` |
+| **Tables & Fields** | `update_table`, `update_field`, `rescan_field_values`, `discard_field_values`, `reorder_fields` |
+| **Databases** | `create_database`, `update_database`, `delete_database`, `validate_database`, `sync_database_schema`, `notify_database` |
+| **Users & Groups** | `create_user`, `update_user`, `deactivate_user`, `reactivate_user`, `create_group`, `update_group`, `delete_group`, `add_group_member`, `remove_group_member` |
+| **Permissions** | `update_permissions_graph`, `update_collection_permissions` |
+| **Segments** | `create_segment`, `update_segment`, `delete_segment` |
+| **Revisions** | `revert_revision` |
+| **Settings** | `update_setting` |
+| **Alerts** | `create_alert`, `update_alert`, `delete_alert`, `create_dashboard_subscription`, `update_dashboard_subscription`, `delete_dashboard_subscription` |
+| **Snippets** | `create_snippet`, `update_snippet`, `delete_snippet` |
+| **Glossary** | `create_glossary_term`, `update_glossary_term`, `delete_glossary_term` |
+| **Documents** | `create_document`, `update_document`, `delete_document` |
+| **Timelines** | `create_timeline`, `update_timeline`, `delete_timeline`, `create_timeline_event`, `update_timeline_event`, `delete_timeline_event` |
+| **Bookmarks** | `create_bookmark`, `delete_bookmark` |
+| **Moderation** | `create_moderation_review` |
+| **Cache** | `invalidate_cache`, `update_cache_config` |
+| **Persistence** | `persist_model`, `unpersist_model`, `refresh_persisted_model` |
+| **Upload** | `upload_csv` |
 
 ## Security
 
@@ -297,7 +301,7 @@ Tests run against a real Metabase instance via Docker:
 ```bash
 docker compose up -d             # Start Metabase
 ./tests/ci/wait-for-metabase.sh  # Wait for ready (~15s)
-bun test                         # 74 tests, 225 assertions
+bun test                         # 202 tests, 668 assertions
 docker compose down              # Stop Metabase
 ```
 

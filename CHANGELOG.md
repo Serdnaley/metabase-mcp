@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-04-15
+
+### Added
+
+- **86 new tools** expanding coverage from 42 to **128 tools** across **26 domains**:
+  - **Users & Groups** (13 tools): list, get, create, update, deactivate, reactivate users; list, create, update, delete groups; add/remove group members; get current user
+  - **Permissions** (4): get/update data permissions graph, get/update collection permissions graph
+  - **Segments** (5): CRUD for reusable named filters with table_id filtering
+  - **Database write/sync** (6): create, update, delete, validate connections; trigger schema sync; post-ETL notify
+  - **Notifications** (9): alerts CRUD, dashboard subscription list/create/update/delete
+  - **Revisions** (2): list revision history, revert to prior version
+  - **Settings** (3): list, get, update Metabase instance settings
+  - **Glossary** (5): business term definitions CRUD
+  - **Documents** (5): narrative analytics documents CRUD
+  - **Timelines** (8): timeline and event CRUD for chart annotations
+  - **Bookmarks** (3): list, create, delete bookmarks
+  - **Moderation** (1): mark content as verified (Pro/Enterprise)
+  - **EID Translation** (1): translate serialization entity IDs to API IDs
+  - **SQL Snippets** (5): reusable SQL blocks CRUD
+  - **Activity/Tasks** (3): activity feed, background task monitoring
+  - **X-Rays** (1): auto-generated exploratory dashboards
+  - **Cache** (2): invalidate cache, configure cache strategies
+  - **Model Persistence** (3): enable, disable, refresh materialization
+  - **CSV Upload** (1): ad-hoc data ingestion
+  - **Action Public Links** (2): create/delete public action form links
+
+- **Enhanced existing tools**:
+  - Cards: `type` field (question/model/metric), `result_metadata` for model columns, `enable_embedding`
+  - Dashboards: `enable_embedding`
+  - Tables: `update_table`, `update_field` (with `coercion_strategy`), `rescan_field_values`, `discard_field_values`, `reorder_fields`
+  - Collections: `get_collection_tree`, `personal_only` filter, `archived` filter on items
+  - Search: `archived` filter for searching trash
+  - Segments: `table_id` filter
+  - Snippets: `get_snippet` individual lookup
+
+- **Feature research docs** in `docs/` — gap analysis, feature sources, and per-domain feature documentation
+
+### Fixed
+
+- `updateCollection` no longer unconditionally sends `archived: false` — only includes the field when explicitly provided
+- `getSetting` / `updateSetting` handle plain-text responses from Metabase (was causing JSON parse errors)
+- Timeline event timestamps normalized to ISO 8601 format
+
+### Changed
+
+- Tool count: 42 → 128 across 26 domains
+- Test count: 202 tests, 668 assertions across 31 test files
+- Updated E2E read-only mode test with complete tool inventory
+
 ## [0.1.5] - 2026-04-09
 
 ### Changed
