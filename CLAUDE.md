@@ -57,6 +57,30 @@ src/client.ts     → openapi-fetch HTTP client with auth middleware
 
 `scripts/generate-types.ts` downloads the Metabase OpenAPI spec, cleans problematic schema names (double dots, `/` and `%` in property keys, broken `$ref` pointers), then generates types via `openapi-typescript`. The generated types are committed.
 
+## Releasing to npm
+
+Releases are published via GitHub Actions (Trusted Publishing / OIDC — no npm token needed).
+
+```bash
+# 1. Bump version in package.json
+# 2. Update CHANGELOG.md with new version section
+# 3. Update README.md (tool counts, tools table, test counts)
+# 4. Commit and push to main
+git add package.json CHANGELOG.md README.md
+git commit -m "chore: prepare X.Y.Z release"
+git push origin main
+
+# 5. Create a GitHub release — this triggers the publish workflow
+gh release create vX.Y.Z --title "vX.Y.Z" --notes "Release notes here"
+```
+
+The CI workflow (`.github/workflows/publish.yml`) runs on `release: [published]`:
+1. Runs full test suite against Metabase in Docker
+2. Builds the bundle (`bun run build`)
+3. Publishes to npm with `--provenance --access public`
+
+The E2E test `tests/e2e/read-only-mode.test.ts` has hardcoded `READ_ONLY_TOOLS` and `WRITE_TOOLS` arrays — update them when adding/removing tools.
+
 ## Important patterns
 
 - **Zod v4**: This project uses zod 4.x. `z.record()` requires two arguments: `z.record(z.string(), z.unknown())`, not `z.record(z.unknown())`.
