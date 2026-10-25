@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- `METABASE_CUSTOM_HEADERS`: extra HTTP headers sent on every Metabase request, including the session login. It takes a JSON object or `Name: value` pairs separated by newlines or `;`, for example Cloudflare Access service tokens. Auth headers keep precedence, and a malformed value fails at startup.
+
 ## [0.2.0] - 2026-04-15
 
 ### Added

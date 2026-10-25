@@ -188,8 +188,25 @@ Add to your Zed `settings.json`:
 | `METABASE_EMAIL` | No* | Email for session-based auth |
 | `METABASE_PASSWORD` | No* | Password for session-based auth |
 | `METABASE_READ_ONLY_MODE` | No | Set to `true` to disable write tools |
+| `METABASE_CUSTOM_HEADERS` | No | Extra HTTP headers sent on every request, including the session login (see below) |
 
 *Either `METABASE_API_KEY` or both `METABASE_EMAIL` + `METABASE_PASSWORD` must be provided. API key is recommended.
+
+### Custom headers
+
+Use `METABASE_CUSTOM_HEADERS` when Metabase sits behind a proxy that needs its own headers, such as Cloudflare Access service tokens. Give it a JSON object:
+
+```bash
+METABASE_CUSTOM_HEADERS='{"CF-Access-Client-Id": "xxx.access", "CF-Access-Client-Secret": "yyy"}'
+```
+
+or `Name: value` pairs separated by newlines or `;`:
+
+```bash
+METABASE_CUSTOM_HEADERS='CF-Access-Client-Id: xxx.access; CF-Access-Client-Secret: yyy'
+```
+
+The auth headers (`X-API-Key`, `X-Metabase-Session`) always win over a custom header with the same name. A malformed value stops the server at startup.
 
 ### Getting a Metabase API Key
 
