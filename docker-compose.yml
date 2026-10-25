@@ -1,6 +1,8 @@
 services:
   metabase:
-    image: metabase/metabase:latest
+    # Pinned to the version the suite is verified against; override with MB_IMAGE
+    # (e.g. MB_IMAGE=metabase/metabase:latest) to test another release.
+    image: ${MB_IMAGE:-metabase/metabase:v0.64.3.4}
     ports:
       - "3000:3000"
     healthcheck:
