@@ -28,6 +28,36 @@ const createCustomHeadersMiddleware = (
   },
 });
 
+/**
+ * Metabase error bodies often carry full Java stack traces ("trace", "via") —
+ * tens of KB that flood the LLM context. Strip them, keep message/cause/errors.
+ */
+const STRIPPED_ERROR_KEYS = ["trace", "via", "stacktrace"];
+const createErrorCompactionMiddleware = (): Middleware => ({
+  async onResponse({ response }) {
+    if (response.ok) return response;
+    if (!response.headers.get("content-type")?.includes("application/json")) return response;
+    const text = await response.clone().text();
+    let body: unknown;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      return response;
+    }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return response;
+    const record = body as Record<string, unknown>;
+    if (!STRIPPED_ERROR_KEYS.some((k) => k in record)) return response;
+    for (const key of STRIPPED_ERROR_KEYS) delete record[key];
+    const headers = new Headers(response.headers);
+    headers.delete("content-length");
+    return new Response(JSON.stringify(record), {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  },
+});
+
 const loginWithSession = async (
   baseUrl: string,
   email: string,
@@ -61,6 +91,7 @@ export const createMetabaseClient = async (
 ): Promise<MetabaseClient> => {
   const client = createClient<paths>({ baseUrl: config.metabaseUrl });
   const customHeaders = config.customHeaders ?? {};
+  client.use(createErrorCompactionMiddleware());
 
   if (Object.keys(customHeaders).length > 0) {
     client.use(createCustomHeadersMiddleware(customHeaders));

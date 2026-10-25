@@ -48,4 +48,27 @@ describe("client", () => {
     });
     expect(client).toBeDefined();
   });
+
+  test("error responses are stripped of Java stack traces", async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch: () =>
+        Response.json(
+          { message: "boom", cause: "bad param", via: [{ type: "x" }], trace: [["a", "b", "c", 1]] },
+          { status: 400 }
+        ),
+    });
+    try {
+      const client = await createMetabaseClient({
+        metabaseUrl: `http://localhost:${server.port}`,
+        apiKey: "mb_test_key",
+        readOnly: false,
+      });
+      const { error, response } = await client.GET("/api/user/current");
+      expect(response.status).toBe(400);
+      expect(error).toEqual({ message: "boom", cause: "bad param" } as any);
+    } finally {
+      server.stop(true);
+    }
+  });
 });
