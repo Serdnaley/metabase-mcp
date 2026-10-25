@@ -6,12 +6,13 @@ export const listGlossaryTerms = async (client: MetabaseClient) => {
   return data;
 };
 
+/** Metabase has no GET /api/glossary/{id}; look the term up in the list. */
 export const getGlossaryTerm = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await (client as any).GET("/api/glossary/{id}", {
-    params: { path: { id } },
-  });
-  if (error) throw new Error(`Get glossary term failed: ${JSON.stringify(error)}`);
-  return data;
+  const list = (await listGlossaryTerms(client)) as any;
+  const terms: any[] = Array.isArray(list) ? list : list?.data ?? [];
+  const term = terms.find((t) => t?.id === id);
+  if (!term) throw new Error(`Get glossary term failed: term ${id} not found`);
+  return term;
 };
 
 export const createGlossaryTerm = async (
@@ -30,9 +31,13 @@ export const updateGlossaryTerm = async (
   id: number,
   params: { term?: string; definition?: string }
 ) => {
-  const body: Record<string, unknown> = {};
-  if (params.term !== undefined) body.term = params.term;
-  if (params.definition !== undefined) body.definition = params.definition;
+  // PUT requires both term and definition; fill the missing one from the current term
+  let current: any = {};
+  if (params.term === undefined || params.definition === undefined) current = await getGlossaryTerm(client, id);
+  const body: Record<string, unknown> = {
+    term: params.term ?? current.term,
+    definition: params.definition ?? current.definition,
+  };
   const { data, error } = await (client as any).PUT("/api/glossary/{id}", {
     params: { path: { id } },
     body,

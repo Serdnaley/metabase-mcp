@@ -9,6 +9,8 @@ const READ_ONLY_TOOLS = [
   "generate_xray",
   "get_action",
   "get_activity",
+  "get_recent_items",
+  "get_popular_items",
   "get_alert",
   "get_card",
   "get_collection",

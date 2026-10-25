@@ -1,16 +1,25 @@
 import { describe, test, expect } from "bun:test";
 import { getTestClient } from "../helpers.js";
-import { getActivity, listTasks, getTask } from "../../src/services/activity.js";
+import { getActivity, getRecentItems, getPopularItems, listTasks, getTask } from "../../src/services/activity.js";
 
 describe("activity service", () => {
-  test("getActivity returns activity data", async () => {
+  test("getRecentItems returns recents", async () => {
     const client = await getTestClient();
-    try {
-      const result = await getActivity(client);
-      expect(result).toBeDefined();
-    } catch (e: any) {
-      console.log("Activity API not available in this Metabase version:", e.message);
-    }
+    const result = (await getRecentItems(client, ["views", "selections"])) as any;
+    expect(Array.isArray(result.recents)).toBe(true);
+  });
+
+  test("getPopularItems returns popular items", async () => {
+    const client = await getTestClient();
+    const result = (await getPopularItems(client)) as any;
+    expect(Array.isArray(result.popular_items)).toBe(true);
+  });
+
+  test("getActivity combines recents and popular items", async () => {
+    const client = await getTestClient();
+    const result = (await getActivity(client)) as any;
+    expect(Array.isArray(result.recents)).toBe(true);
+    expect(Array.isArray(result.popular_items)).toBe(true);
   });
 
   test("listTasks returns tasks array", async () => {
@@ -33,10 +42,6 @@ describe("activity service", () => {
 
   test("getTask throws for non-existent task", async () => {
     const client = await getTestClient();
-    try {
-      await expect(getTask(client, 999999)).rejects.toThrow("Get task failed");
-    } catch (e: any) {
-      console.log("Task API not available in this Metabase version:", e.message);
-    }
+    await expect(getTask(client, 999999)).rejects.toThrow("Get task failed");
   });
 });
