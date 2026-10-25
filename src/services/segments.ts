@@ -1,5 +1,27 @@
 import type { MetabaseClient } from "../client.js";
 
+/**
+ * Metabase 0.60+ requires a segment definition to be a full query (`:lib/type` or `:type`).
+ * Older clients (and this tool's schema) send the legacy inner MBQL clause
+ * (`{ filter: [...] }`), so wrap it into a legacy `type: "query"` query, which every
+ * supported Metabase version accepts.
+ */
+const normalizeDefinition = async (
+  client: MetabaseClient,
+  tableId: number,
+  definition: Record<string, unknown>
+): Promise<Record<string, unknown>> => {
+  if ("lib/type" in definition || "type" in definition) return definition;
+  const { data, error } = await client.GET("/api/table/{id}", { params: { path: { id: tableId } } } as any);
+  if (error) throw new Error(`Get table ${tableId} failed: ${JSON.stringify(error)}`);
+  const databaseId = (data as any)?.db_id;
+  return {
+    database: databaseId,
+    type: "query",
+    query: { "source-table": tableId, ...definition },
+  };
+};
+
 export const listSegments = async (client: MetabaseClient, params?: { table_id?: number }) => {
   const { data, error } = await client.GET("/api/segment", {
     params: params?.table_id !== undefined ? { query: { table_id: params.table_id } } : {},
@@ -29,7 +51,7 @@ export const createSegment = async (
     body: {
       name: params.name,
       table_id: params.table_id,
-      definition: params.definition,
+      definition: await normalizeDefinition(client, params.table_id, params.definition),
       description: params.description ?? null,
     } as any,
   });
@@ -53,7 +75,10 @@ export const updateSegment = async (
     revision_message: params.revision_message,
   };
   if (params.name !== undefined) body.name = params.name;
-  if (params.definition !== undefined) body.definition = params.definition;
+  if (params.definition !== undefined) {
+    const current = (await getSegment(client, id)) as any;
+    body.definition = await normalizeDefinition(client, current.table_id, params.definition);
+  }
   if (params.description !== undefined) body.description = params.description;
   if (params.archived !== undefined) body.archived = params.archived;
 

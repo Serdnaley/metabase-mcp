@@ -60,7 +60,7 @@ describe("databases service", () => {
   test("getDatabaseSchema returns tables in schema", async () => {
     const client = await getTestClient();
     const schemas = (await listDatabaseSchemas(client, SAMPLE_DB_ID)) as any[];
-    const schemaName = schemas[0] || "PUBLIC";
+    const schemaName = schemas[0] ?? "PUBLIC";
     const result = (await getDatabaseSchema(
       client,
       SAMPLE_DB_ID,

@@ -56,15 +56,13 @@ export const listDatabaseSchemas = async (client: MetabaseClient, id: number) =>
 };
 
 export const getDatabaseSchema = async (client: MetabaseClient, id: number, schema: string) => {
-  const { data, error } = await client.GET("/api/database/{id}/schema/{schema}", {
-    params: {
-      path: { id, schema },
-      query: {
-        include_hidden: false,
-        include_editable_data_model: false,
-      },
-    },
-  });
+  const query = { include_hidden: false, include_editable_data_model: false };
+  // Schema-less databases (e.g. SQLite, the sample DB since Metabase 0.6x) report their
+  // schema as "" — those tables are served by /schema without a name segment.
+  const { data, error } =
+    schema === ""
+      ? await client.GET("/api/database/{id}/schema/" as any, { params: { path: { id }, query } } as any)
+      : await client.GET("/api/database/{id}/schema/{schema}", { params: { path: { id, schema }, query } });
   if (error) throw new Error(`Get database schema failed: ${JSON.stringify(error)}`);
   return data;
 };

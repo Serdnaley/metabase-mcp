@@ -132,29 +132,50 @@ export const executeCardQuery = async (
   let parameters: unknown[] | undefined;
 
   if (params?.parameter_values && Object.keys(params.parameter_values).length > 0) {
-    // Fetch the card to get template tag metadata
+    // Fetch the card to get template tag + parameter metadata
     const card = (await getCard(client, cardId)) as any;
-    const templateTags = card?.dataset_query?.native?.["template-tags"] || {};
+    const dq = card?.dataset_query;
+    // Legacy MBQL keeps tags under native; MBQL 5 (Metabase 0.57+) under stages[0]
+    // MBQL 5 stores them as an array of tags, legacy as a map keyed by name
+    const rawTags = dq?.native?.["template-tags"] ?? dq?.stages?.[0]?.["template-tags"] ?? {};
+    const templateTags: Record<string, any> = Array.isArray(rawTags)
+      ? Object.fromEntries(rawTags.map((t: any) => [t?.name, t]))
+      : rawTags;
+    const cardParams: any[] = Array.isArray(card?.parameters) ? card.parameters : [];
 
     parameters = Object.entries(params.parameter_values).map(([name, value]) => {
       const tag = templateTags[name];
-      const tagType = tag?.type || "text";
+      const cardParam = cardParams.find(
+        (p) =>
+          p?.slug === name ||
+          (Array.isArray(p?.target) && JSON.stringify(p.target).includes(`["template-tag","${name}"]`))
+      );
 
       // Map template tag types to Metabase parameter types
+      const tagType = tag?.type || "text";
       let paramType = "category";
-      if (tagType === "date" || tag?.["widget-type"]?.startsWith("date")) {
-        paramType = tag?.["widget-type"] || "date/single";
+      if (tagType === "date") {
+        // Raw date variables only accept date/single (Metabase 0.60+ validates this);
+        // widget-type only matters for field filters
+        paramType = "date/single";
+      } else if (tagType === "dimension" && tag?.["widget-type"]?.startsWith("date")) {
+        paramType = tag["widget-type"];
       } else if (tagType === "number") {
         paramType = "number/=";
-      } else if (tagType === "text") {
-        paramType = "category";
+      } else if (tagType === "dimension" && tag?.["widget-type"]) {
+        paramType = tag["widget-type"];
       }
 
-      return {
-        type: paramType,
-        target: ["variable", ["template-tag", name]],
-        value,
-      };
+      const target =
+        cardParam?.target ??
+        (tagType === "dimension"
+          ? ["dimension", ["template-tag", name]]
+          : ["variable", ["template-tag", name]]);
+
+      // Metabase 0.60+ requires parameters[].id; it matches the template tag / card parameter id
+      const id = cardParam?.id ?? tag?.id ?? name;
+
+      return { id, type: cardParam?.type ?? paramType, target, value };
     });
   }
 
