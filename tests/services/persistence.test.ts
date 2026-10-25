@@ -1,64 +1,39 @@
-import { describe, test, expect } from "bun:test";
+import { describe, test, expect, afterAll } from "bun:test";
 import { getTestClient, SAMPLE_DB_ID, testName } from "../helpers.js";
 import { createCard, deleteCard } from "../../src/services/cards.js";
 import { persistModel, unpersistModel, refreshPersistedModel } from "../../src/services/persistence.js";
 
-describe("persistence service", () => {
-  let modelId: number | null = null;
+// Model persistence needs a paid plan on 0.64 (402) and a database with persistence
+// enabled; anything else (e.g. a wrong route) must fail the test.
+const ENV_LIMITS = [/premium-feature-not-available|paid feature/i, /persist(ence|ing)? .*(not enabled|disabled)/i, /does(n't| not) support/i];
+const isEnvLimit = (msg: string) => !/API endpoint does not exist/.test(msg) && ENV_LIMITS.some((re) => re.test(msg));
 
-  test("setup: create a model for persistence tests", async () => {
+describe("persistence service", () => {
+  let modelId: number;
+
+  afterAll(async () => {
     const client = await getTestClient();
-    const result = await createCard(client, {
+    if (modelId) { try { await deleteCard(client, modelId); } catch {} }
+  });
+
+  test("persist → refresh → unpersist a model", async () => {
+    const client = await getTestClient();
+    const model = (await createCard(client, {
       name: testName("persist-model"),
       type: "model",
-      dataset_query: {
-        type: "native",
-        native: { query: "SELECT 1 AS id" },
-        database: SAMPLE_DB_ID,
-      },
+      dataset_query: { type: "native", native: { query: "SELECT 1 AS id" }, database: SAMPLE_DB_ID },
       display: "table",
-    }) as any;
-    expect(result.id).toBeDefined();
-    modelId = result.id;
-  });
+    })) as any;
+    modelId = model.id;
 
-  test("persistModel attempts to enable persistence", async () => {
-    if (!modelId) return;
-    const client = await getTestClient();
     try {
-      const result = await persistModel(client, modelId);
-      expect(result).toBeDefined();
+      await persistModel(client, modelId);
     } catch (e: any) {
-      // Persistence may not be available on OSS — gracefully skip
-      console.log("persistModel not available (likely OSS edition):", e.message);
+      if (!isEnvLimit(e.message)) throw e;
+      console.log(`SKIP persistence lifecycle (environment): ${e.message.slice(0, 200)}`);
+      return;
     }
-  });
-
-  test("refreshPersistedModel attempts refresh", async () => {
-    if (!modelId) return;
-    const client = await getTestClient();
-    try {
-      const result = await refreshPersistedModel(client, modelId);
-      expect(result).toBeDefined();
-    } catch (e: any) {
-      console.log("refreshPersistedModel not available:", e.message);
-    }
-  });
-
-  test("unpersistModel attempts to disable persistence", async () => {
-    if (!modelId) return;
-    const client = await getTestClient();
-    try {
-      const result = await unpersistModel(client, modelId);
-      expect(result).toBeDefined();
-    } catch (e: any) {
-      console.log("unpersistModel not available:", e.message);
-    }
-  });
-
-  test("cleanup", async () => {
-    if (!modelId) return;
-    const client = await getTestClient();
-    try { await deleteCard(client, modelId); } catch {}
+    expect(await refreshPersistedModel(client, modelId)).toBeDefined();
+    expect(await unpersistModel(client, modelId)).toEqual({ success: true });
   });
 });

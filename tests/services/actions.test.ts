@@ -76,10 +76,10 @@ describe("actions service", () => {
       cleanupActionIds.push(createdActionId);
       actionsEnabled = true;
     } catch (err: any) {
-      // Actions require explicit opt-in on the database — skip gracefully
-      console.log(
-        "Actions not enabled on sample database (requires Metabase config). Skipping CRUD tests."
-      );
+      // Actions require explicit opt-in on the database (and a writable engine);
+      // anything else is a real failure.
+      if (/API endpoint does not exist/.test(err.message) || !/actions? (are |is )?not enabled|does not support actions/i.test(err.message)) throw err;
+      console.log(`SKIP action CRUD (environment): ${err.message.slice(0, 200)}`);
       actionsEnabled = false;
     }
   });

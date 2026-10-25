@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { getTestClient, SAMPLE_DB_ID } from "../helpers.js";
+import { getTestClient, SAMPLE_DB_ID, skipOnEnvError } from "../helpers.js";
 import { getDatabaseMetadata } from "../../src/services/databases.js";
 import { generateXray } from "../../src/services/xrays.js";
 import { invalidateCache, updateCacheConfig } from "../../src/services/cache.js";
@@ -39,41 +39,31 @@ describe("utility services", () => {
   });
 
   describe("cache service", () => {
-    test("invalidateCache with database ID does not throw (may 404 on OSS)", async () => {
+    // Cache invalidation is a paid feature (402 on OSS); a wrong route must still fail
+    const PAID = [/premium-feature-not-available|paid feature/i];
+
+    test("invalidateCache with database ID", async () => {
       const client = await getTestClient();
-      try {
-        const result = (await invalidateCache(client, { database: SAMPLE_DB_ID })) as any;
-        // If the endpoint is available, it returns a success-like response
-        expect(result).toBeDefined();
-      } catch (err: any) {
-        // Cache invalidation may return 404 on OSS Metabase when caching is not enabled
-        expect(err.message).toContain("Invalidate cache failed");
-      }
+      await skipOnEnvError("invalidateCache(db)", PAID, async () => {
+        expect(await invalidateCache(client, { database: SAMPLE_DB_ID })).toBeDefined();
+      });
     });
 
-    test("invalidateCache with no params does not throw (may 404 on OSS)", async () => {
+    test("invalidateCache with no params", async () => {
       const client = await getTestClient();
-      try {
-        const result = (await invalidateCache(client)) as any;
-        expect(result).toBeDefined();
-      } catch (err: any) {
-        expect(err.message).toContain("Invalidate cache failed");
-      }
+      await skipOnEnvError("invalidateCache()", PAID, async () => {
+        expect(await invalidateCache(client)).toBeDefined();
+      });
     });
 
-    test("updateCacheConfig attempts to set cache strategy", async () => {
+    test("updateCacheConfig sets the root cache strategy", async () => {
       const client = await getTestClient();
-      try {
-        const result = await updateCacheConfig(client, {
-          model: "root",
-          model_id: 0,
-          strategy: { type: "nocache" },
-        });
-        expect(result).toBeDefined();
-      } catch (e: any) {
-        // Cache management may not be available on all editions
-        console.log("updateCacheConfig not available:", e.message);
-      }
+      const result = await updateCacheConfig(client, {
+        model: "root",
+        model_id: 0,
+        strategy: { type: "nocache" },
+      });
+      expect(result).toBeDefined();
     });
   });
 });

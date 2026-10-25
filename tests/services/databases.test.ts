@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { getTestClient, SAMPLE_DB_ID, testName } from "../helpers.js";
+import { getTestClient, SAMPLE_DB_ID, testName, skipOnEnvError } from "../helpers.js";
 import {
   listDatabases,
   getDatabase,
@@ -105,45 +105,30 @@ describe("databases service", () => {
 
   test("notifyDatabase triggers sync without error", async () => {
     const client = await getTestClient();
-    try {
+    // The notify endpoint only works when MB_API_KEY is set on the Metabase server
+    await skipOnEnvError("notifyDatabase", [/MB_API_KEY is not set/], async () => {
       const result = await notifyDatabase(client, SAMPLE_DB_ID);
       expect(result).toEqual({ success: true });
-    } catch (e: any) {
-      // Requires MB_API_KEY to be set on the Metabase server
-      console.log("notifyDatabase not available:", e.message);
-    }
+    });
   });
 
   test("database CRUD lifecycle: create, update, delete", async () => {
     const client = await getTestClient();
     const name = testName("db");
+    // Re-register the sample database file under a new name: SQLite since 0.63, H2 before
+    // (Metabase refuses H2 as a warehouse, so that path is an explicit skip).
+    const sample = (await getDatabase(client, SAMPLE_DB_ID)) as any;
+    const { "read-only?": _ro, ...details } = sample.details ?? {};
 
-    try {
-      // Create an H2 in-memory database
-      const created = await createDatabase(client, {
-        name,
-        engine: "h2",
-        details: { db: "mem:" + name },
-      }) as any;
-      expect(created).toBeDefined();
+    await skipOnEnvError("database CRUD", [/H2 is not supported as a data warehouse/], async () => {
+      const created = (await createDatabase(client, { name, engine: sample.engine, details })) as any;
       expect(created.id).toBeDefined();
-
       try {
-        // Update the database name
-        const updated = await updateDatabase(client, { id: created.id, name: name + "-updated" }) as any;
-        expect(updated).toBeDefined();
-
-        // Delete
-        const deleted = await deleteDatabase(client, created.id);
-        expect(deleted).toEqual({ success: true });
-      } catch (e) {
-        // Cleanup on failure
-        try { await deleteDatabase(client, created.id); } catch {}
-        throw e;
+        const updated = (await updateDatabase(client, { id: created.id, name: name + "-updated" })) as any;
+        expect(updated.name).toBe(name + "-updated");
+      } finally {
+        expect(await deleteDatabase(client, created.id)).toEqual({ success: true });
       }
-    } catch (e: any) {
-      // H2 may not be supported as data warehouse in this Metabase version
-      console.log("Database CRUD test skipped:", e.message);
-    }
+    });
   });
 });
