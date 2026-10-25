@@ -24,6 +24,10 @@ bun test
 docker compose down
 ```
 
+`docker-compose.yml` pins the Metabase image (`MB_IMAGE` overrides it, e.g. `metabase/metabase:latest`). Bump the pin only after the suite passes on the new version; `docs/metabase-changes-*.md` records what changed between pins.
+
+Tests must fail on wrong endpoints. For features that depend on a paid plan or server config, wrap the call in `skipOnEnvError()` (tests/helpers.ts) with a specific error pattern, or `test.skipIf()` on `getTokenFeatures()` — never a bare try/catch that logs and passes.
+
 The test preload (`tests/setup.ts` via `bunfig.toml`) auto-provisions the Metabase instance on first run (creates admin user + API key, saves to `/tmp/metabase-mcp-test-setup.json`). Subsequent runs reuse existing credentials.
 
 ## Architecture

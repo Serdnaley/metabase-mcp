@@ -4,8 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See
+`docs/metabase-changes-0.59-to-0.64.md` for the full API diff.
+
+### Fixed
+
+- `execute_card_query` with parameters: sends the now-required `parameters[].id`, reads MBQL 5
+  template tags (`stages[0]["template-tags"]`, an array), and raw date variables use `date/single`.
+- `create_segment` / `update_segment`: bare MBQL filter definitions (`{ filter: [...] }`) are wrapped
+  into a full query, which Metabase 0.64 requires.
+- `get_database_schema`: works on schema-less databases (`""`), such as the SQLite sample DB.
+- Alerts: `create_alert`, `update_alert`, `delete_alert`, `list_alerts`, `get_alert` now use
+  `/api/notification` (the old `/api/alert` write routes don't exist). New input shape:
+  `send_condition`, `send_once`, `channels: [{ type: "email", user_ids, emails } | { type: "slack", channel }]`,
+  `cron_schedule`. Delete deactivates.
+- Dashboard subscriptions use `/api/pulse`: list by `dashboard_id`, create (defaults to every question
+  on the dashboard), delete archives.
+- `get_activity`: `/api/activity` was removed upstream; now returns recent views + popular items.
+- `persist_model` / `unpersist_model`: correct `.../persist` and `.../unpersist` routes.
+- `get_glossary_term` (no GET-by-id route; looked up in the list); `update_glossary_term` with one field.
+- `list_collection_items` sorting (Metabase 0.64 renamed the params to kebab-case).
+- `create_document` / `update_document`: send the required ProseMirror `document` body (new `text`
+  shortcut; `content` kept as an alias). `delete_document` archives first.
+- `translate_entity_ids` request body; `upload_csv` sends multipart form data.
+
 ### Added
 
+- `get_recent_items`, `get_popular_items` tools.
+- Metabase error responses are stripped of Java stack traces (`trace`, `via`) before reaching the model.
+- CI pinned to Metabase v0.64.3.4 (`MB_IMAGE` override) plus a weekly non-blocking job on `latest`.
 - `METABASE_CUSTOM_HEADERS`: extra HTTP headers sent on every Metabase request, including the session login. It takes a JSON object or `Name: value` pairs separated by newlines or `;`, for example Cloudflare Access service tokens. Auth headers keep precedence, and a malformed value fails at startup.
 
 ## [0.2.0] - 2026-04-15

@@ -2,11 +2,11 @@
 
 MCP server for Metabase — comprehensive coverage of the Metabase REST API for AI assistants.
 
-Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **128 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
+Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **130 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
 
 ## Features
 
-- **128 MCP tools** across 26 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads
+- **130 MCP tools** across 26 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads
 - **Full CRUD**: Create, read, update, delete across all domains
 - **Admin automation**: User/group management, permissions, settings, database connections
 - **Read-only mode**: Restrict to read-only tools via a single env var
@@ -241,7 +241,7 @@ The AI assistant will:
 
 ## Tools
 
-### Read tools (50 — always available)
+### Read tools (52 — always available)
 
 | Domain | Tools |
 |---|---|
@@ -259,7 +259,7 @@ The AI assistant will:
 | **Revisions** | `list_revisions` |
 | **Settings** | `list_settings`, `get_setting` |
 | **Alerts** | `list_alerts`, `get_alert`, `list_dashboard_subscriptions` |
-| **Activity** | `get_activity`, `list_tasks`, `get_task` |
+| **Activity** | `get_activity`, `get_recent_items`, `get_popular_items`, `list_tasks`, `get_task` |
 | **Snippets** | `list_snippets`, `get_snippet` |
 | **Glossary** | `list_glossary_terms`, `get_glossary_term` |
 | **Documents** | `list_documents`, `get_document` |
@@ -316,11 +316,19 @@ bun run generate-types         # Regenerate types from Metabase OpenAPI spec
 Tests run against a real Metabase instance via Docker:
 
 ```bash
-docker compose up -d             # Start Metabase
+docker compose up -d             # Start Metabase (pinned version, see docker-compose.yml)
 ./tests/ci/wait-for-metabase.sh  # Wait for ready (~15s)
-bun test                         # 202 tests, 668 assertions
+bun test                         # 216 tests
 docker compose down              # Stop Metabase
 ```
+
+Verified against Metabase **v0.64.3.4** (the CI pin) and **v0.59.6**. To try another release:
+`MB_IMAGE=metabase/metabase:latest docker compose up -d`. CI also runs the suite weekly on
+`metabase:latest` as a non-blocking job, so upstream API drift shows up before the pin is bumped.
+
+Features that need a paid plan or extra server config (moderation, cache invalidation, model
+persistence, CSV upload database, `MB_API_KEY` for `notify_database`, actions on the SQLite sample
+DB) are skipped explicitly with a `SKIP … (environment)` log line; any other API error fails the test.
 
 ## How It Works
 
