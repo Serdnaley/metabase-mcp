@@ -3,14 +3,53 @@ import type { MetabaseClient } from "../client.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const anyClient = (client: MetabaseClient): any => client;
 
-export const listAlerts = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/alert", {});
+// ── Alerts ────────────────────────────────────────────────────────────────
+// Since Metabase 0.54 alerts are card notifications under /api/notification.
+// The old /api/alert write routes no longer exist (only GET remains for compat).
+
+export type AlertSendCondition = "has_result" | "goal_above" | "goal_below";
+
+export type AlertChannel =
+  | { type: "email"; user_ids?: number[]; emails?: string[] }
+  | { type: "slack"; channel: string };
+
+const DEFAULT_ALERT_CRON = "0 0 9 * * ? *"; // daily at 09:00 (Quartz)
+
+const buildHandlers = (channels: AlertChannel[]) =>
+  channels.map((ch) => {
+    if (ch.type === "slack") {
+      return {
+        channel_type: "channel/slack",
+        recipients: [{ type: "notification-recipient/raw-value", details: { value: ch.channel } }],
+      };
+    }
+    return {
+      channel_type: "channel/email",
+      recipients: [
+        ...(ch.user_ids ?? []).map((user_id) => ({ type: "notification-recipient/user", user_id })),
+        ...(ch.emails ?? []).map((value) => ({ type: "notification-recipient/raw-value", details: { value } })),
+      ],
+    };
+  });
+
+const buildSubscriptions = (cronSchedule: string) => [
+  { type: "notification-subscription/cron", cron_schedule: cronSchedule },
+];
+
+export const listAlerts = async (
+  client: MetabaseClient,
+  params?: { card_id?: number; include_inactive?: boolean }
+) => {
+  const query: Record<string, unknown> = { payload_type: "notification/card" };
+  if (params?.card_id !== undefined) query.card_id = params.card_id;
+  if (params?.include_inactive !== undefined) query.include_inactive = params.include_inactive;
+  const { data, error } = await anyClient(client).GET("/api/notification", { params: { query } });
   if (error) throw new Error(`List alerts failed: ${JSON.stringify(error)}`);
   return data;
 };
 
 export const getAlert = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/alert/{id}", {
+  const { data, error } = await anyClient(client).GET("/api/notification/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Get alert failed: ${JSON.stringify(error)}`);
@@ -20,61 +59,77 @@ export const getAlert = async (client: MetabaseClient, id: number) => {
 export const createAlert = async (
   client: MetabaseClient,
   params: {
-    card: { id: number; include_csv?: boolean; include_xls?: boolean };
-    alert_condition: "rows" | "goal";
-    alert_first_only?: boolean;
-    alert_above_goal?: boolean;
-    channels: Record<string, unknown>[];
+    card_id: number;
+    send_condition?: AlertSendCondition;
+    send_once?: boolean;
+    channels: AlertChannel[];
+    cron_schedule?: string;
   }
 ) => {
-  const { data, error } = await anyClient(client).POST("/api/alert", {
+  const { data, error } = await anyClient(client).POST("/api/notification", {
     body: {
-      card: params.card,
-      alert_condition: params.alert_condition,
-      alert_first_only: params.alert_first_only ?? false,
-      alert_above_goal: params.alert_above_goal ?? null,
-      channels: params.channels,
+      payload_type: "notification/card",
+      payload: {
+        card_id: params.card_id,
+        send_condition: params.send_condition ?? "has_result",
+        send_once: params.send_once ?? false,
+      },
+      handlers: buildHandlers(params.channels),
+      subscriptions: buildSubscriptions(params.cron_schedule ?? DEFAULT_ALERT_CRON),
     },
   });
   if (error) throw new Error(`Create alert failed: ${JSON.stringify(error)}`);
   return data;
 };
 
+/**
+ * PUT /api/notification/{id} takes the whole notification, so fetch it,
+ * merge the requested changes and send it back.
+ */
 export const updateAlert = async (
   client: MetabaseClient,
   id: number,
-  params: Record<string, unknown>
+  params: {
+    send_condition?: AlertSendCondition;
+    send_once?: boolean;
+    channels?: AlertChannel[];
+    cron_schedule?: string;
+    active?: boolean;
+  }
 ) => {
-  const { data, error } = await anyClient(client).PUT("/api/alert/{id}", {
+  const current = (await getAlert(client, id)) as any;
+  if (current?.payload_type !== "notification/card") {
+    throw new Error(`Update alert failed: notification ${id} is not a card alert (${current?.payload_type})`);
+  }
+  const body = { ...current, payload: { ...current.payload } };
+  if (params.send_condition !== undefined) body.payload.send_condition = params.send_condition;
+  if (params.send_once !== undefined) body.payload.send_once = params.send_once;
+  if (params.channels !== undefined) body.handlers = buildHandlers(params.channels);
+  if (params.cron_schedule !== undefined) body.subscriptions = buildSubscriptions(params.cron_schedule);
+  if (params.active !== undefined) body.active = params.active;
+
+  const { data, error } = await anyClient(client).PUT("/api/notification/{id}", {
     params: { path: { id } },
-    body: params,
+    body,
   });
   if (error) throw new Error(`Update alert failed: ${JSON.stringify(error)}`);
   return data;
 };
 
+/** Metabase has no hard delete for notifications — deactivating is what the UI does. */
 export const deleteAlert = async (client: MetabaseClient, id: number) => {
-  const { error } = await anyClient(client).DELETE("/api/alert/{id}", {
-    params: { path: { id } },
-  });
-  if (error) throw new Error(`Delete alert failed: ${JSON.stringify(error)}`);
+  await updateAlert(client, id, { active: false });
   return { success: true };
 };
 
-export const listDashboardSubscriptions = async (
-  client: MetabaseClient,
-  dashboardId: number
-) => {
-  const { data, error } = await anyClient(client).GET(
-    "/api/dashboard/{dashboard-id}/subscriptions",
-    {
-      params: { path: { "dashboard-id": dashboardId } },
-    }
-  );
-  if (error)
-    throw new Error(
-      `List dashboard subscriptions failed: ${JSON.stringify(error)}`
-    );
+// ── Dashboard subscriptions ─────────────────────────────────────────────────
+// Still pulses: GET/POST /api/pulse, PUT /api/pulse/{id}; no DELETE (archive instead).
+
+export const listDashboardSubscriptions = async (client: MetabaseClient, dashboardId: number) => {
+  const { data, error } = await anyClient(client).GET("/api/pulse", {
+    params: { query: { dashboard_id: dashboardId } },
+  });
+  if (error) throw new Error(`List dashboard subscriptions failed: ${JSON.stringify(error)}`);
   return data;
 };
 
@@ -82,21 +137,35 @@ export const createDashboardSubscription = async (
   client: MetabaseClient,
   dashboardId: number,
   params: {
+    name?: string;
     channels: Record<string, unknown>[];
     parameters?: Record<string, unknown>[];
+    cards?: Record<string, unknown>[];
   }
 ) => {
-  const { data, error } = await anyClient(client).POST(
-    "/api/dashboard/{dashboard-id}/subscription",
-    {
-      params: { path: { "dashboard-id": dashboardId } },
-      body: params,
-    }
-  );
-  if (error)
-    throw new Error(
-      `Create dashboard subscription failed: ${JSON.stringify(error)}`
-    );
+  let cards = params.cards;
+  let name = params.name;
+  if (!cards || !name) {
+    const { data: dashboard, error } = await anyClient(client).GET("/api/dashboard/{id}", {
+      params: { path: { id: dashboardId } },
+    });
+    if (error) throw new Error(`Create dashboard subscription failed: ${JSON.stringify(error)}`);
+    name ??= (dashboard as any)?.name ?? `Dashboard ${dashboardId}`;
+    // Default: every question card on the dashboard, no attachments
+    cards ??= ((dashboard as any)?.dashcards ?? [])
+      .filter((dc: any) => dc.card_id)
+      .map((dc: any) => ({ id: dc.card_id, include_csv: false, include_xls: false, dashboard_card_id: dc.id }));
+  }
+  const { data, error } = await anyClient(client).POST("/api/pulse", {
+    body: {
+      name,
+      dashboard_id: dashboardId,
+      cards,
+      channels: params.channels,
+      parameters: params.parameters ?? [],
+    },
+  });
+  if (error) throw new Error(`Create dashboard subscription failed: ${JSON.stringify(error)}`);
   return data;
 };
 
@@ -113,13 +182,8 @@ export const updateDashboardSubscription = async (
   return data;
 };
 
-export const deleteDashboardSubscription = async (
-  client: MetabaseClient,
-  subscriptionId: number
-) => {
-  const { error } = await anyClient(client).DELETE("/api/pulse/{id}", {
-    params: { path: { id: subscriptionId } },
-  });
-  if (error) throw new Error(`Delete dashboard subscription failed: ${JSON.stringify(error)}`);
+/** Pulses can't be hard-deleted via the API; archiving removes them from the dashboard. */
+export const deleteDashboardSubscription = async (client: MetabaseClient, subscriptionId: number) => {
+  await updateDashboardSubscription(client, subscriptionId, { archived: true });
   return { success: true };
 };
