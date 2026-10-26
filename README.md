@@ -5,6 +5,7 @@
 [![Tests](https://github.com/Serdnaley/metabase-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/Serdnaley/metabase-mcp/actions/workflows/test.yml)
 [![Metabase](https://img.shields.io/badge/Metabase-0.59%20%E2%80%93%200.64-509ee3.svg)](docs/metabase-changes-0.59-to-0.64.md)
 [![MCP](https://img.shields.io/badge/MCP-stdio%20%7C%20HTTP-6e56cf.svg)](https://modelcontextprotocol.io)
+[![Glama score](https://glama.ai/mcp/servers/Serdnaley/metabase-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Serdnaley/metabase-mcp)
 
 **The headless MCP server for Metabase.** Plug Metabase into any AI agent, app, CI job or server with a plain **API key**: no OAuth flow, no browser, no admin switch to flip.
 
