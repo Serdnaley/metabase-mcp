@@ -30,9 +30,26 @@ Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.
 
 ### Added
 
+- **Metrics** (Metabase 0.60+ for running, 0.64+ for dimensions): `list_metrics`, `get_metric`,
+  `create_metric`, `update_metric`, `run_metric` (filters, breakouts, temporal buckets, or a raw
+  definition for metric math), `list_metric_dimensions`, `get_metric_dimension_values`. On older
+  versions list/get fall back to cards and the rest report the required version.
+- **Measures**: `list_measures`, `get_measure`, `create_measure`, `update_measure` (bare
+  `{ aggregation: [...] }` definitions are wrapped like segments).
+- **Transforms**: `list_transforms`, `get_transform`, `create_transform` (SQL shortcut),
+  `update_transform`, `delete_transform` (optionally dropping the table), `run_transform`,
+  `cancel_transform_run`, `list_transform_runs`, `get_transform_run`, transform jobs
+  (`list_transform_jobs`, `create_transform_job`, `run_transform_job`, `delete_transform_job`) and tags
+  (`list_transform_tags`, `create_transform_tag`). Requires `MB_TRANSFORMS_ENABLED=true` and a
+  non-sample warehouse.
+- **Exports**: `export_card_query` and `export_query` (csv/json inline with a size cap, or any format
+  incl. xlsx to `output_path`), `export_dashboard_pdf` (Metabase 0.64+).
+- **Notifications**: `list_notifications` (any payload type), `send_notification` (send now).
 - `get_recent_items`, `get_popular_items` tools.
 - Metabase error responses are stripped of Java stack traces (`trace`, `via`) before reaching the model.
 - CI pinned to Metabase v0.64.3.4 (`MB_IMAGE` override) plus a weekly non-blocking job on `latest`.
+- Test stack: an optional Postgres "Test Warehouse" (docker compose service) for transform and CSV
+  upload tests; tests that need it skip explicitly without it.
 - `METABASE_CUSTOM_HEADERS`: extra HTTP headers sent on every Metabase request, including the session login. It takes a JSON object or `Name: value` pairs separated by newlines or `;`, for example Cloudflare Access service tokens. Auth headers keep precedence, and a malformed value fails at startup.
 
 ## [0.2.0] - 2026-04-15

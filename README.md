@@ -2,11 +2,11 @@
 
 MCP server for Metabase — comprehensive coverage of the Metabase REST API for AI assistants.
 
-Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **130 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
+Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **161 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
 
 ## Features
 
-- **130 MCP tools** across 26 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads
+- **161 MCP tools** across 30 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads, metrics, measures, transforms, exports
 - **Full CRUD**: Create, read, update, delete across all domains
 - **Admin automation**: User/group management, permissions, settings, database connections
 - **Read-only mode**: Restrict to read-only tools via a single env var
@@ -241,7 +241,7 @@ The AI assistant will:
 
 ## Tools
 
-### Read tools (52 — always available)
+### Read tools (69 — always available)
 
 | Domain | Tools |
 |---|---|
@@ -258,7 +258,7 @@ The AI assistant will:
 | **Segments** | `list_segments`, `get_segment` |
 | **Revisions** | `list_revisions` |
 | **Settings** | `list_settings`, `get_setting` |
-| **Alerts** | `list_alerts`, `get_alert`, `list_dashboard_subscriptions` |
+| **Alerts** | `list_alerts`, `get_alert`, `list_notifications`, `list_dashboard_subscriptions` |
 | **Activity** | `get_activity`, `get_recent_items`, `get_popular_items`, `list_tasks`, `get_task` |
 | **Snippets** | `list_snippets`, `get_snippet` |
 | **Glossary** | `list_glossary_terms`, `get_glossary_term` |
@@ -267,8 +267,12 @@ The AI assistant will:
 | **Bookmarks** | `list_bookmarks` |
 | **X-Rays** | `generate_xray` |
 | **EID Translation** | `translate_entity_ids` |
+| **Metrics** | `list_metrics`, `get_metric`, `run_metric`, `list_metric_dimensions`, `get_metric_dimension_values` |
+| **Measures** | `list_measures`, `get_measure` |
+| **Transforms** | `list_transforms`, `get_transform`, `list_transform_runs`, `get_transform_run`, `list_transform_jobs`, `list_transform_tags` |
+| **Exports** | `export_card_query`, `export_query`, `export_dashboard_pdf` |
 
-### Write tools (78 — disabled in read-only mode)
+### Write tools (92 — disabled in read-only mode)
 
 | Domain | Tools |
 |---|---|
@@ -283,7 +287,7 @@ The AI assistant will:
 | **Segments** | `create_segment`, `update_segment`, `delete_segment` |
 | **Revisions** | `revert_revision` |
 | **Settings** | `update_setting` |
-| **Alerts** | `create_alert`, `update_alert`, `delete_alert`, `create_dashboard_subscription`, `update_dashboard_subscription`, `delete_dashboard_subscription` |
+| **Alerts** | `create_alert`, `update_alert`, `delete_alert`, `send_notification`, `create_dashboard_subscription`, `update_dashboard_subscription`, `delete_dashboard_subscription` |
 | **Snippets** | `create_snippet`, `update_snippet`, `delete_snippet` |
 | **Glossary** | `create_glossary_term`, `update_glossary_term`, `delete_glossary_term` |
 | **Documents** | `create_document`, `update_document`, `delete_document` |
@@ -293,12 +297,17 @@ The AI assistant will:
 | **Cache** | `invalidate_cache`, `update_cache_config` |
 | **Persistence** | `persist_model`, `unpersist_model`, `refresh_persisted_model` |
 | **Upload** | `upload_csv` |
+| **Metrics** | `create_metric`, `update_metric` |
+| **Measures** | `create_measure`, `update_measure` |
+| **Transforms** | `create_transform`, `update_transform`, `delete_transform`, `run_transform`, `cancel_transform_run`, `create_transform_job`, `run_transform_job`, `delete_transform_job`, `create_transform_tag` |
 
 ## Security
 
 **`execute_query` is available even in read-only mode.** It can execute arbitrary SQL against any database the configured Metabase account has access to. Metabase enforces its own permission model, but this tool does not add additional restrictions.
 
 To prevent write operations, ensure the Metabase API key or account has **read-only database permissions** within Metabase itself.
+
+**Exports can write local files.** `export_card_query`, `export_query` and `export_dashboard_pdf` stay available in read-only mode (they only read from Metabase) and, when given `output_path`, write to that absolute path on the machine running the MCP server. They never overwrite an existing file unless `overwrite: true` is passed.
 
 **Action types are restricted.** The `create_action` tool only allows `query` and `implicit` action types. HTTP actions (which could make arbitrary outbound requests) are blocked.
 
