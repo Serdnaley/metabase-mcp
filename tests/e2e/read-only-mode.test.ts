@@ -2,6 +2,7 @@ import { describe, test, expect } from "bun:test";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getTestClient } from "../helpers.js";
 import { registerAllTools } from "../../src/tools/index.js";
+import { buildToolCatalog } from "../../src/registry.js";
 
 const READ_ONLY_TOOLS = [
   "execute_card_query",
@@ -217,6 +218,29 @@ describe("E2E: read-only mode", () => {
 
     for (const tool of allTools) {
       expect(toolNames).toContain(tool);
+    }
+  });
+
+  test("every tool has annotations matching the READ_ONLY / WRITE lists", async () => {
+    const client = await getTestClient();
+    const catalog = buildToolCatalog(client, { metabaseUrl: "http://localhost:3000", readOnly: false });
+    expect(catalog.length).toBe(READ_ONLY_TOOLS.length + WRITE_TOOLS.length);
+    // Raw SQL tools are marked read-only; their descriptions carry a write warning
+    const RAW_SQL = ["execute_query", "export_query"];
+    for (const t of catalog) {
+      expect(t.annotations).toBeDefined();
+      expect(typeof t.annotations.readOnlyHint).toBe("boolean");
+      expect(typeof t.annotations.destructiveHint).toBe("boolean");
+      expect(t.annotations.openWorldHint).toBe(false);
+      if (WRITE_TOOLS.includes(t.name)) {
+        expect(t.write).toBe(true);
+        expect(t.annotations.readOnlyHint).toBe(false);
+      } else {
+        expect(READ_ONLY_TOOLS).toContain(t.name);
+        expect(t.write).toBe(false);
+        expect(t.annotations.readOnlyHint).toBe(true);
+        if (RAW_SQL.includes(t.name)) expect(t.description).toContain("WARNING");
+      }
     }
   });
 });

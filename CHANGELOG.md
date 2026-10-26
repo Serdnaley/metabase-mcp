@@ -30,6 +30,19 @@ Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.
 
 ### Added
 
+- **Headless HTTP mode**: Streamable HTTP transport (`MCP_TRANSPORT=http` or `--http`) with a
+  required bearer token (`MCP_HTTP_TOKEN`), `GET /health`, stateless `/mcp` endpoint. No-auth only
+  on loopback (`MCP_HTTP_ALLOW_NO_AUTH=true`) with DNS-rebinding protection.
+- **Toolsets**: `METABASE_TOOLSETS` (one toolset per domain, presets `all`, `query`, `content`,
+  `admin`), `METABASE_TOOLS_ENABLE` / `METABASE_TOOLS_DISABLE` (names or globs). Precedence:
+  read-only > disable > enable > toolsets. Startup log shows the effective tool count.
+- **Tool annotations** on every tool: `readOnlyHint`, `destructiveHint`, `idempotentHint`,
+  `openWorldHint`. `execute_query` / `export_query` (raw SQL) are marked read-only for one-click
+  approval; their descriptions warn that the SQL itself is not restricted.
+- Tool catalog site generated from the registry (`bun run docs`, published to GitHub Pages);
+  README tool tables are generated too, and CI fails when they drift.
+- `LICENSE` (MIT), README badges, `mcpName` + `server.json` for the official MCP Registry.
+
 - `get_group`: a permission group with its members and their `membership_id`, which
   `remove_group_member` needs (no tool exposed it before).
 - **Metrics** (Metabase 0.60+ for running, 0.64+ for dimensions): `list_metrics`, `get_metric`,

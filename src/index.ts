@@ -4,21 +4,58 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { loadConfig } from "./config.js";
 import { createMetabaseClient } from "./client.js";
-import { registerAllTools } from "./tools/index.js";
+import { buildToolCatalog, parseToolSelection, registerTools, selectTools } from "./registry.js";
+import { loadHttpOptions, startHttpServer } from "./http.js";
+import { SERVER_NAME, SERVER_VERSION } from "./server-info.js";
+
+const fail = (message: string): never => {
+  console.error(`Configuration error: ${message}`);
+  process.exit(1);
+};
 
 const main = async () => {
   const config = loadConfig();
+
+  let httpOptions: ReturnType<typeof loadHttpOptions>;
+  let selected: ReturnType<typeof selectTools>;
+  try {
+    httpOptions = loadHttpOptions(process.env, process.argv.slice(2));
+  } catch (err) {
+    return fail((err as Error).message);
+  }
+
   const client = await createMetabaseClient(config);
+  const catalog = buildToolCatalog(client, config);
+  try {
+    selected = selectTools(catalog, { ...parseToolSelection(process.env), readOnly: config.readOnly });
+  } catch (err) {
+    return fail((err as Error).message);
+  }
+  for (const w of selected.warnings) console.error(`Warning: ${w}`);
 
-  const server = new McpServer({
-    name: "metabase-mcp",
-    version: "0.1.0",
-  });
+  // stderr only: stdout belongs to the stdio transport
+  const writes = selected.tools.filter((t) => t.write).length;
+  console.error(
+    `${SERVER_NAME} ${SERVER_VERSION}: ${selected.tools.length}/${catalog.length} tools enabled ` +
+      `(${selected.tools.length - writes} read, ${writes} write)${config.readOnly ? ", read-only mode" : ""}`
+  );
 
-  registerAllTools(server, client, config);
+  const createServer = () => {
+    const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
+    registerTools(server, selected.tools);
+    return server;
+  };
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  if (httpOptions) {
+    await startHttpServer(createServer, httpOptions);
+    console.error(
+      `${SERVER_NAME}: listening on http://${httpOptions.host}:${httpOptions.port}/mcp` +
+        (httpOptions.token ? " (bearer auth)" : " (NO AUTH, loopback only)")
+    );
+    return;
+  }
+
+  await createServer().connect(new StdioServerTransport());
 };
 
 main().catch((err) => {

@@ -35,3 +35,4 @@ generated/*.json
 
 # Finder (MacOS) folder config
 .DS_Store
+docs-site

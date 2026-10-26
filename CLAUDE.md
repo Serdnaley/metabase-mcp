@@ -35,19 +35,23 @@ The test preload (`tests/setup.ts` via `bunfig.toml`) auto-provisions the Metaba
 Three-layer functional architecture — no classes anywhere:
 
 ```
-src/tools/*       → MCP tool registration (zod schemas + handlers)
+src/tools/*       → MCP tool declarations (zod schemas + handlers), one module = one toolset
+src/registry.ts   → collects tools, derives read/write + annotations, applies toolset filters
 src/services/*    → Business logic (pure API call functions)
 src/client.ts     → openapi-fetch HTTP client with auth middleware
+src/http.ts       → Streamable HTTP transport with bearer auth (stdio is the default)
 ```
 
 **Data flow:** MCP client → tool handler → service function → openapi-fetch → Metabase REST API
 
 ### Key files
 
-- `src/index.ts` — Entry point: loads config, creates client, registers tools, starts stdio transport
+- `src/index.ts` — Entry point: loads config, creates client, builds the tool catalog, applies `METABASE_TOOLSETS` / `_ENABLE` / `_DISABLE` / read-only, starts stdio or HTTP
+- `src/registry.ts` — `buildToolCatalog()` records every `server.tool()` call (registering twice, read-only on/off, to classify write tools), adds annotations; `selectTools()` applies precedence read-only > disable > enable > toolsets
+- `src/server-info.ts` — server name/version (keep `SERVER_VERSION` = package.json version; a test checks it, and `server.json`)
 - `src/config.ts` — Zod schema parsing env vars (`METABASE_URL`, `METABASE_API_KEY`, etc.)
 - `src/client.ts` — `createMetabaseClient()` factory with API key or session auth middleware
-- `src/tools/index.ts` — `registerAllTools()` calls all domain registrations
+- `src/tools/index.ts` — `TOOL_MODULES` (toolset id, label, register fn); `registerAllTools()` registers everything unfiltered
 - `generated/metabase-api.d.ts` — 40k lines of generated types from Metabase's OpenAPI spec
 
 ### Adding a new tool
@@ -56,6 +60,9 @@ src/client.ts     → openapi-fetch HTTP client with auth middleware
 2. Register tool in `src/tools/<domain>.ts` — `server.tool(name, description, zodSchema, handler)`
 3. Write tools must be wrapped in `if (!config.readOnly) { ... }`
 4. Tool handlers return `{ content: [{ type: "text", text: JSON.stringify(result, null, 2) }] }`
+5. A new domain file = a new toolset: add it to `TOOL_MODULES` (and to a preset in `registry.ts` if it fits)
+6. Annotations come from `annotate()` in `registry.ts` (name prefix rules); check the result for your tool
+7. Run `bun run docs:readme` to regenerate the README tool tables/counts (CI runs `docs:check`), and update the e2e READ_ONLY/WRITE lists
 
 ### Type generation
 
@@ -66,11 +73,11 @@ src/client.ts     → openapi-fetch HTTP client with auth middleware
 Releases are published via GitHub Actions (Trusted Publishing / OIDC — no npm token needed).
 
 ```bash
-# 1. Bump version in package.json
+# 1. Bump version in package.json, src/server-info.ts and server.json (both "version" fields)
 # 2. Update CHANGELOG.md with new version section
-# 3. Update README.md (tool counts, tools table, test counts)
+# 3. bun run docs:readme (tool tables/counts), update test counts in README.md
 # 4. Commit and push to main
-git add package.json CHANGELOG.md README.md
+git add package.json src/server-info.ts server.json CHANGELOG.md README.md
 git commit -m "chore: prepare X.Y.Z release"
 git push origin main
 
@@ -82,6 +89,8 @@ The CI workflow (`.github/workflows/publish.yml`) runs on `release: [published]`
 1. Runs full test suite against Metabase in Docker
 2. Builds the bundle (`bun run build`)
 3. Publishes to npm with `--provenance --access public`
+
+After the npm publish, the MCP Registry listing is updated with `mcp-publisher publish` (see `docs/listing-checklist.md`).
 
 The E2E test `tests/e2e/read-only-mode.test.ts` has hardcoded `READ_ONLY_TOOLS` and `WRITE_TOOLS` arrays — update them when adding/removing tools.
 
