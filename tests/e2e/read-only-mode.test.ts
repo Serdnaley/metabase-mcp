@@ -225,7 +225,7 @@ describe("E2E: read-only mode", () => {
     const client = await getTestClient();
     const catalog = buildToolCatalog(client, { metabaseUrl: "http://localhost:3000", readOnly: false });
     expect(catalog.length).toBe(READ_ONLY_TOOLS.length + WRITE_TOOLS.length);
-    // Raw SQL tools are available in read-only mode but can still modify data
+    // Raw SQL tools are marked read-only; their descriptions carry a write warning
     const RAW_SQL = ["execute_query", "export_query"];
     for (const t of catalog) {
       expect(t.annotations).toBeDefined();
@@ -238,7 +238,8 @@ describe("E2E: read-only mode", () => {
       } else {
         expect(READ_ONLY_TOOLS).toContain(t.name);
         expect(t.write).toBe(false);
-        expect(t.annotations.readOnlyHint).toBe(!RAW_SQL.includes(t.name));
+        expect(t.annotations.readOnlyHint).toBe(true);
+        if (RAW_SQL.includes(t.name)) expect(t.description).toContain("WARNING");
       }
     }
   });

@@ -40,7 +40,7 @@ export const registerExportTools = (server: McpServer, client: MetabaseClient, _
 
   server.tool(
     "export_query",
-    "Export an ad-hoc query's results as csv, json or xlsx",
+    "Export an ad-hoc query's results as csv, json or xlsx. WARNING: the SQL is sent as-is; this server does not block INSERT/UPDATE/DELETE/DDL. Whether it can change data depends only on the Metabase API key's permissions and the database user's grants.",
     {
       query: z.record(z.string(), z.unknown()).describe("dataset_query, e.g. { database: 1, type: 'native', native: { query: 'SELECT ...' } }"),
       format: formatSchema,

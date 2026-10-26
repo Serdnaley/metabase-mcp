@@ -397,7 +397,7 @@ To prevent write operations, ensure the Metabase API key or account has **read-o
 
 **HTTP mode requires a bearer token.** `MCP_TRANSPORT=http` refuses to start without `MCP_HTTP_TOKEN` (compared in constant time), unless `MCP_HTTP_ALLOW_NO_AUTH=true` on a loopback host, where Host-header checks block DNS rebinding. The token grants everything the configured Metabase key can do, so treat it like that key and serve the endpoint over TLS outside localhost.
 
-**Tool hints are honest.** Read tools are marked `readOnlyHint: true`. `execute_query` and `export_query` run arbitrary SQL, so they are *not* marked read-only even though read-only mode keeps them: a client that auto-approves read-only tools will still ask before running SQL.
+**Raw SQL is one-click.** Read tools are marked `readOnlyHint: true`, including `execute_query` and `export_query`, so clients can auto-approve them. ⚠️ Their SQL is sent as-is: this server does not block `INSERT`/`UPDATE`/`DELETE`/DDL, and both tool descriptions say so. Use a Metabase API key whose group cannot run native queries (or a database user with read-only grants) if SQL must not write — see [docs/read-only-and-permissions.md](docs/read-only-and-permissions.md).
 
 **Action types are restricted.** The `create_action` tool only allows `query` and `implicit` action types. HTTP actions (which could make arbitrary outbound requests) are blocked.
 

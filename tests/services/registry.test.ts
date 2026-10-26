@@ -106,6 +106,7 @@ describe("tool registry", () => {
     expect(byName.create_card.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: false, idempotentHint: false });
     expect(byName.delete_card.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: true });
     expect(byName.execute_query.write).toBe(false);
-    expect(byName.execute_query.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true });
+    expect(byName.execute_query.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
+    expect(byName.execute_query.description).toContain("WARNING");
   });
 });

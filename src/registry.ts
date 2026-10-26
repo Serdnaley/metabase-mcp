@@ -51,11 +51,13 @@ const IDEMPOTENT_WRITE_PREFIXES = [
 ];
 
 export const annotate = (name: string, write: boolean): ToolAnnotations => {
-  if (!write && !RAW_SQL_TOOLS.has(name)) {
-    return { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
-  }
+  // Raw SQL tools are marked read-only (Andres 26.10) so clients can approve them in one click;
+  // their descriptions carry a warning that the SQL itself is not restricted.
   if (RAW_SQL_TOOLS.has(name)) {
-    return { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false };
+    return { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false };
+  }
+  if (!write) {
+    return { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
   }
   const additive = ADDITIVE_PREFIXES.some((p) => name.startsWith(p));
   return {

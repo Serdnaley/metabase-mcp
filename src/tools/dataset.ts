@@ -4,7 +4,7 @@ import type { MetabaseClient } from "../client.js";
 import { executeQuery } from "../services/dataset.js";
 
 export const registerDatasetTools = (server: McpServer, client: MetabaseClient) => {
-  server.tool("execute_query", "Run an ad-hoc query (native SQL or structured) and return results", {
+  server.tool("execute_query", "Run an ad-hoc query (native SQL or structured) and return results. WARNING: the SQL is sent as-is; this server does not block INSERT/UPDATE/DELETE/DDL. Whether it can change data depends only on the Metabase API key's permissions and the database user's grants.", {
     database: z.number().describe("Database ID to query"),
     type: z.enum(["native", "query"]).describe("Query type: native SQL or structured"),
     native: z.object({
