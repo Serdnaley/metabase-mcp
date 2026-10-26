@@ -1,0 +1,8 @@
+node_modules
+tests
+generated
+docs
+docs-site
+*.mcpb
+packaging/mcpb/build
+.git

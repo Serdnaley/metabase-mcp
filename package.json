@@ -13,7 +13,10 @@
     "test:setup": "bun run tests/setup.ts",
     "docs": "bun run scripts/generate-docs.ts",
     "docs:readme": "bun run scripts/generate-docs.ts --readme",
-    "docs:check": "bun run scripts/generate-docs.ts --check"
+    "docs:check": "bun run scripts/generate-docs.ts --check",
+    "version:check": "bun run scripts/version.ts check",
+    "version:set": "bun run scripts/version.ts set",
+    "mcpb": "bun run scripts/build-mcpb.ts"
   },
   "bin": {
     "metabase-mcp": "dist/index.js"

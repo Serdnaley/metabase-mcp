@@ -134,3 +134,27 @@ describe("config validation", () => {
     expect(cleaned).toBe("http://localhost:3000");
   });
 });
+
+describe("loadConfig env handling", () => {
+  test("empty optional env vars count as unset (MCPB hosts pass \"\" for blank fields)", async () => {
+    const { loadConfig } = await import("../../src/config.js");
+    const keys = ["METABASE_URL", "METABASE_API_KEY", "METABASE_EMAIL", "METABASE_PASSWORD"] as const;
+    const saved = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+    try {
+      process.env.METABASE_URL = "http://localhost:3000/";
+      process.env.METABASE_API_KEY = "mb_test_key";
+      process.env.METABASE_EMAIL = "";
+      process.env.METABASE_PASSWORD = "  ";
+      const config = loadConfig();
+      expect(config.metabaseUrl).toBe("http://localhost:3000");
+      expect(config.apiKey).toBe("mb_test_key");
+      expect(config.email).toBeUndefined();
+      expect(config.password).toBeUndefined();
+    } finally {
+      for (const k of keys) {
+        if (saved[k] === undefined) delete process.env[k];
+        else process.env[k] = saved[k];
+      }
+    }
+  });
+});
