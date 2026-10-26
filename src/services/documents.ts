@@ -23,7 +23,7 @@ const resolveDocument = (params: {
   params.document ?? params.content ?? (params.text !== undefined ? textToProseMirror(params.text) : undefined);
 
 export const listDocuments = async (client: MetabaseClient) => {
-  const { data, error } = await (client as any).GET("/api/document", {});
+  const { data, error } = await client.GET("/api/document", {});
   if (error) throw new Error(`List documents failed: ${JSON.stringify(error)}`);
   return data;
 };

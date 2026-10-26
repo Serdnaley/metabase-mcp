@@ -12,7 +12,7 @@ export const updateTable = async (
   if (params.entity_type !== undefined) body.entity_type = params.entity_type;
   const { data, error } = await client.PUT("/api/table/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update table failed: ${JSON.stringify(error)}`);
   return data;
@@ -41,7 +41,7 @@ export const updateField = async (
   if (params.coercion_strategy !== undefined) body.coercion_strategy = params.coercion_strategy;
   const { data, error } = await client.PUT("/api/field/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update field failed: ${JSON.stringify(error)}`);
   return data;
@@ -66,7 +66,7 @@ export const discardFieldValues = async (client: MetabaseClient, id: number) => 
 export const reorderFields = async (client: MetabaseClient, id: number, fieldOrder: number[]) => {
   const { error } = await client.PUT("/api/table/{id}/fields/order", {
     params: { path: { id } },
-    body: fieldOrder as any,
+    body: fieldOrder,
   });
   if (error) throw new Error(`Reorder fields failed: ${JSON.stringify(error)}`);
   return { success: true };

@@ -10,13 +10,13 @@ const anyClient = (client: MetabaseClient): any => client;
 // ignored by 0.64 (which derives it from the definition), so it is always sent.
 
 export const listMeasures = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/measure", {});
+  const { data, error } = await client.GET("/api/measure", {});
   if (error) throw new Error(`List measures failed: ${JSON.stringify(error)}`);
   return data;
 };
 
 export const getMeasure = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/measure/{id}", { params: { path: { id } } });
+  const { data, error } = await client.GET("/api/measure/{id}", { params: { path: { id } } });
   if (error) throw new Error(`Get measure failed: ${JSON.stringify(error)}`);
   return data;
 };

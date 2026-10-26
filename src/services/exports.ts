@@ -77,7 +77,7 @@ export const exportCardQuery = async (
   const parameters = await buildCardParameters(client, cardId, params.parameter_values);
   const body: Record<string, unknown> = { format_rows: params.format_rows ?? false };
   if (parameters) body.parameters = parameters;
-  const { data, error, response } = await anyClient(client).POST("/api/card/{card-id}/query/{export-format}", {
+  const { data, error, response } = await client.POST("/api/card/{card-id}/query/{export-format}", {
     params: { path: { "card-id": cardId, "export-format": params.format } },
     body,
     parseAs: "arrayBuffer",
@@ -109,7 +109,7 @@ export const exportDashboardPdf = async (
   const body: Record<string, unknown> = {};
   if (params.paper_size) body.paper_size = params.paper_size;
   if (params.parameters) body.parameters = params.parameters;
-  const { data, error, response } = await anyClient(client).POST("/api/dashboard/{id}/pdf", {
+  const { data, error, response } = await client.POST("/api/dashboard/{id}/pdf", {
     params: { path: { id: dashboardId } },
     body,
     parseAs: "arrayBuffer",

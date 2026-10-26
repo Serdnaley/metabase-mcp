@@ -1,7 +1,7 @@
 import type { MetabaseClient } from "../client.js";
 
 export const listSnippets = async (client: MetabaseClient) => {
-  const { data, error } = await client.GET("/api/native-query-snippet", {} as any);
+  const { data, error } = await client.GET("/api/native-query-snippet", {});
   if (error) throw new Error(`List snippets failed: ${JSON.stringify(error)}`);
   return data;
 };
@@ -9,7 +9,7 @@ export const listSnippets = async (client: MetabaseClient) => {
 export const getSnippet = async (client: MetabaseClient, id: number) => {
   const { data, error } = await client.GET("/api/native-query-snippet/{id}", {
     params: { path: { id } },
-  } as any);
+  });
   if (error) throw new Error(`Get snippet failed: ${JSON.stringify(error)}`);
   return data;
 };
@@ -24,7 +24,7 @@ export const createSnippet = async (
       content: params.content,
       description: params.description ?? null,
       collection_id: params.collection_id ?? null,
-    } as any,
+    },
   });
   if (error) throw new Error(`Create snippet failed: ${JSON.stringify(error)}`);
   return data;
@@ -42,8 +42,8 @@ export const updateSnippet = async (
   if (params.archived !== undefined) body.archived = params.archived;
   const { data, error } = await client.PUT("/api/native-query-snippet/{id}", {
     params: { path: { id } },
-    body: body as any,
-  } as any);
+    body: body,
+  });
   if (error) throw new Error(`Update snippet failed: ${JSON.stringify(error)}`);
   return data;
 };

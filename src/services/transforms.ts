@@ -26,13 +26,13 @@ export const listTransforms = async (
   const query: Record<string, unknown> = {};
   if (params?.database_id !== undefined) query["database-id"] = params.database_id;
   if (params?.tag_ids?.length) query["tag-ids"] = params.tag_ids;
-  const { data, error } = await anyClient(client).GET("/api/transform", { params: { query } });
+  const { data, error } = await client.GET("/api/transform", { params: { query } });
   if (error) throw fail("List transforms", error);
   return data;
 };
 
 export const getTransform = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/transform/{id}", { params: { path: { id } } });
+  const { data, error } = await client.GET("/api/transform/{id}", { params: { path: { id } } });
   if (error) throw fail("Get transform", error);
   return data;
 };
@@ -108,7 +108,7 @@ export const updateTransform = async (
       name: params.target_table ?? current?.target?.name,
     };
   }
-  const { data, error } = await anyClient(client).PUT("/api/transform/{id}", { params: { path: { id } }, body });
+  const { data, error } = await client.PUT("/api/transform/{id}", { params: { path: { id } }, body });
   if (error) throw fail("Update transform", error);
   return data;
 };
@@ -119,22 +119,22 @@ export const deleteTransform = async (
   params?: { drop_table?: boolean }
 ) => {
   if (params?.drop_table) {
-    const { error } = await anyClient(client).DELETE("/api/transform/{id}/table", { params: { path: { id } } });
+    const { error } = await client.DELETE("/api/transform/{id}/table", { params: { path: { id } } });
     if (error) throw fail("Drop transform table", error);
   }
-  const { error } = await anyClient(client).DELETE("/api/transform/{id}", { params: { path: { id } } });
+  const { error } = await client.DELETE("/api/transform/{id}", { params: { path: { id } } });
   if (error) throw fail("Delete transform", error);
   return { success: true };
 };
 
 export const runTransform = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).POST("/api/transform/{id}/run", { params: { path: { id } } });
+  const { data, error } = await client.POST("/api/transform/{id}/run", { params: { path: { id } } });
   if (error) throw fail("Run transform", error);
   return data;
 };
 
 export const cancelTransformRun = async (client: MetabaseClient, id: number) => {
-  const { error } = await anyClient(client).POST("/api/transform/{id}/cancel", { params: { path: { id } } });
+  const { error } = await client.POST("/api/transform/{id}/cancel", { params: { path: { id } } });
   if (error) throw fail("Cancel transform run", error);
   return { success: true };
 };
@@ -147,7 +147,7 @@ export const listTransformRuns = async (
   if (params?.transform_ids?.length) query["transform-ids"] = params.transform_ids;
   if (params?.statuses?.length) query.statuses = params.statuses;
   // 0.64 renamed GET /api/transform/run to /api/transform/runs
-  let res = await anyClient(client).GET("/api/transform/runs", { params: { query } });
+  let res = await client.GET("/api/transform/runs", { params: { query } });
   if (res.error && isMissingEndpoint(res.error)) {
     res = await anyClient(client).GET("/api/transform/run", { params: { query } });
   }
@@ -156,7 +156,7 @@ export const listTransformRuns = async (
 };
 
 export const getTransformRun = async (client: MetabaseClient, runId: number) => {
-  const { data, error } = await anyClient(client).GET("/api/transform/run/{run-id}", {
+  const { data, error } = await client.GET("/api/transform/run/{run-id}", {
     params: { path: { "run-id": runId } },
   });
   if (error) throw fail("Get transform run", error);
@@ -166,7 +166,7 @@ export const getTransformRun = async (client: MetabaseClient, runId: number) => 
 // ── Jobs: scheduled runs of every transform carrying one of the job's tags ──
 
 export const listTransformJobs = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/transform-job", {});
+  const { data, error } = await client.GET("/api/transform-job", {});
   if (error) throw fail("List transform jobs", error);
   return data;
 };
@@ -183,7 +183,7 @@ export const createTransformJob = async (
 };
 
 export const runTransformJob = async (client: MetabaseClient, jobId: number) => {
-  const { data, error } = await anyClient(client).POST("/api/transform-job/{job-id}/run", {
+  const { data, error } = await client.POST("/api/transform-job/{job-id}/run", {
     params: { path: { "job-id": jobId } },
   });
   if (error) throw fail("Run transform job", error);
@@ -191,7 +191,7 @@ export const runTransformJob = async (client: MetabaseClient, jobId: number) => 
 };
 
 export const deleteTransformJob = async (client: MetabaseClient, jobId: number) => {
-  const { error } = await anyClient(client).DELETE("/api/transform-job/{job-id}", {
+  const { error } = await client.DELETE("/api/transform-job/{job-id}", {
     params: { path: { "job-id": jobId } },
   });
   if (error) throw fail("Delete transform job", error);
@@ -199,13 +199,13 @@ export const deleteTransformJob = async (client: MetabaseClient, jobId: number) 
 };
 
 export const listTransformTags = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/transform-tag", {});
+  const { data, error } = await client.GET("/api/transform-tag", {});
   if (error) throw fail("List transform tags", error);
   return data;
 };
 
 export const createTransformTag = async (client: MetabaseClient, name: string) => {
-  const { data, error } = await anyClient(client).POST("/api/transform-tag", { body: { name } });
+  const { data, error } = await client.POST("/api/transform-tag", { body: { name } });
   if (error) throw await apiError(client, "Create transform tag", error);
   return data;
 };

@@ -31,6 +31,9 @@ import { registerMetricTools } from "./metrics.js";
 import { registerMeasureTools } from "./measures.js";
 import { registerTransformTools } from "./transforms.js";
 import { registerExportTools } from "./exports.js";
+import { registerApiKeyTools } from "./api-keys.js";
+import { registerEmbeddingTools } from "./embedding.js";
+import { registerDiagnosticsTools } from "./diagnostics.js";
 
 export type ToolModule = {
   /** Toolset id used in METABASE_TOOLSETS */
@@ -49,7 +52,7 @@ export const TOOL_MODULES: ToolModule[] = [
   { toolset: "cards", label: "Cards", register: (s, c, cfg) => registerCardTools(s, c, cfg) },
   { toolset: "dashboards", label: "Dashboards", register: (s, c, cfg) => registerDashboardTools(s, c, cfg) },
   { toolset: "actions", label: "Actions", register: (s, c, cfg) => registerActionTools(s, c, cfg) },
-  { toolset: "dataset", label: "Dataset (ad-hoc queries)", register: (s, c) => registerDatasetTools(s, c) },
+  { toolset: "dataset", label: "Dataset (ad-hoc queries)", register: (s, c, cfg) => registerDatasetTools(s, c, cfg) },
   { toolset: "users", label: "Users & Groups", register: (s, c, cfg) => registerUserTools(s, c, cfg) },
   { toolset: "permissions", label: "Permissions", register: (s, c, cfg) => registerPermissionTools(s, c, cfg) },
   { toolset: "segments", label: "Segments", register: (s, c, cfg) => registerSegmentTools(s, c, cfg) },
@@ -72,6 +75,9 @@ export const TOOL_MODULES: ToolModule[] = [
   { toolset: "measures", label: "Measures", register: (s, c, cfg) => registerMeasureTools(s, c, cfg) },
   { toolset: "transforms", label: "Transforms", register: (s, c, cfg) => registerTransformTools(s, c, cfg) },
   { toolset: "exports", label: "Exports", register: (s, c, cfg) => registerExportTools(s, c, cfg) },
+  { toolset: "api-keys", label: "API Keys", register: (s, c, cfg) => registerApiKeyTools(s, c, cfg) },
+  { toolset: "embedding", label: "Embedding", register: (s, c, cfg) => registerEmbeddingTools(s, c, cfg) },
+  { toolset: "diagnostics", label: "Tasks & Logs", register: (s, c, cfg) => registerDiagnosticsTools(s, c, cfg) },
 ];
 
 /** Registers every tool on the server (no toolset filtering, no annotations). */

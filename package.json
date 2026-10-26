@@ -2,7 +2,7 @@
   "name": "@serdnaley/metabase-mcp",
   "version": "0.3.0",
   "mcpName": "io.github.Serdnaley/metabase-mcp",
-  "description": "Headless MCP server for Metabase: API-key auth (no OAuth), stdio or HTTP, 161 tools with toolsets, works on every Metabase tier",
+  "description": "Headless MCP server for Metabase: API-key auth (no OAuth), stdio or HTTP, 178 tools with toolsets, works on every Metabase tier",
   "type": "module",
   "scripts": {
     "generate-types": "bun run scripts/generate-types.ts",

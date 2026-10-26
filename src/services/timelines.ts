@@ -3,13 +3,13 @@ import type { MetabaseClient } from "../client.js";
 export const listTimelines = async (client: MetabaseClient, params?: { collection_id?: number }) => {
   const query: Record<string, unknown> = {};
   if (params?.collection_id !== undefined) query.collection_id = params.collection_id;
-  const { data, error } = await (client as any).GET("/api/timeline", { params: { query } });
+  const { data, error } = await client.GET("/api/timeline", { params: { query } });
   if (error) throw new Error(`List timelines failed: ${JSON.stringify(error)}`);
   return data;
 };
 
 export const getTimeline = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await (client as any).GET("/api/timeline/{id}", {
+  const { data, error } = await client.GET("/api/timeline/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Get timeline failed: ${JSON.stringify(error)}`);
@@ -42,7 +42,7 @@ export const updateTimeline = async (
   if (params.icon !== undefined) body.icon = params.icon;
   if (params.default !== undefined) body.default = params.default;
   if (params.archived !== undefined) body.archived = params.archived;
-  const { data, error } = await (client as any).PUT("/api/timeline/{id}", {
+  const { data, error } = await client.PUT("/api/timeline/{id}", {
     params: { path: { id } },
     body,
   });
@@ -51,7 +51,7 @@ export const updateTimeline = async (
 };
 
 export const deleteTimeline = async (client: MetabaseClient, id: number) => {
-  const { error } = await (client as any).DELETE("/api/timeline/{id}", {
+  const { error } = await client.DELETE("/api/timeline/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Delete timeline failed: ${JSON.stringify(error)}`);
@@ -94,7 +94,7 @@ export const updateTimelineEvent = async (
   if (params.description !== undefined) body.description = params.description;
   if (params.icon !== undefined) body.icon = params.icon;
   if (params.archived !== undefined) body.archived = params.archived;
-  const { data, error } = await (client as any).PUT("/api/timeline-event/{id}", {
+  const { data, error } = await client.PUT("/api/timeline-event/{id}", {
     params: { path: { id } },
     body,
   });
@@ -103,7 +103,7 @@ export const updateTimelineEvent = async (
 };
 
 export const deleteTimelineEvent = async (client: MetabaseClient, id: number) => {
-  const { error } = await (client as any).DELETE("/api/timeline-event/{id}", {
+  const { error } = await client.DELETE("/api/timeline-event/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Delete timeline event failed: ${JSON.stringify(error)}`);

@@ -1,7 +1,7 @@
 import type { MetabaseClient } from "../client.js";
 
 export const listBookmarks = async (client: MetabaseClient) => {
-  const { data, error } = await (client as any).GET("/api/bookmark", {});
+  const { data, error } = await client.GET("/api/bookmark", {});
   if (error) throw new Error(`List bookmarks failed: ${JSON.stringify(error)}`);
   return data;
 };

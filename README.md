@@ -11,7 +11,7 @@
 
 - **Headless auth.** A Metabase API key (or email/password) is all it needs. That works where an interactive OAuth login can't: servers, CI, containers, your own app or agent. Metabase's built-in MCP is documented as OAuth-only and needs an admin to enable it on 0.60+.
 - **Runs locally or as a service.** stdio for desktop clients, or Streamable HTTP with a bearer token for shared and server deployments. Metabase credentials stay on the server.
-- **Full coverage.** **161 tools** for querying and for running Metabase: dashboards, questions, collections, users, groups, permissions, databases, settings, alerts, transforms, exports and more.
+- **Full coverage.** **178 tools** for querying and for running Metabase: dashboards, questions, collections, users, groups, permissions, databases, settings, alerts, transforms, exports and more.
 - **Only the tools you need.** Toolsets and per-tool enable/disable keep the model's context small. Every tool carries read-only/destructive hints, so clients can auto-approve reads.
 - **Any Metabase.** Works with Metabase OSS (free) and paid editions, tested against 0.59 and 0.64. Paid-only features (caching, model persistence, moderation) work when your instance has them; CI covers the free edition.
 
@@ -19,11 +19,13 @@ How it compares with Metabase's built-in MCP and other Metabase MCP servers: [do
 
 ## Features
 
-- **161 MCP tools** across 30 toolsets: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads, metrics, measures, transforms, exports
+- **178 MCP tools** across 33 toolsets: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads, metrics, measures, transforms, exports, API keys, embedding, tasks & logs
 - **Toolsets**: load only what you need (`METABASE_TOOLSETS=query`), add or drop single tools with globs
 - **Tool annotations**: `readOnlyHint` / `destructiveHint` / `idempotentHint` on every tool
 - **stdio or HTTP**: Streamable HTTP with bearer auth for shared deployments
 - **Read-only mode**: hide every write tool with one env var
+- **Large-result safety**: compact query results, row and response-size caps, paging
+- **Resources & prompts**: browse databases, cards, dashboards and collections; ready-made workflows
 - **Admin automation**: users, groups, permissions, settings, database connections, transforms
 - **Type-safe**: HTTP client generated from Metabase's OpenAPI spec
 - **Zero config**: runs via `npx`, no installation needed
@@ -238,6 +240,8 @@ Generic JSON config (Cursor, VS Code and others):
 | `METABASE_TOOLSETS` | No | Comma list of toolsets or presets to load (default: all). See [Toolsets](#toolsets) |
 | `METABASE_TOOLS_ENABLE` | No | Extra tools to load on top of the toolsets (names or globs, e.g. `get_card,export_*`) |
 | `METABASE_TOOLS_DISABLE` | No | Tools never to load (names or globs); always wins over enable |
+| `METABASE_MAX_ROWS` | No | Row cap for query tools (default `500`); see [Large results](#large-results) |
+| `METABASE_MAX_RESPONSE_CHARS` | No | Size cap for any tool response (default `100000`) |
 | `MCP_TRANSPORT` | No | `stdio` (default) or `http`. `--http` on the command line does the same |
 | `MCP_HTTP_HOST` / `MCP_HTTP_PORT` | No | HTTP bind address, default `127.0.0.1:3333` (`PORT` also works) |
 | `MCP_HTTP_TOKEN` | HTTP mode | Bearer token clients must send (min. 16 chars) |
@@ -279,6 +283,25 @@ METABASE_TOOLS_DISABLE='delete_*'       # never delete anything
 ```
 
 Precedence, strongest first: **read-only mode > `METABASE_TOOLS_DISABLE` > `METABASE_TOOLS_ENABLE` > `METABASE_TOOLSETS`**. An unknown toolset stops the server at startup; an enable/disable pattern that matches nothing logs a warning. The startup log (stderr) shows how many tools are enabled.
+
+### Large results
+
+Query tools (`execute_query`, `execute_card_query`, `run_metric`) return a compact view: `columns`
+(name, type) and `rows`, without Metabase's column internals, `results_metadata` and insights. Pass
+`verbose: true` for the raw response. Results are capped at `METABASE_MAX_ROWS` rows (per call:
+`max_rows`, never above the cap) and paged with `offset`; a `note` says how to get the rest. Every tool
+response is compact JSON capped at `METABASE_MAX_RESPONSE_CHARS`. For a 10 / 100 / 500-row
+`SELECT * FROM ORDERS` this is 94% / 76% / 60% smaller than the raw pretty-printed response. For
+full result sets use the export tools with `output_path`.
+
+### Resources and prompts
+
+Besides tools the server offers MCP **resources** for browsing (compact JSON):
+`metabase://databases`, `metabase://database/{id}/schema`, `metabase://card/{id}`,
+`metabase://dashboard/{id}`, `metabase://collection/{id}` (`root` for the root collection), and
+**prompts** for common workflows: `explore-database`, `build-dashboard`, `explain-card`,
+`audit-permissions`. Both follow the tool selection: a resource needs its toolset, a prompt needs
+every tool it uses (so `build-dashboard` disappears in read-only mode).
 
 ### HTTP mode (shared / server deployments)
 
@@ -338,7 +361,7 @@ Full catalog with parameters: see the [tool catalog site](https://serdnaley.gith
 
 <!-- tools:start (generated by scripts/generate-docs.ts, do not edit) -->
 
-### Read tools (70, always available)
+### Read tools (79, always available)
 
 | Toolset | Tools |
 |---|---|
@@ -357,7 +380,7 @@ Full catalog with parameters: see the [tool catalog site](https://serdnaley.gith
 | **Settings** (`settings`) | `list_settings`, `get_setting` |
 | **Alerts & Subscriptions** (`notifications`) | `list_alerts`, `get_alert`, `list_dashboard_subscriptions`, `list_notifications` |
 | **X-Rays** (`xrays`) | `generate_xray` |
-| **Activity & Tasks** (`activity`) | `get_activity`, `get_recent_items`, `get_popular_items`, `list_tasks`, `get_task` |
+| **Activity & Tasks** (`activity`) | `get_activity`, `get_recent_items`, `get_popular_items` |
 | **Snippets** (`snippets`) | `list_snippets`, `get_snippet` |
 | **Glossary** (`glossary`) | `list_glossary_terms`, `get_glossary_term` |
 | **Documents** (`documents`) | `list_documents`, `get_document` |
@@ -368,8 +391,11 @@ Full catalog with parameters: see the [tool catalog site](https://serdnaley.gith
 | **Measures** (`measures`) | `list_measures`, `get_measure` |
 | **Transforms** (`transforms`) | `list_transforms`, `get_transform`, `list_transform_runs`, `get_transform_run`, `list_transform_jobs`, `list_transform_tags` |
 | **Exports** (`exports`) | `export_card_query`, `export_query`, `export_dashboard_pdf` |
+| **API Keys** (`api-keys`) | `list_api_keys` |
+| **Embedding** (`embedding`) | `get_embedding_status`, `create_embed_url` |
+| **Tasks & Logs** (`diagnostics`) | `list_tasks`, `get_task`, `list_task_types`, `list_task_runs`, `get_scheduler_info`, `get_server_logs`, `list_log_presets`, `get_premium_token_status` |
 
-### Write tools (91, hidden in read-only mode)
+### Write tools (99, hidden in read-only mode)
 
 | Toolset | Tools |
 |---|---|
@@ -397,8 +423,11 @@ Full catalog with parameters: see the [tool catalog site](https://serdnaley.gith
 | **Metrics** (`metrics`) | `create_metric`, `update_metric` |
 | **Measures** (`measures`) | `create_measure`, `update_measure` |
 | **Transforms** (`transforms`) | `create_transform`, `update_transform`, `delete_transform`, `run_transform`, `cancel_transform_run`, `create_transform_job`, `run_transform_job`, `delete_transform_job`, `create_transform_tag` |
+| **API Keys** (`api-keys`) | `create_api_key`, `update_api_key`, `regenerate_api_key`, `delete_api_key` |
+| **Embedding** (`embedding`) | `set_static_embedding`, `set_resource_embedding` |
+| **Tasks & Logs** (`diagnostics`) | `set_log_levels`, `reset_log_levels` |
 
-Presets for `METABASE_TOOLSETS`: `all` (everything); `query` (search, databases, tables, dataset, cards, metrics, measures, segments, exports, activity, xrays); `content` (search, collections, cards, dashboards, documents, snippets, timelines, bookmarks, glossary, revisions, moderation, notifications, exports); `admin` (users, permissions, settings, databases, tables, cache, persistence, upload, transforms, actions, activity, eid-translation).
+Presets for `METABASE_TOOLSETS`: `all` (everything); `query` (search, databases, tables, dataset, cards, metrics, measures, segments, exports, activity, xrays); `content` (search, collections, cards, dashboards, documents, snippets, timelines, bookmarks, glossary, revisions, moderation, notifications, exports); `admin` (users, permissions, settings, databases, tables, cache, persistence, upload, transforms, actions, activity, eid-translation, api-keys, embedding, diagnostics).
 
 <!-- tools:end -->
 

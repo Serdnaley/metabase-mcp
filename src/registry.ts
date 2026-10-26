@@ -3,6 +3,7 @@ import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import type { MetabaseClient } from "./client.js";
 import type { Config } from "./config.js";
 import { TOOL_MODULES } from "./tools/index.js";
+import { capText, compactJsonText, DEFAULT_MAX_RESPONSE_CHARS } from "./results.js";
 
 /** One tool as declared by a src/tools/* module, plus metadata derived here. */
 export type ToolDef = {
@@ -33,7 +34,7 @@ export const TOOLSET_PRESETS: Record<string, string[]> = {
   // Instance administration and data operations
   admin: [
     "users", "permissions", "settings", "databases", "tables", "cache", "persistence",
-    "upload", "transforms", "actions", "activity", "eid-translation",
+    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics",
   ],
 };
 
@@ -47,7 +48,7 @@ const RAW_SQL_TOOLS = new Set(["execute_query", "export_query"]);
 const ADDITIVE_PREFIXES = ["create_", "add_", "copy_", "validate_", "sync_", "rescan_", "run_", "send_", "upload_", "persist_", "refresh_"];
 const IDEMPOTENT_WRITE_PREFIXES = [
   "update_", "delete_", "remove_", "deactivate_", "reactivate_", "discard_", "invalidate_",
-  "unpersist_", "reorder_", "sync_", "rescan_", "validate_", "refresh_", "persist_",
+  "unpersist_", "reorder_", "sync_", "rescan_", "validate_", "refresh_", "persist_", "set_", "reset_",
 ];
 
 export const annotate = (name: string, write: boolean): ToolAnnotations => {
@@ -170,12 +171,34 @@ export const selectTools = (
   return { tools, warnings };
 };
 
-export const registerTools = (server: McpServer, tools: ToolDef[]) => {
+/**
+ * Every tool response goes through here: JSON text is re-serialised compactly and capped at
+ * maxResponseChars, so no single call can flood the client's context.
+ */
+export const wrapHandler = (handler: ToolCallback<any>, maxResponseChars: number): ToolCallback<any> =>
+  (async (...args: unknown[]) => {
+    const result = await (handler as (...a: unknown[]) => Promise<any>)(...args);
+    if (!result || !Array.isArray(result.content)) return result;
+    return {
+      ...result,
+      content: result.content.map((c: any) =>
+        c?.type === "text" && typeof c.text === "string"
+          ? { ...c, text: capText(compactJsonText(c.text), maxResponseChars) }
+          : c
+      ),
+    };
+  }) as ToolCallback<any>;
+
+export const registerTools = (
+  server: McpServer,
+  tools: ToolDef[],
+  maxResponseChars: number = DEFAULT_MAX_RESPONSE_CHARS
+) => {
   for (const t of tools) {
     server.registerTool(
       t.name,
       { description: t.description, inputSchema: t.inputSchema as any, annotations: t.annotations },
-      t.handler
+      wrapHandler(t.handler, maxResponseChars)
     );
   }
 };

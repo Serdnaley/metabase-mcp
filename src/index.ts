@@ -2,11 +2,13 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { loadConfig } from "./config.js";
+import { loadConfig, resultLimits } from "./config.js";
 import { createMetabaseClient } from "./client.js";
 import { buildToolCatalog, parseToolSelection, registerTools, selectTools } from "./registry.js";
 import { loadHttpOptions, startHttpServer } from "./http.js";
 import { SERVER_NAME, SERVER_VERSION } from "./server-info.js";
+import { registerResources } from "./resources.js";
+import { registerPrompts } from "./prompts.js";
 
 const fail = (message: string): never => {
   console.error(`Configuration error: ${message}`);
@@ -42,7 +44,9 @@ const main = async () => {
 
   const createServer = () => {
     const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
-    registerTools(server, selected.tools);
+    registerTools(server, selected.tools, resultLimits(config).maxResponseChars);
+    registerResources(server, client, new Set(selected.tools.map((t) => t.toolset)));
+    registerPrompts(server, new Set(selected.tools.map((t) => t.name)));
     return server;
   };
 

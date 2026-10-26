@@ -58,7 +58,7 @@ export const updateUser = async (
 
   const { data, error } = await client.PUT("/api/user/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update user failed: ${JSON.stringify(error)}`);
   return data;
@@ -89,7 +89,7 @@ export const listGroups = async (client: MetabaseClient) => {
 export const getGroup = async (client: MetabaseClient, id: number) => {
   const { data, error } = await client.GET("/api/permissions/group/{id}" as any, {
     params: { path: { id } },
-  } as any);
+  });
   if (error) throw new Error(`Get group failed: ${JSON.stringify(error)}`);
   return data;
 };

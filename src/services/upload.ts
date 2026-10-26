@@ -14,7 +14,7 @@ export const uploadCsv = async (
   const { data, error } = await client.POST("/api/upload/csv", {
     body: form as any,
     bodySerializer: (body: unknown) => body as FormData,
-  } as any);
+  });
   if (error) throw new Error(`Upload CSV failed: ${JSON.stringify(error)}`);
   return data;
 };

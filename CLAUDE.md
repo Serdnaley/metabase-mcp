@@ -66,7 +66,7 @@ src/http.ts       → Streamable HTTP transport with bearer auth (stdio is the d
 
 ### Type generation
 
-`scripts/generate-types.ts` downloads the Metabase OpenAPI spec, cleans problematic schema names (double dots, `/` and `%` in property keys, broken `$ref` pointers), then generates types via `openapi-typescript`. The generated types are committed.
+`scripts/generate-types.ts` downloads the Metabase OpenAPI spec (pinned to v0.64, the CI version; `METABASE_SPEC=<url|path>` overrides), cleans problematic schema names (double dots, `/` and `%` in property keys, broken `$ref` pointers), then generates types via `openapi-typescript`. The generated types are committed.
 
 ## Releasing (npm, MCP Registry, .mcpb, Docker)
 

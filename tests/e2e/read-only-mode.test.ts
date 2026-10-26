@@ -75,6 +75,15 @@ const READ_ONLY_TOOLS = [
   "export_card_query",
   "export_query",
   "export_dashboard_pdf",
+  "list_api_keys",
+  "get_embedding_status",
+  "create_embed_url",
+  "list_task_types",
+  "list_task_runs",
+  "get_scheduler_info",
+  "get_server_logs",
+  "list_log_presets",
+  "get_premium_token_status",
 ];
 
 const WRITE_TOOLS = [
@@ -169,6 +178,14 @@ const WRITE_TOOLS = [
   "run_transform_job",
   "delete_transform_job",
   "create_transform_tag",
+  "create_api_key",
+  "update_api_key",
+  "regenerate_api_key",
+  "delete_api_key",
+  "set_static_embedding",
+  "set_resource_embedding",
+  "set_log_levels",
+  "reset_log_levels",
 ];
 
 const getToolNames = (server: McpServer): string[] => {
