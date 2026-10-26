@@ -2,7 +2,9 @@
 
 MCP server for Metabase — comprehensive coverage of the Metabase REST API for AI assistants.
 
-Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **161 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
+Headless by design: it authenticates with a Metabase **API key** (or email/password), with no OAuth flow and no browser, so it runs in CI, agents and servers, and works on every Metabase tier, including free OSS. **161 tools** cover dashboards, questions, collections, users, permissions, alerts, settings and more, so AI assistants can fully manage Metabase, not just read from it.
+
+**Comparison:** how this server stacks up against Metabase's built-in MCP and other Metabase MCP servers: [docs/comparison.md](docs/comparison.md).
 
 ## Features
 
