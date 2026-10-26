@@ -34,7 +34,7 @@ export const TOOLSET_PRESETS: Record<string, string[]> = {
   // Instance administration and data operations
   admin: [
     "users", "permissions", "settings", "databases", "tables", "cache", "persistence",
-    "upload", "transforms", "actions", "activity", "eid-translation",
+    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics",
   ],
 };
 
@@ -48,7 +48,7 @@ const RAW_SQL_TOOLS = new Set(["execute_query", "export_query"]);
 const ADDITIVE_PREFIXES = ["create_", "add_", "copy_", "validate_", "sync_", "rescan_", "run_", "send_", "upload_", "persist_", "refresh_"];
 const IDEMPOTENT_WRITE_PREFIXES = [
   "update_", "delete_", "remove_", "deactivate_", "reactivate_", "discard_", "invalidate_",
-  "unpersist_", "reorder_", "sync_", "rescan_", "validate_", "refresh_", "persist_",
+  "unpersist_", "reorder_", "sync_", "rescan_", "validate_", "refresh_", "persist_", "set_", "reset_",
 ];
 
 export const annotate = (name: string, write: boolean): ToolAnnotations => {

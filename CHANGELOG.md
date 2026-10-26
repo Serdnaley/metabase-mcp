@@ -22,6 +22,19 @@ All notable changes to this project will be documented in this file.
 - Prompts: `explore-database`, `build-dashboard`, `explain-card`, `audit-permissions`.
 - Both follow the tool selection: resources need their toolset, prompts need every tool they use.
 
+### Admin tools (17 new, 178 total)
+
+- **API keys** toolset: `list_api_keys`, `create_api_key` (full key returned once),
+  `update_api_key`, `regenerate_api_key`, `delete_api_key`.
+- **Embedding** toolset: `get_embedding_status` (settings, embeddable items, whether a signing key
+  exists, never its value), `set_static_embedding`, `set_resource_embedding` (per-parameter
+  enabled/locked/disabled), `create_embed_url` (signed iframe URL, signed locally).
+- **Tasks & logs** (`diagnostics`) toolset: `list_tasks` (now with status/task filters, paging and
+  compact output; moved from `activity`), `get_task`, `list_task_types`, `list_task_runs`,
+  `get_scheduler_info`, `get_server_logs` (level/text filter, ANSI stripped), `list_log_presets`,
+  `set_log_levels` / `reset_log_levels` (temporary), `get_premium_token_status`.
+- The `admin` preset includes the three new toolsets.
+
 ## [0.3.0] - 2026-10-26
 
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See

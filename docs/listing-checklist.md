@@ -44,4 +44,4 @@ Metabase"), and a test Metabase if they ask for one.
 ### Awesome lists (optional)
 
 PRs to `punkpeye/awesome-mcp-servers` and `wong2/awesome-mcp-servers` under data & analytics, one line:
-"Headless Metabase MCP: API-key auth, stdio/HTTP, 161 tools with toolsets, any Metabase tier."
+"Headless Metabase MCP: API-key auth, stdio/HTTP, 178 tools with toolsets, any Metabase tier."
