@@ -3,6 +3,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
 import {
+  listNotifications,
+  sendNotificationNow,
   listAlerts,
   getAlert,
   createAlert,
@@ -72,7 +74,30 @@ export const registerNotificationTools = (
     async ({ dashboard_id }) => text(await listDashboardSubscriptions(client, dashboard_id))
   );
 
+  server.tool(
+    "list_notifications",
+    "List notifications of any kind (question alerts, system-event notifications). Alerts are payload_type 'notification/card'. Use list_alerts for alerts only.",
+    {
+      payload_type: z.string().optional().describe("e.g. 'notification/card' (alerts) or 'notification/system-event'"),
+      card_id: z.number().optional().describe("Only notifications on this card"),
+      creator_id: z.number().optional().describe("Only notifications created by this user"),
+      recipient_id: z.number().optional().describe("Only notifications this user receives"),
+      include_inactive: z.boolean().optional().describe("Include deactivated notifications"),
+    },
+    async (params) => text(await listNotifications(client, params))
+  );
+
   if (!config.readOnly) {
+    server.tool(
+      "send_notification",
+      "Send a notification (e.g. an alert) right now, outside its schedule. Delivers real emails/Slack messages. Metabase 0.64+ allows this only for its creator or an admin.",
+      {
+        id: z.number().describe("Notification (alert) ID"),
+        handler_ids: z.array(z.number()).optional().describe("Only send via these handler (channel) IDs; default all"),
+      },
+      async ({ id, handler_ids }) => text(await sendNotificationNow(client, id, { handler_ids }))
+    );
+
     server.tool(
       "create_alert",
       "Create an alert on a saved question. Metabase checks the question on the cron schedule and notifies the channels when the condition is met.",

@@ -187,3 +187,38 @@ export const deleteDashboardSubscription = async (client: MetabaseClient, subscr
   await updateDashboardSubscription(client, subscriptionId, { archived: true });
   return { success: true };
 };
+
+// ── Generic notifications (alerts, dashboard subscriptions migrated to notifications, system events) ──
+
+export const listNotifications = async (
+  client: MetabaseClient,
+  params?: {
+    payload_type?: string;
+    card_id?: number;
+    creator_id?: number;
+    recipient_id?: number;
+    include_inactive?: boolean;
+  }
+) => {
+  const query: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(params ?? {})) if (v !== undefined) query[k] = v;
+  const { data, error } = await anyClient(client).GET("/api/notification", { params: { query } });
+  if (error) throw new Error(`List notifications failed: ${JSON.stringify(error)}`);
+  return data;
+};
+
+/** Send a notification now, outside its schedule (0.64+: needs creator or admin). */
+export const sendNotificationNow = async (
+  client: MetabaseClient,
+  id: number,
+  params?: { handler_ids?: number[] }
+) => {
+  const body: Record<string, unknown> = {};
+  if (params?.handler_ids?.length) body.handler_ids = params.handler_ids;
+  const { error } = await anyClient(client).POST("/api/notification/{id}/send", {
+    params: { path: { id } },
+    body,
+  });
+  if (error) throw new Error(`Send notification failed: ${JSON.stringify(error)}`);
+  return { success: true };
+};

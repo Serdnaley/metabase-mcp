@@ -1,6 +1,8 @@
 import { describe, test, expect, afterAll } from "bun:test";
-import { getTestClient, testName, SAMPLE_DB_ID } from "../helpers.js";
+import { getTestClient, testName, SAMPLE_DB_ID, skipOnEnvError } from "../helpers.js";
 import {
+  listNotifications,
+  sendNotificationNow,
   listAlerts,
   getAlert,
   createAlert,
@@ -58,6 +60,19 @@ describe("notifications service", () => {
     expect(result.payload_type).toBe("notification/card");
     expect(result.payload.card_id).toBe(cardId);
     alertId = result.id;
+  });
+
+  test("listNotifications filters by payload type and card", async () => {
+    const client = await getTestClient();
+    const all = asArray(await listNotifications(client, { payload_type: "notification/card", card_id: cardId }));
+    expect(all.some((n: any) => n.id === alertId)).toBe(true);
+  });
+
+  test("sendNotificationNow sends (or reports missing email setup)", async () => {
+    const client = await getTestClient();
+    await skipOnEnvError("send notification", [/email|smtp|channel/i], async () => {
+      expect(await sendNotificationNow(client, alertId)).toEqual({ success: true });
+    });
   });
 
   test("listAlerts filters by card", async () => {
