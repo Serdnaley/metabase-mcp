@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-26
+
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See
 `docs/metabase-changes-0.59-to-0.64.md` for the full API diff.
 

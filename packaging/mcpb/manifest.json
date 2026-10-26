@@ -3,25 +3,36 @@
   "manifest_version": "0.3",
   "name": "metabase-mcp",
   "display_name": "Metabase (headless MCP)",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Metabase MCP server with API-key auth (no OAuth): 161 tools for queries, dashboards, admin, transforms and exports.",
   "long_description": "Connects Claude to any Metabase instance (free or paid, 0.59+) with a Metabase API key or email/password. 161 tools across 30 toolsets: questions, dashboards, collections, SQL, metrics, measures, segments, transforms, users and permissions, databases, settings, alerts, exports. Optional read-only mode and toolset/tool filtering.",
   "author": {
     "name": "Andres Pavliuk",
     "url": "https://github.com/Serdnaley"
   },
-  "repository": { "type": "git", "url": "https://github.com/Serdnaley/metabase-mcp" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serdnaley/metabase-mcp"
+  },
   "homepage": "https://serdnaley.github.io/metabase-mcp/",
   "documentation": "https://github.com/Serdnaley/metabase-mcp#readme",
   "support": "https://github.com/Serdnaley/metabase-mcp/issues",
   "license": "MIT",
-  "keywords": ["metabase", "bi", "analytics", "sql", "dashboards"],
+  "keywords": [
+    "metabase",
+    "bi",
+    "analytics",
+    "sql",
+    "dashboards"
+  ],
   "server": {
     "type": "node",
     "entry_point": "server/index.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server/index.js"],
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
       "env": {
         "METABASE_URL": "${user_config.metabase_url}",
         "METABASE_API_KEY": "${user_config.metabase_api_key}",
@@ -81,7 +92,13 @@
     }
   },
   "compatibility": {
-    "platforms": ["darwin", "win32", "linux"],
-    "runtimes": { "node": ">=18.0.0" }
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
   }
 }

@@ -433,7 +433,7 @@ Tests run against a real Metabase instance via Docker:
 ```bash
 docker compose up -d             # Start Metabase (pinned version, see docker-compose.yml)
 ./tests/ci/wait-for-metabase.sh  # Wait for ready (~15s)
-bun test                         # 216 tests
+bun test                         # 276 tests
 docker compose down              # Stop Metabase
 ```
 

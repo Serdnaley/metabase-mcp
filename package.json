@@ -1,6 +1,6 @@
 {
   "name": "@serdnaley/metabase-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "mcpName": "io.github.Serdnaley/metabase-mcp",
   "description": "Headless MCP server for Metabase: API-key auth (no OAuth), stdio or HTTP, 161 tools with toolsets, works on every Metabase tier",
   "type": "module",
