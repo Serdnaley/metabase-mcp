@@ -9,6 +9,7 @@ import {
   deactivateUser,
   reactivateUser,
   listGroups,
+  getGroup,
   createGroup,
   updateGroup,
   deleteGroup,
@@ -147,49 +148,31 @@ describe("users service", () => {
   // ── Group membership lifecycle ────────────────────────────────────────────
 
   test("addGroupMember adds a user to a group", async () => {
-    if (!createdUserId || !createdGroupId) return;
     const client = await getTestClient();
     const result = (await addGroupMember(client, {
       group_id: createdGroupId,
       user_id: createdUserId,
-    })) as any;
-    expect(result).toBeDefined();
-    // The response shape varies by Metabase version — try common field names
-    const membershipId = result?.membership_id ?? result?.id ?? null;
-    createdMembershipId = membershipId;
-    // If the direct response doesn't expose an ID, fall back to fetching from the user
-    if (!createdMembershipId) {
-      const user = (await getUser(client, createdUserId)) as any;
-      const memberships: any[] = user?.user_group_memberships ?? [];
-      const found = memberships.find((m: any) => m.group_id === createdGroupId);
-      createdMembershipId = found?.membership_id ?? found?.id ?? null;
-    }
-    expect(createdMembershipId).toBeDefined();
+    })) as any[];
+    // Metabase returns the group's members, each with its membership_id
+    const member = result.find((m) => m.user_id === createdUserId);
+    expect(member?.membership_id).toBeNumber();
+    createdMembershipId = member.membership_id;
+  });
+
+  test("getGroup lists members with membership ids", async () => {
+    const client = await getTestClient();
+    const group = (await getGroup(client, createdGroupId)) as any;
+    expect(group.id).toBe(createdGroupId);
+    const member = group.members.find((m: any) => m.user_id === createdUserId);
+    expect(member?.membership_id).toBe(createdMembershipId);
   });
 
   test("removeGroupMember removes a user from a group", async () => {
-    if (!createdUserId || !createdGroupId) return;
     const client = await getTestClient();
-    if (createdMembershipId) {
-      const result = await removeGroupMember(client, createdMembershipId);
-      expect(result).toEqual({ success: true });
-    } else {
-      // Final fallback: look up membership from user data
-      try {
-        const user = (await getUser(client, createdUserId)) as any;
-        const memberships: any[] = user?.user_group_memberships ?? [];
-        const found = memberships.find((m: any) => m.group_id === createdGroupId);
-        if (found) {
-          const id = found.membership_id ?? found.id;
-          const result = await removeGroupMember(client, id);
-          expect(result).toEqual({ success: true });
-        } else {
-          console.log("Could not find membership to remove");
-        }
-      } catch (e: any) {
-        console.log("removeGroupMember not testable:", e.message);
-      }
-    }
+    const result = await removeGroupMember(client, createdMembershipId);
+    expect(result).toEqual({ success: true });
+    const group = (await getGroup(client, createdGroupId)) as any;
+    expect(group.members.some((m: any) => m.user_id === createdUserId)).toBe(false);
   });
 
   test("deleteGroup deletes the permission group", async () => {

@@ -75,6 +75,24 @@ describe("collections service", () => {
     expect(found).toBeDefined();
   });
 
+  test("listCollectionItems sorts by name in both directions", async () => {
+    const client = await getTestClient();
+    const parent = (await createCollection(client, { name: testName("sort-parent") })) as any;
+    cleanupIds.push(parent.id);
+    for (const n of ["aaa-sort", "zzz-sort"]) {
+      const c = (await createCollection(client, { name: testName(n), parent_id: parent.id })) as any;
+      cleanupIds.push(c.id);
+    }
+    const names = async (dir: "asc" | "desc") => {
+      const r = (await listCollectionItems(client, parent.id, { sort_column: "name", sort_direction: dir })) as any;
+      return ((r.data || r) as any[]).map((i) => i.name);
+    };
+    const asc = await names("asc");
+    const desc = await names("desc");
+    expect(asc[0].startsWith("aaa-sort")).toBe(true);
+    expect(desc[0].startsWith("zzz-sort")).toBe(true);
+  });
+
   test("listCollectionItems with model filter", async () => {
     const client = await getTestClient();
     // Should return empty when filtering for a model type that doesn't exist in the collection

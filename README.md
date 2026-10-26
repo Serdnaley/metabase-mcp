@@ -2,11 +2,13 @@
 
 MCP server for Metabase — comprehensive coverage of the Metabase REST API for AI assistants.
 
-Metabase ships a [built-in MCP](https://www.metabase.com/docs/master/ai/mcp) for querying data. This project goes further: **128 tools** covering dashboards, questions, collections, users, permissions, alerts, settings, and more — so AI assistants can fully manage Metabase, not just read from it.
+Headless by design: it authenticates with a Metabase **API key** (or email/password), with no OAuth flow and no browser, so it runs in CI, agents and servers, and works on every Metabase tier, including free OSS. **161 tools** cover dashboards, questions, collections, users, permissions, alerts, settings and more, so AI assistants can fully manage Metabase, not just read from it.
+
+**Comparison:** how this server stacks up against Metabase's built-in MCP and other Metabase MCP servers: [docs/comparison.md](docs/comparison.md).
 
 ## Features
 
-- **128 MCP tools** across 26 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads
+- **161 MCP tools** across 30 domains: search, databases, tables, collections, cards, dashboards, actions, dataset, users, groups, permissions, segments, revisions, settings, alerts, subscriptions, glossary, documents, timelines, bookmarks, moderation, snippets, x-rays, cache, persistence, uploads, metrics, measures, transforms, exports
 - **Full CRUD**: Create, read, update, delete across all domains
 - **Admin automation**: User/group management, permissions, settings, database connections
 - **Read-only mode**: Restrict to read-only tools via a single env var
@@ -241,7 +243,7 @@ The AI assistant will:
 
 ## Tools
 
-### Read tools (50 — always available)
+### Read tools (70 — always available)
 
 | Domain | Tools |
 |---|---|
@@ -253,13 +255,13 @@ The AI assistant will:
 | **Dashboards** | `list_dashboards`, `get_dashboard` |
 | **Actions** | `list_actions`, `get_action` |
 | **Dataset** | `execute_query` |
-| **Users & Groups** | `list_users`, `get_user`, `get_current_user`, `list_groups` |
+| **Users & Groups** | `list_users`, `get_user`, `get_current_user`, `list_groups`, `get_group` |
 | **Permissions** | `get_permissions_graph`, `get_collection_permissions` |
 | **Segments** | `list_segments`, `get_segment` |
 | **Revisions** | `list_revisions` |
 | **Settings** | `list_settings`, `get_setting` |
-| **Alerts** | `list_alerts`, `get_alert`, `list_dashboard_subscriptions` |
-| **Activity** | `get_activity`, `list_tasks`, `get_task` |
+| **Alerts** | `list_alerts`, `get_alert`, `list_notifications`, `list_dashboard_subscriptions` |
+| **Activity** | `get_activity`, `get_recent_items`, `get_popular_items`, `list_tasks`, `get_task` |
 | **Snippets** | `list_snippets`, `get_snippet` |
 | **Glossary** | `list_glossary_terms`, `get_glossary_term` |
 | **Documents** | `list_documents`, `get_document` |
@@ -267,8 +269,12 @@ The AI assistant will:
 | **Bookmarks** | `list_bookmarks` |
 | **X-Rays** | `generate_xray` |
 | **EID Translation** | `translate_entity_ids` |
+| **Metrics** | `list_metrics`, `get_metric`, `run_metric`, `list_metric_dimensions`, `get_metric_dimension_values` |
+| **Measures** | `list_measures`, `get_measure` |
+| **Transforms** | `list_transforms`, `get_transform`, `list_transform_runs`, `get_transform_run`, `list_transform_jobs`, `list_transform_tags` |
+| **Exports** | `export_card_query`, `export_query`, `export_dashboard_pdf` |
 
-### Write tools (78 — disabled in read-only mode)
+### Write tools (91 — disabled in read-only mode)
 
 | Domain | Tools |
 |---|---|
@@ -277,13 +283,13 @@ The AI assistant will:
 | **Dashboards** | `create_dashboard`, `update_dashboard`, `delete_dashboard`, `copy_dashboard`, `update_dashboard_cards`, `create_dashboard_public_link`, `delete_dashboard_public_link` |
 | **Actions** | `create_action`, `update_action`, `delete_action`, `execute_action`, `create_action_public_link`, `delete_action_public_link` |
 | **Tables & Fields** | `update_table`, `update_field`, `rescan_field_values`, `discard_field_values`, `reorder_fields` |
-| **Databases** | `create_database`, `update_database`, `delete_database`, `validate_database`, `sync_database_schema`, `notify_database` |
+| **Databases** | `create_database`, `update_database`, `delete_database`, `validate_database`, `sync_database_schema` |
 | **Users & Groups** | `create_user`, `update_user`, `deactivate_user`, `reactivate_user`, `create_group`, `update_group`, `delete_group`, `add_group_member`, `remove_group_member` |
 | **Permissions** | `update_permissions_graph`, `update_collection_permissions` |
 | **Segments** | `create_segment`, `update_segment`, `delete_segment` |
 | **Revisions** | `revert_revision` |
 | **Settings** | `update_setting` |
-| **Alerts** | `create_alert`, `update_alert`, `delete_alert`, `create_dashboard_subscription`, `update_dashboard_subscription`, `delete_dashboard_subscription` |
+| **Alerts** | `create_alert`, `update_alert`, `delete_alert`, `send_notification`, `create_dashboard_subscription`, `update_dashboard_subscription`, `delete_dashboard_subscription` |
 | **Snippets** | `create_snippet`, `update_snippet`, `delete_snippet` |
 | **Glossary** | `create_glossary_term`, `update_glossary_term`, `delete_glossary_term` |
 | **Documents** | `create_document`, `update_document`, `delete_document` |
@@ -293,12 +299,19 @@ The AI assistant will:
 | **Cache** | `invalidate_cache`, `update_cache_config` |
 | **Persistence** | `persist_model`, `unpersist_model`, `refresh_persisted_model` |
 | **Upload** | `upload_csv` |
+| **Metrics** | `create_metric`, `update_metric` |
+| **Measures** | `create_measure`, `update_measure` |
+| **Transforms** | `create_transform`, `update_transform`, `delete_transform`, `run_transform`, `cancel_transform_run`, `create_transform_job`, `run_transform_job`, `delete_transform_job`, `create_transform_tag` |
 
 ## Security
 
 **`execute_query` is available even in read-only mode.** It can execute arbitrary SQL against any database the configured Metabase account has access to. Metabase enforces its own permission model, but this tool does not add additional restrictions.
 
 To prevent write operations, ensure the Metabase API key or account has **read-only database permissions** within Metabase itself.
+
+**Exports can write local files.** `export_card_query`, `export_query` and `export_dashboard_pdf` stay available in read-only mode (they only read from Metabase) and, when given `output_path`, write to that absolute path on the machine running the MCP server. They never overwrite an existing file unless `overwrite: true` is passed. Metabase applies the same access check to an export as to running the query; its separate "Download results" permission exists only on Pro/Enterprise.
+
+**Read-only mode is not a security boundary.** `METABASE_READ_ONLY_MODE` only hides write tools. What a key can really do is set in Metabase: an API key gets the permissions of its group **plus All Users**. For a read-only assistant, put the key in a group with View-only collection access and "Create queries" set to query builder only (or no), and restrict All Users to no more than that. See [docs/read-only-and-permissions.md](docs/read-only-and-permissions.md) for the probe results and a setup checklist.
 
 **Action types are restricted.** The `create_action` tool only allows `query` and `implicit` action types. HTTP actions (which could make arbitrary outbound requests) are blocked.
 
@@ -316,11 +329,20 @@ bun run generate-types         # Regenerate types from Metabase OpenAPI spec
 Tests run against a real Metabase instance via Docker:
 
 ```bash
-docker compose up -d             # Start Metabase
+docker compose up -d             # Start Metabase (pinned version, see docker-compose.yml)
 ./tests/ci/wait-for-metabase.sh  # Wait for ready (~15s)
-bun test                         # 202 tests, 668 assertions
+bun test                         # 216 tests
 docker compose down              # Stop Metabase
 ```
+
+Verified against Metabase **v0.64.3.4** (the CI pin) and **v0.59.6**. To try another release:
+`MB_IMAGE=metabase/metabase:latest docker compose up -d`. CI also runs the suite weekly on
+`metabase:latest` as a non-blocking job, so upstream API drift shows up before the pin is bumped.
+
+Actions, transforms and CSV uploads run against the Postgres "Test Warehouse" from
+`docker-compose.yml`. Features that need a paid plan or a missing service (moderation, cache
+invalidation, model persistence, or the warehouse itself) are skipped explicitly with a
+`SKIP … (environment)` log line; any other API error fails the test.
 
 ## How It Works
 

@@ -90,6 +90,56 @@ const createApiKey = async (sessionToken: string): Promise<string> => {
   return data.unmasked_key;
 };
 
+/**
+ * Optional Postgres "Test Warehouse" for features the SQLite/H2 sample DB can't do
+ * (transforms, CSV uploads). Metabase connects to it at MB_TEST_PG_HOST (default
+ * localhost; "postgres" inside docker compose). Missing Postgres only skips those tests.
+ */
+const WAREHOUSE_NAME = "Test Warehouse";
+
+const ensureWarehouse = async (metabaseUrl: string, apiKey: string) => {
+  const headers = { "X-API-Key": apiKey, "Content-Type": "application/json" };
+  // Transforms are off by default on self-hosted 0.64+; harmless if the setting doesn't exist
+  await fetch(`${metabaseUrl}/api/setting/transforms-enabled`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ value: true }),
+  }).catch(() => {});
+
+  const list = (await (await fetch(`${metabaseUrl}/api/database`, { headers })).json()) as any;
+  const dbs: any[] = Array.isArray(list) ? list : list.data ?? [];
+  let db = dbs.find((d) => d.name === WAREHOUSE_NAME);
+  if (!db) {
+    const res = await fetch(`${metabaseUrl}/api/database`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        name: WAREHOUSE_NAME,
+        engine: "postgres",
+        details: {
+          host: process.env.MB_TEST_PG_HOST ?? "localhost",
+          port: Number(process.env.MB_TEST_PG_PORT ?? 5432),
+          dbname: process.env.MB_TEST_PG_DB ?? "postgres",
+          user: process.env.MB_TEST_PG_USER ?? "postgres",
+          password: process.env.MB_TEST_PG_PASSWORD ?? "",
+        },
+      }),
+    });
+    if (!res.ok) {
+      console.log(`SKIP Test Warehouse (environment): Postgres not reachable — ${(await res.text()).slice(0, 200)}`);
+      return;
+    }
+    db = await res.json();
+    console.log(`Test Warehouse registered (database ${db.id})`);
+  }
+  // Point CSV uploads at the warehouse (ignored if already set / unsupported)
+  await fetch(`${metabaseUrl}/api/setting/uploads-settings`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ value: { db_id: db.id, schema_name: "public", table_prefix: null } }),
+  }).catch(() => {});
+};
+
 const main = async () => {
   // Skip if state file already exists (re-run without restart)
   try {
@@ -102,6 +152,7 @@ const main = async () => {
       });
       if (healthRes.ok) {
         console.log("Test setup: using existing credentials");
+        await ensureWarehouse(state.metabaseUrl, state.apiKey);
         return;
       }
     }
@@ -136,6 +187,7 @@ const main = async () => {
   // Write state for tests to read (owner-only permissions)
   const state = { metabaseUrl: METABASE_URL, apiKey };
   await Bun.write(SETUP_STATE_FILE, JSON.stringify(state));
+  await ensureWarehouse(METABASE_URL, apiKey);
   const { chmodSync } = await import("node:fs");
   chmodSync(SETUP_STATE_FILE, 0o600);
   console.log("Test setup complete");

@@ -13,7 +13,6 @@ import {
   deleteDatabase,
   validateDatabase,
   syncDatabaseSchema,
-  notifyDatabase,
 } from "../services/databases.js";
 
 export const registerDatabaseTools = (server: McpServer, client: MetabaseClient, config: Config) => {
@@ -37,7 +36,7 @@ export const registerDatabaseTools = (server: McpServer, client: MetabaseClient,
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 
-  server.tool("get_database_schema", "Get tables within a specific database schema", { id: z.number().describe("Database ID"), schema: z.string().describe("Schema name") }, async ({ id, schema }) => {
+  server.tool("get_database_schema", "Get tables within a specific database schema", { id: z.number().describe("Database ID"), schema: z.string().describe("Schema name as returned by list_database_schemas (\"\" for schema-less databases such as SQLite)") }, async ({ id, schema }) => {
     const result = await getDatabaseSchema(client, id, schema);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
@@ -107,18 +106,6 @@ export const registerDatabaseTools = (server: McpServer, client: MetabaseClient,
       },
       async ({ id }) => {
         const result = await syncDatabaseSchema(client, id);
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-    );
-
-    server.tool(
-      "notify_database",
-      "Send a post-ETL pipeline notification to trigger a schema sync on a database",
-      {
-        id: z.number().describe("Database ID"),
-      },
-      async ({ id }) => {
-        const result = await notifyDatabase(client, id);
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );

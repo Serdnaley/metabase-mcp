@@ -4,9 +4,61 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See
+`docs/metabase-changes-0.59-to-0.64.md` for the full API diff.
+
+### Fixed
+
+- `execute_card_query` with parameters: sends the now-required `parameters[].id`, reads MBQL 5
+  template tags (`stages[0]["template-tags"]`, an array), and raw date variables use `date/single`.
+- `create_segment` / `update_segment`: bare MBQL filter definitions (`{ filter: [...] }`) are wrapped
+  into a full query, which Metabase 0.64 requires.
+- `get_database_schema`: works on schema-less databases (`""`), such as the SQLite sample DB.
+- Alerts: `create_alert`, `update_alert`, `delete_alert`, `list_alerts`, `get_alert` now use
+  `/api/notification` (the old `/api/alert` write routes don't exist). New input shape:
+  `send_condition`, `send_once`, `channels: [{ type: "email", user_ids, emails } | { type: "slack", channel }]`,
+  `cron_schedule`. Delete deactivates.
+- Dashboard subscriptions use `/api/pulse`: list by `dashboard_id`, create (defaults to every question
+  on the dashboard), delete archives.
+- `get_activity`: `/api/activity` was removed upstream; now returns recent views + popular items.
+- `persist_model` / `unpersist_model`: correct `.../persist` and `.../unpersist` routes.
+- `get_glossary_term` (no GET-by-id route; looked up in the list); `update_glossary_term` with one field.
+- `list_collection_items` sorting (Metabase 0.64 renamed the params to kebab-case).
+- `create_document` / `update_document`: send the required ProseMirror `document` body (new `text`
+  shortcut; `content` kept as an alias). `delete_document` archives first.
+- `translate_entity_ids` request body; `upload_csv` sends multipart form data.
+
 ### Added
 
+- `get_group`: a permission group with its members and their `membership_id`, which
+  `remove_group_member` needs (no tool exposed it before).
+- **Metrics** (Metabase 0.60+ for running, 0.64+ for dimensions): `list_metrics`, `get_metric`,
+  `create_metric`, `update_metric`, `run_metric` (filters, breakouts, temporal buckets, or a raw
+  definition for metric math), `list_metric_dimensions`, `get_metric_dimension_values`. On older
+  versions list/get fall back to cards and the rest report the required version.
+- **Measures**: `list_measures`, `get_measure`, `create_measure`, `update_measure` (bare
+  `{ aggregation: [...] }` definitions are wrapped like segments).
+- **Transforms**: `list_transforms`, `get_transform`, `create_transform` (SQL shortcut),
+  `update_transform`, `delete_transform` (optionally dropping the table), `run_transform`,
+  `cancel_transform_run`, `list_transform_runs`, `get_transform_run`, transform jobs
+  (`list_transform_jobs`, `create_transform_job`, `run_transform_job`, `delete_transform_job`) and tags
+  (`list_transform_tags`, `create_transform_tag`). Requires `MB_TRANSFORMS_ENABLED=true` and a
+  non-sample warehouse.
+- **Exports**: `export_card_query` and `export_query` (csv/json inline with a size cap, or any format
+  incl. xlsx to `output_path`), `export_dashboard_pdf` (Metabase 0.64+).
+- **Notifications**: `list_notifications` (any payload type), `send_notification` (send now).
+- `get_recent_items`, `get_popular_items` tools.
+- Metabase error responses are stripped of Java stack traces (`trace`, `via`) before reaching the model.
+- CI pinned to Metabase v0.64.3.4 (`MB_IMAGE` override) plus a weekly non-blocking job on `latest`.
+- Test stack: an optional Postgres "Test Warehouse" (docker compose service) for transform and CSV
+  upload tests; tests that need it skip explicitly without it.
 - `METABASE_CUSTOM_HEADERS`: extra HTTP headers sent on every Metabase request, including the session login. It takes a JSON object or `Name: value` pairs separated by newlines or `;`, for example Cloudflare Access service tokens. Auth headers keep precedence, and a malformed value fails at startup.
+
+### Removed
+
+- `notify_database`: `POST /api/notify/db/:id` only accepts Metabase's server-wide `MB_API_KEY`, not a
+  user or API-key session, so the tool could never work with this server's auth. Use
+  `sync_database_schema` instead.
 
 ## [0.2.0] - 2026-04-15
 

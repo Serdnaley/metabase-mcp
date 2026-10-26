@@ -27,18 +27,25 @@ export const listCollectionItems = async (
   id: number,
   params?: { models?: string[]; sort_column?: string; sort_direction?: string; archived?: boolean }
 ) => {
+  // Metabase 0.64 renamed these params to kebab-case and silently ignores the snake_case
+  // ones; older versions only know snake_case. Send both so sorting works everywhere.
+  const query: Record<string, unknown> = {
+    models: params?.models,
+    archived: params?.archived ?? false,
+    include_can_run_adhoc_query: false,
+    show_dashboard_questions: false,
+    "show-dashboard-questions": false,
+  };
+  if (params?.sort_column !== undefined) {
+    query.sort_column = params.sort_column;
+    query["sort-column"] = params.sort_column;
+  }
+  if (params?.sort_direction !== undefined) {
+    query.sort_direction = params.sort_direction;
+    query["sort-direction"] = params.sort_direction;
+  }
   const { data, error } = await client.GET("/api/collection/{id}/items", {
-    params: {
-      path: { id },
-      query: {
-        models: params?.models as any,
-        sort_column: params?.sort_column as any,
-        sort_direction: params?.sort_direction as any,
-        archived: params?.archived ?? false,
-        include_can_run_adhoc_query: false,
-        show_dashboard_questions: false,
-      },
-    },
+    params: { path: { id }, query: query as any },
   });
   if (error) throw new Error(`List collection items failed: ${JSON.stringify(error)}`);
   return data;

@@ -1,5 +1,5 @@
-import { describe, test, expect, afterAll } from "bun:test";
-import { getTestClient, testName, SAMPLE_DB_ID } from "../helpers.js";
+import { describe, test, expect, afterAll, beforeAll } from "bun:test";
+import { getTestClient, testName, getWarehouseDbId } from "../helpers.js";
 import {
   listActions,
   getAction,
@@ -10,11 +10,24 @@ import {
 } from "../../src/services/actions.js";
 import { createCard, deleteCard } from "../../src/services/cards.js";
 
+// Actions need a database with actions enabled and a writable engine. The SQLite sample DB
+// can't do them (0.64) and H2 isn't allowed, so they run against the Postgres "Test Warehouse"
+// and skip explicitly when it isn't there.
 const cleanupActionIds: number[] = [];
 const cleanupCardIds: number[] = [];
-let actionsEnabled = false;
+let warehouseId: number | null = null;
+
+const needsWarehouse = (name: string) => {
+  if (warehouseId) return false;
+  console.log(`SKIP ${name} (environment): no Postgres Test Warehouse`);
+  return true;
+};
 
 describe("actions service", () => {
+  beforeAll(async () => {
+    warehouseId = await getWarehouseDbId();
+  });
+
   afterAll(async () => {
     const client = await getTestClient();
     for (const id of cleanupActionIds) {
@@ -28,143 +41,104 @@ describe("actions service", () => {
   let modelCardId: number;
   let createdActionId: number;
 
-  test("setup: create a model card for actions", async () => {
-    const client = await getTestClient();
-    const card = (await createCard(client, {
-      name: testName("action-model"),
-      display: "table",
-      dataset_query: {
-        type: "native",
-        native: { query: "SELECT * FROM ORDERS LIMIT 1" },
-        database: SAMPLE_DB_ID,
-      },
-    })) as any;
-    modelCardId = card.id;
-    cleanupCardIds.push(modelCardId);
-    try {
-      await client.PUT("/api/card/{id}", {
-        params: { path: { id: modelCardId } },
-        body: { type: "model" } as any,
-      });
-    } catch {}
-  });
-
   test("listActions returns a list", async () => {
     const client = await getTestClient();
     const result = await listActions(client);
-    expect(result).toBeDefined();
     expect(Array.isArray(result)).toBe(true);
   });
 
-  test("createAction creates a query action", async () => {
+  test("setup: enable actions on the warehouse and create a model", async () => {
+    if (needsWarehouse("action setup")) return;
     const client = await getTestClient();
-    try {
-      const result = (await createAction(client, {
-        name: testName("test-action"),
-        type: "query",
-        model_id: modelCardId,
-        database_id: SAMPLE_DB_ID,
-        dataset_query: {
-          type: "native",
-          native: { query: "SELECT 1" },
-          database: SAMPLE_DB_ID,
-        },
-      })) as any;
-      expect(result).toBeDefined();
-      expect(result.id).toBeDefined();
-      createdActionId = result.id;
-      cleanupActionIds.push(createdActionId);
-      actionsEnabled = true;
-    } catch (err: any) {
-      // Actions require explicit opt-in on the database — skip gracefully
-      console.log(
-        "Actions not enabled on sample database (requires Metabase config). Skipping CRUD tests."
-      );
-      actionsEnabled = false;
-    }
+    const { error } = await client.PUT("/api/database/{id}", {
+      params: { path: { id: warehouseId! } },
+      body: { settings: { "database-enable-actions": true } } as any,
+    });
+    expect(error).toBeUndefined();
+    const card = (await createCard(client, {
+      name: testName("action-model"),
+      display: "table",
+      dataset_query: { type: "native", native: { query: "SELECT 1 AS id" }, database: warehouseId! },
+    })) as any;
+    modelCardId = card.id;
+    cleanupCardIds.push(modelCardId);
+    const { error: modelError } = await client.PUT("/api/card/{id}", {
+      params: { path: { id: modelCardId } },
+      body: { type: "model" } as any,
+    });
+    expect(modelError).toBeUndefined();
+  });
+
+  test("createAction creates a query action", async () => {
+    if (needsWarehouse("createAction")) return;
+    const client = await getTestClient();
+    const result = (await createAction(client, {
+      name: testName("test-action"),
+      type: "query",
+      model_id: modelCardId,
+      database_id: warehouseId,
+      dataset_query: {
+        type: "native",
+        native: { query: "CREATE TABLE IF NOT EXISTS mcp_test_action_probe (id int)" },
+        database: warehouseId,
+      },
+      parameters: [],
+      visualization_settings: {},
+    })) as any;
+    expect(result.id).toBeNumber();
+    createdActionId = result.id;
+    cleanupActionIds.push(createdActionId);
   });
 
   test("getAction returns action details", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    expect(createdActionId).toBeDefined();
+    if (needsWarehouse("getAction")) return;
     const client = await getTestClient();
     const result = (await getAction(client, createdActionId)) as any;
-    expect(result).toBeDefined();
     expect(result.id).toBe(createdActionId);
+    expect(result.model_id).toBe(modelCardId);
   });
 
   test("updateAction updates the action", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    expect(createdActionId).toBeDefined();
+    if (needsWarehouse("updateAction")) return;
     const client = await getTestClient();
     const newName = testName("updated-action");
-    const result = (await updateAction(client, createdActionId, {
-      name: newName,
-    })) as any;
-    expect(result).toBeDefined();
+    const result = (await updateAction(client, createdActionId, { name: newName })) as any;
+    expect(result.name).toBe(newName);
   });
 
   test("executeAction executes the action", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    expect(createdActionId).toBeDefined();
+    if (needsWarehouse("executeAction")) return;
     const client = await getTestClient();
-    const result = await executeAction(client, createdActionId);
-    expect(result).toBeDefined();
+    const result = (await executeAction(client, createdActionId)) as any;
+    expect(result).toHaveProperty("rows-affected");
+  });
+
+  test("listActions with model_id filter returns the action", async () => {
+    if (needsWarehouse("listActions by model")) return;
+    const client = await getTestClient();
+    const result = (await listActions(client, { model_id: modelCardId })) as any[];
+    expect(result.some((a) => a.id === createdActionId)).toBe(true);
+  });
+
+  test("createAction with http type is rejected", async () => {
+    if (needsWarehouse("http action")) return;
+    const client = await getTestClient();
+    await expect(
+      createAction(client, { name: testName("http-action"), type: "http", model_id: modelCardId })
+    ).rejects.toThrow();
   });
 
   test("deleteAction deletes the action", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    expect(createdActionId).toBeDefined();
+    if (needsWarehouse("deleteAction")) return;
     const client = await getTestClient();
     const result = await deleteAction(client, createdActionId);
     expect(result).toEqual({ success: true });
     cleanupActionIds.splice(cleanupActionIds.indexOf(createdActionId), 1);
-  });
-
-  test("createAction with http type is rejected by Metabase", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    const client = await getTestClient();
-    // HTTP actions should be rejected — Metabase doesn't allow them via API
-    // or the service should throw because it's an invalid type
-    await expect(
-      createAction(client, {
-        name: testName("http-action"),
-        type: "http",
-        model_id: modelCardId,
-      })
-    ).rejects.toThrow();
+    await expect(getAction(client, createdActionId)).rejects.toThrow();
   });
 
   test("getAction throws for non-existent action", async () => {
     const client = await getTestClient();
     await expect(getAction(client, 999999)).rejects.toThrow();
-  });
-
-  test("listActions with model_id filter", async () => {
-    if (!actionsEnabled) {
-      console.log("Skipped: actions not enabled");
-      return;
-    }
-    const client = await getTestClient();
-    const result = await listActions(client, { model_id: 999999 });
-    expect(result).toBeDefined();
-    expect(Array.isArray(result)).toBe(true);
-    // Non-existent model should return empty array
-    expect((result as any[]).length).toBe(0);
   });
 });

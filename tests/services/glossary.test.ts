@@ -14,45 +14,42 @@ describe("glossary service", () => {
 
   test("listGlossaryTerms returns array", async () => {
     const client = await getTestClient();
-    try {
-      const result = await listGlossaryTerms(client) as any;
-      expect(result).toBeDefined();
-      const items = Array.isArray(result) ? result : result.data ?? [];
-      expect(Array.isArray(items)).toBe(true);
-    } catch (e: any) {
-      console.log("Glossary API not available:", e.message);
-    }
+    const result = await listGlossaryTerms(client) as any;
+    expect(result).toBeDefined();
+    const items = Array.isArray(result) ? result : result.data ?? [];
+    expect(Array.isArray(items)).toBe(true);
   });
 
   test("glossary term CRUD lifecycle", async () => {
     const client = await getTestClient();
     let termId: number | null = null;
 
-    try {
-      const term = testName("Revenue");
-      const created = await createGlossaryTerm(client, {
-        term,
-        definition: "Total income",
-      }) as any;
-      expect(created).toBeDefined();
-      expect(created.id).toBeDefined();
-      termId = created.id;
-      cleanupIds.push(termId!);
+    const term = testName("Revenue");
+    const created = await createGlossaryTerm(client, {
+      term,
+      definition: "Total income",
+    }) as any;
+    expect(created).toBeDefined();
+    expect(created.id).toBeDefined();
+    termId = created.id;
+    cleanupIds.push(termId!);
 
-      const fetched = await getGlossaryTerm(client, termId!) as any;
-      expect(fetched.id).toBe(termId);
+    const fetched = await getGlossaryTerm(client, termId!) as any;
+    expect(fetched.id).toBe(termId);
 
-      const updated = await updateGlossaryTerm(client, termId!, {
-        definition: "Total income before deductions",
-      }) as any;
-      expect(updated).toBeDefined();
+    const updated = await updateGlossaryTerm(client, termId!, {
+      definition: "Total income before deductions",
+    }) as any;
+    expect(updated).toBeDefined();
 
-      const deleted = await deleteGlossaryTerm(client, termId!);
-      expect(deleted).toEqual({ success: true });
-      cleanupIds.splice(cleanupIds.indexOf(termId!), 1);
-      termId = null;
-    } catch (e: any) {
-      console.log("Glossary API not available:", e.message);
-    }
+    const deleted = await deleteGlossaryTerm(client, termId!);
+    expect(deleted).toEqual({ success: true });
+    cleanupIds.splice(cleanupIds.indexOf(termId!), 1);
+    termId = null;
+  });
+
+  test("getGlossaryTerm throws for non-existent term", async () => {
+    const client = await getTestClient();
+    await expect(getGlossaryTerm(client, 999999)).rejects.toThrow("Get glossary term failed");
   });
 });

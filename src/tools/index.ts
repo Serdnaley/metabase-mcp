@@ -27,6 +27,10 @@ import { registerTimelineTools } from "./timelines.js";
 import { registerBookmarkTools } from "./bookmarks.js";
 import { registerModerationTools } from "./moderation.js";
 import { registerEidTranslationTools } from "./eid-translation.js";
+import { registerMetricTools } from "./metrics.js";
+import { registerMeasureTools } from "./measures.js";
+import { registerTransformTools } from "./transforms.js";
+import { registerExportTools } from "./exports.js";
 
 export const registerAllTools = (server: McpServer, client: MetabaseClient, config: Config) => {
   registerSearchTools(server, client);
@@ -55,4 +59,8 @@ export const registerAllTools = (server: McpServer, client: MetabaseClient, conf
   registerBookmarkTools(server, client, config);
   registerModerationTools(server, client, config);
   registerEidTranslationTools(server, client);
+  registerMetricTools(server, client, config);
+  registerMeasureTools(server, client, config);
+  registerTransformTools(server, client, config);
+  registerExportTools(server, client, config);
 };

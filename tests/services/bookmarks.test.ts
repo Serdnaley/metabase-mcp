@@ -15,13 +15,9 @@ describe("bookmarks service", () => {
 
   test("listBookmarks returns array", async () => {
     const client = await getTestClient();
-    try {
-      const result = await listBookmarks(client) as any;
-      expect(result).toBeDefined();
-      expect(Array.isArray(result)).toBe(true);
-    } catch (e: any) {
-      console.log("Bookmarks API not available:", e.message);
-    }
+    const result = await listBookmarks(client) as any;
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
   });
 
   test("bookmark lifecycle: create and delete", async () => {
@@ -33,14 +29,10 @@ describe("bookmarks service", () => {
     }) as any;
     cleanupCardIds.push(card.id);
 
-    try {
-      const created = await createBookmark(client, { type: "card", item_id: card.id });
-      expect(created).toBeDefined();
+    const created = await createBookmark(client, { type: "card", item_id: card.id });
+    expect(created).toBeDefined();
 
-      const deleted = await deleteBookmark(client, { type: "card", item_id: card.id });
-      expect(deleted).toBeDefined();
-    } catch (e: any) {
-      console.log("Bookmarks API not available:", e.message);
-    }
+    const deleted = await deleteBookmark(client, { type: "card", item_id: card.id });
+    expect(deleted).toBeDefined();
   });
 });

@@ -1,7 +1,7 @@
 import type { MetabaseClient } from "../client.js";
 
 export const persistModel = async (client: MetabaseClient, cardId: number) => {
-  const { data, error } = await (client as any).POST("/api/persist/card/{id}", {
+  const { data, error } = await (client as any).POST("/api/persist/card/{id}/persist", {
     params: { path: { id: cardId } },
   });
   if (error) throw new Error(`Persist model failed: ${JSON.stringify(error)}`);
@@ -9,7 +9,7 @@ export const persistModel = async (client: MetabaseClient, cardId: number) => {
 };
 
 export const unpersistModel = async (client: MetabaseClient, cardId: number) => {
-  const { error } = await (client as any).DELETE("/api/persist/card/{id}", {
+  const { error } = await (client as any).POST("/api/persist/card/{id}/unpersist", {
     params: { path: { id: cardId } },
   });
   if (error) throw new Error(`Unpersist model failed: ${JSON.stringify(error)}`);
