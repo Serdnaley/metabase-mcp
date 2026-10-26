@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_MAX_RESPONSE_CHARS, DEFAULT_MAX_ROWS, loadResultLimits, type ResultLimits } from "./results.js";
 
 export const configSchema = z
   .object({
@@ -8,6 +9,10 @@ export const configSchema = z
     password: z.string().optional(),
     readOnly: z.boolean().default(false),
     customHeaders: z.record(z.string(), z.string()).optional(),
+    /** METABASE_MAX_ROWS: row cap for query tools */
+    maxRows: z.number().int().positive().optional(),
+    /** METABASE_MAX_RESPONSE_CHARS: size cap for every tool response */
+    maxResponseChars: z.number().int().positive().optional(),
   })
   .refine(
     (c) => c.apiKey || (c.email && c.password),
@@ -72,8 +77,10 @@ const envValue = (name: string): string | undefined => {
 
 export const loadConfig = (): Config => {
   let customHeaders: Record<string, string>;
+  let limits: ResultLimits;
   try {
     customHeaders = parseCustomHeaders(process.env.METABASE_CUSTOM_HEADERS);
+    limits = loadResultLimits(process.env);
   } catch (err) {
     console.error(`Configuration error: ${(err as Error).message}`);
     process.exit(1);
@@ -86,6 +93,8 @@ export const loadConfig = (): Config => {
     password: envValue("METABASE_PASSWORD"),
     readOnly: process.env.METABASE_READ_ONLY_MODE === "true",
     customHeaders,
+    maxRows: limits.maxRows,
+    maxResponseChars: limits.maxResponseChars,
   };
 
   const result = configSchema.safeParse(raw);
@@ -97,3 +106,9 @@ export const loadConfig = (): Config => {
 
   return result.data;
 };
+
+/** Result limits with defaults filled in (configs built in tests may omit them). */
+export const resultLimits = (config: Partial<Config>): ResultLimits => ({
+  maxRows: config.maxRows ?? DEFAULT_MAX_ROWS,
+  maxResponseChars: config.maxResponseChars ?? DEFAULT_MAX_RESPONSE_CHARS,
+});

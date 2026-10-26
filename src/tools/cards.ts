@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { resultLimits } from "../config.js";
+import { resultShapeInputs, shapeQueryResult } from "../results.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
@@ -15,12 +17,14 @@ export const registerCardTools = (server: McpServer, client: MetabaseClient, con
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   });
 
-  server.tool("execute_card_query", "Run a saved question and return results. For parameterized cards, pass template tag values as key-value pairs (e.g. { fromDate: '2024-01-01', toDate: '2024-12-31' }). For date ranges in native queries, use two separate date/single parameters.", {
+  server.tool("execute_card_query", "Run a saved question and return results as compact columns + rows (paged with max_rows/offset). For parameterized cards, pass template tag values as key-value pairs (e.g. { fromDate: '2024-01-01', toDate: '2024-12-31' }). For date ranges in native queries, use two separate date/single parameters.", {
     card_id: z.number().describe("Card ID"),
     parameter_values: z.record(z.string(), z.unknown()).optional().describe("Template tag parameter values as { paramName: value } pairs. For date: '2024-01-01'. For date/month-year: '2024-01'. For number: 100. For text: 'value'. For date ranges, use two separate date parameters (fromDate + toDate)."),
-  }, async ({ card_id, parameter_values }) => {
+    ...resultShapeInputs,
+  }, async ({ card_id, parameter_values, max_rows, offset, verbose }) => {
     const result = await executeCardQuery(client, card_id, { parameter_values });
-    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    const shaped = shapeQueryResult(result, resultLimits(config), { max_rows, offset, verbose });
+    return { content: [{ type: "text", text: JSON.stringify(shaped) }] };
   });
 
   if (!config.readOnly) {

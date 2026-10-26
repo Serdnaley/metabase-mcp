@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { resultLimits } from "../config.js";
+import { resultShapeInputs, shapeQueryResult } from "../results.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { MetabaseClient } from "../client.js";
 import type { Config } from "../config.js";
@@ -62,8 +64,10 @@ export const registerMetricTools = (server: McpServer, client: MetabaseClient, c
         .record(z.string(), z.unknown())
         .optional()
         .describe("Raw /api/metric/dataset definition (expression, filters, projections); overrides the other inputs"),
+      ...resultShapeInputs,
     },
-    async (params) => text(await runMetric(client, params))
+    async ({ max_rows, offset, verbose, ...params }) =>
+      text(shapeQueryResult(await runMetric(client, params), resultLimits(config), { max_rows, offset, verbose }))
   );
 
   server.tool(

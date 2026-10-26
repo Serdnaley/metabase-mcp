@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Large-result safety
+
+- Query tools (`execute_query`, `execute_card_query`, `run_metric`) return a compact view by default:
+  `columns` (name, type) + `rows`, no column internals, `results_metadata` or insights. `verbose: true`
+  returns the raw Metabase response.
+- Row cap `METABASE_MAX_ROWS` (default 500) with per-call `max_rows` and `offset` paging; a `note`
+  says how to get the rest (next offset, or an export tool with `output_path`).
+- Every tool response is serialised as compact JSON and capped at `METABASE_MAX_RESPONSE_CHARS`
+  (default 100000) with a truncation notice.
+- Measured on a 10 / 100 / 500-row `SELECT * FROM ORDERS`: 94% / 76% / 60% fewer characters than 0.3.0.
+
 ## [0.3.0] - 2026-10-26
 
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See
