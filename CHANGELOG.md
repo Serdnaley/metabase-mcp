@@ -30,6 +30,8 @@ Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.
 
 ### Added
 
+- `get_group`: a permission group with its members and their `membership_id`, which
+  `remove_group_member` needs (no tool exposed it before).
 - **Metrics** (Metabase 0.60+ for running, 0.64+ for dimensions): `list_metrics`, `get_metric`,
   `create_metric`, `update_metric`, `run_metric` (filters, breakouts, temporal buckets, or a raw
   definition for metric math), `list_metric_dimensions`, `get_metric_dimension_values`. On older
@@ -51,6 +53,12 @@ Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.
 - Test stack: an optional Postgres "Test Warehouse" (docker compose service) for transform and CSV
   upload tests; tests that need it skip explicitly without it.
 - `METABASE_CUSTOM_HEADERS`: extra HTTP headers sent on every Metabase request, including the session login. It takes a JSON object or `Name: value` pairs separated by newlines or `;`, for example Cloudflare Access service tokens. Auth headers keep precedence, and a malformed value fails at startup.
+
+### Removed
+
+- `notify_database`: `POST /api/notify/db/:id` only accepts Metabase's server-wide `MB_API_KEY`, not a
+  user or API-key session, so the tool could never work with this server's auth. Use
+  `sync_database_schema` instead.
 
 ## [0.2.0] - 2026-04-15
 

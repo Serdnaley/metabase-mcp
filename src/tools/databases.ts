@@ -13,7 +13,6 @@ import {
   deleteDatabase,
   validateDatabase,
   syncDatabaseSchema,
-  notifyDatabase,
 } from "../services/databases.js";
 
 export const registerDatabaseTools = (server: McpServer, client: MetabaseClient, config: Config) => {
@@ -107,18 +106,6 @@ export const registerDatabaseTools = (server: McpServer, client: MetabaseClient,
       },
       async ({ id }) => {
         const result = await syncDatabaseSchema(client, id);
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
-      }
-    );
-
-    server.tool(
-      "notify_database",
-      "Send a post-ETL pipeline notification to trigger a schema sync on a database",
-      {
-        id: z.number().describe("Database ID"),
-      },
-      async ({ id }) => {
-        const result = await notifyDatabase(client, id);
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );

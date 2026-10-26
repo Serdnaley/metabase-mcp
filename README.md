@@ -241,7 +241,7 @@ The AI assistant will:
 
 ## Tools
 
-### Read tools (69 — always available)
+### Read tools (70 — always available)
 
 | Domain | Tools |
 |---|---|
@@ -253,7 +253,7 @@ The AI assistant will:
 | **Dashboards** | `list_dashboards`, `get_dashboard` |
 | **Actions** | `list_actions`, `get_action` |
 | **Dataset** | `execute_query` |
-| **Users & Groups** | `list_users`, `get_user`, `get_current_user`, `list_groups` |
+| **Users & Groups** | `list_users`, `get_user`, `get_current_user`, `list_groups`, `get_group` |
 | **Permissions** | `get_permissions_graph`, `get_collection_permissions` |
 | **Segments** | `list_segments`, `get_segment` |
 | **Revisions** | `list_revisions` |
@@ -272,7 +272,7 @@ The AI assistant will:
 | **Transforms** | `list_transforms`, `get_transform`, `list_transform_runs`, `get_transform_run`, `list_transform_jobs`, `list_transform_tags` |
 | **Exports** | `export_card_query`, `export_query`, `export_dashboard_pdf` |
 
-### Write tools (92 — disabled in read-only mode)
+### Write tools (91 — disabled in read-only mode)
 
 | Domain | Tools |
 |---|---|
@@ -281,7 +281,7 @@ The AI assistant will:
 | **Dashboards** | `create_dashboard`, `update_dashboard`, `delete_dashboard`, `copy_dashboard`, `update_dashboard_cards`, `create_dashboard_public_link`, `delete_dashboard_public_link` |
 | **Actions** | `create_action`, `update_action`, `delete_action`, `execute_action`, `create_action_public_link`, `delete_action_public_link` |
 | **Tables & Fields** | `update_table`, `update_field`, `rescan_field_values`, `discard_field_values`, `reorder_fields` |
-| **Databases** | `create_database`, `update_database`, `delete_database`, `validate_database`, `sync_database_schema`, `notify_database` |
+| **Databases** | `create_database`, `update_database`, `delete_database`, `validate_database`, `sync_database_schema` |
 | **Users & Groups** | `create_user`, `update_user`, `deactivate_user`, `reactivate_user`, `create_group`, `update_group`, `delete_group`, `add_group_member`, `remove_group_member` |
 | **Permissions** | `update_permissions_graph`, `update_collection_permissions` |
 | **Segments** | `create_segment`, `update_segment`, `delete_segment` |
@@ -307,7 +307,9 @@ The AI assistant will:
 
 To prevent write operations, ensure the Metabase API key or account has **read-only database permissions** within Metabase itself.
 
-**Exports can write local files.** `export_card_query`, `export_query` and `export_dashboard_pdf` stay available in read-only mode (they only read from Metabase) and, when given `output_path`, write to that absolute path on the machine running the MCP server. They never overwrite an existing file unless `overwrite: true` is passed.
+**Exports can write local files.** `export_card_query`, `export_query` and `export_dashboard_pdf` stay available in read-only mode (they only read from Metabase) and, when given `output_path`, write to that absolute path on the machine running the MCP server. They never overwrite an existing file unless `overwrite: true` is passed. Metabase applies the same access check to an export as to running the query; its separate "Download results" permission exists only on Pro/Enterprise.
+
+**Read-only mode is not a security boundary.** `METABASE_READ_ONLY_MODE` only hides write tools. What a key can really do is set in Metabase: an API key gets the permissions of its group **plus All Users**. For a read-only assistant, put the key in a group with View-only collection access and "Create queries" set to query builder only (or no), and restrict All Users to no more than that. See [docs/read-only-and-permissions.md](docs/read-only-and-permissions.md) for the probe results and a setup checklist.
 
 **Action types are restricted.** The `create_action` tool only allows `query` and `implicit` action types. HTTP actions (which could make arbitrary outbound requests) are blocked.
 
@@ -335,9 +337,10 @@ Verified against Metabase **v0.64.3.4** (the CI pin) and **v0.59.6**. To try ano
 `MB_IMAGE=metabase/metabase:latest docker compose up -d`. CI also runs the suite weekly on
 `metabase:latest` as a non-blocking job, so upstream API drift shows up before the pin is bumped.
 
-Features that need a paid plan or extra server config (moderation, cache invalidation, model
-persistence, CSV upload database, `MB_API_KEY` for `notify_database`, actions on the SQLite sample
-DB) are skipped explicitly with a `SKIP … (environment)` log line; any other API error fails the test.
+Actions, transforms and CSV uploads run against the Postgres "Test Warehouse" from
+`docker-compose.yml`. Features that need a paid plan or a missing service (moderation, cache
+invalidation, model persistence, or the warehouse itself) are skipped explicitly with a
+`SKIP … (environment)` log line; any other API error fails the test.
 
 ## How It Works
 

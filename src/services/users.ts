@@ -86,6 +86,14 @@ export const listGroups = async (client: MetabaseClient) => {
   return data;
 };
 
+export const getGroup = async (client: MetabaseClient, id: number) => {
+  const { data, error } = await client.GET("/api/permissions/group/{id}" as any, {
+    params: { path: { id } },
+  } as any);
+  if (error) throw new Error(`Get group failed: ${JSON.stringify(error)}`);
+  return data;
+};
+
 export const createGroup = async (client: MetabaseClient, params: { name: string }) => {
   const { data, error } = await client.POST("/api/permissions/group", {
     body: { name: params.name },

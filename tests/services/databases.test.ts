@@ -8,7 +8,6 @@ import {
   getDatabaseSchema,
   syncDatabaseSchema,
   validateDatabase,
-  notifyDatabase,
   createDatabase,
   updateDatabase,
   deleteDatabase,
@@ -103,14 +102,6 @@ describe("databases service", () => {
     );
   });
 
-  test("notifyDatabase triggers sync without error", async () => {
-    const client = await getTestClient();
-    // The notify endpoint only works when MB_API_KEY is set on the Metabase server
-    await skipOnEnvError("notifyDatabase", [/MB_API_KEY is not set/], async () => {
-      const result = await notifyDatabase(client, SAMPLE_DB_ID);
-      expect(result).toEqual({ success: true });
-    });
-  });
 
   test("database CRUD lifecycle: create, update, delete", async () => {
     const client = await getTestClient();

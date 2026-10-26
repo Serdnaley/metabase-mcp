@@ -141,10 +141,3 @@ export const syncDatabaseSchema = async (client: MetabaseClient, id: number) => 
   return { success: true };
 };
 
-export const notifyDatabase = async (client: MetabaseClient, id: number) => {
-  const { error } = await client.POST("/api/notify/db/{id}", {
-    params: { path: { id } },
-  });
-  if (error) throw new Error(`Notify database failed: ${JSON.stringify(error)}`);
-  return { success: true };
-};

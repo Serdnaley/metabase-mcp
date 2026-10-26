@@ -11,6 +11,7 @@ import {
   deactivateUser,
   reactivateUser,
   listGroups,
+  getGroup,
   createGroup,
   updateGroup,
   deleteGroup,
@@ -59,6 +60,16 @@ export const registerUserTools = (server: McpServer, client: MetabaseClient, con
     {},
     async () => {
       const result = await listGroups(client);
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    }
+  );
+
+  server.tool(
+    "get_group",
+    "Get a permission group with its members (each member carries the membership_id that remove_group_member needs)",
+    { id: z.number().describe("Group ID") },
+    async ({ id }) => {
+      const result = await getGroup(client, id);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
   );
@@ -174,7 +185,7 @@ export const registerUserTools = (server: McpServer, client: MetabaseClient, con
       "remove_group_member",
       "Remove a user from a Metabase permission group by membership ID",
       {
-        membership_id: z.number().describe("Membership ID to remove (obtain from list_users or list_groups response)"),
+        membership_id: z.number().describe("Membership ID to remove (from get_group members[].membership_id, or the add_group_member response)"),
       },
       async ({ membership_id }) => {
         const result = await removeGroupMember(client, membership_id);
