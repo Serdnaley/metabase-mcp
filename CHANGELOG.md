@@ -35,6 +35,12 @@ All notable changes to this project will be documented in this file.
   `set_log_levels` / `reset_log_levels` (temporary), `get_premium_token_status`.
 - The `admin` preset includes the three new toolsets.
 
+### Types
+
+- `generated/metabase-api.d.ts` regenerated from the Metabase v0.64 OpenAPI spec (the CI version;
+  `scripts/generate-types.ts` is now pinned to it, `METABASE_SPEC` overrides). 27 `as any` casts
+  removed where the new types cover the calls.
+
 ## [0.3.0] - 2026-10-26
 
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See

@@ -2,7 +2,9 @@ import { writeFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import openapiTS, { astToString } from "openapi-typescript";
 
-const SPEC_URL = "https://www.metabase.com/docs/master/api.json";
+// Pinned to the Metabase version CI tests against (bump together with docker-compose / CI).
+// Override with METABASE_SPEC=<url or local path>.
+const SPEC_URL = process.env.METABASE_SPEC ?? "https://www.metabase.com/docs/v0.64/api.json";
 const SPEC_PATH = "generated/metabase-api.json";
 const OUTPUT_PATH = "generated/metabase-api.d.ts";
 
@@ -40,9 +42,15 @@ async function main() {
   console.log("Downloading Metabase OpenAPI spec...");
   await mkdir("generated", { recursive: true });
 
-  const res = await fetch(SPEC_URL);
-  if (!res.ok) throw new Error(`Failed to download spec: ${res.status}`);
-  const spec = (await res.json()) as Record<string, unknown>;
+  let spec: Record<string, unknown>;
+  if (/^https?:\/\//.test(SPEC_URL)) {
+    const res = await fetch(SPEC_URL);
+    if (!res.ok) throw new Error(`Failed to download spec: ${res.status}`);
+    spec = (await res.json()) as Record<string, unknown>;
+  } else {
+    spec = JSON.parse(await Bun.file(SPEC_URL).text()) as Record<string, unknown>;
+  }
+  console.log(`Spec: ${SPEC_URL}`);
 
   // Fix double dots in schema names
   const schemas =

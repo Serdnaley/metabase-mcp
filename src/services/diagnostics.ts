@@ -47,13 +47,13 @@ export const listTasks = async (client: MetabaseClient, q: TaskQuery = {}) => {
 };
 
 export const getTask = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/task/{id}", { params: { path: { id } } });
+  const { data, error } = await client.GET("/api/task/{id}", { params: { path: { id } } });
   if (error) throw await apiError(client, "Get task", error);
   return compactTask(data, true);
 };
 
 export const listTaskTypes = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/task/unique-tasks", {});
+  const { data, error } = await client.GET("/api/task/unique-tasks", {});
   if (error) throw await apiError(client, "List task types", error);
   return data;
 };
@@ -93,7 +93,7 @@ const LEVELS = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
 
 /** Recent server log lines (Metabase keeps the last ~250 in memory), newest first. */
 export const getServerLogs = async (client: MetabaseClient, q: LogQuery = {}) => {
-  const { data, error } = await anyClient(client).GET("/api/logger/logs", {});
+  const { data, error } = await client.GET("/api/logger/logs", {});
   if (error) throw await apiError(client, "Get server logs", error);
   const min = q.level ? LEVELS.indexOf(q.level) : 0;
   const needle = q.contains?.toLowerCase();
@@ -112,7 +112,7 @@ export const getServerLogs = async (client: MetabaseClient, q: LogQuery = {}) =>
 };
 
 export const listLogPresets = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/logger/presets", {});
+  const { data, error } = await client.GET("/api/logger/presets", {});
   if (error) throw await apiError(client, "List log presets", error);
   return data;
 };
@@ -122,20 +122,20 @@ export const setLogLevels = async (
   client: MetabaseClient,
   params: { log_levels: Record<string, string>; duration: number; duration_unit: "seconds" | "minutes" | "hours" | "days" }
 ) => {
-  const { error } = await anyClient(client).POST("/api/logger/adjustment", { body: params });
+  const { error } = await client.POST("/api/logger/adjustment", { body: params });
   if (error) throw await apiError(client, "Set log levels", error);
   return { success: true, ...params };
 };
 
 export const resetLogLevels = async (client: MetabaseClient) => {
-  const { error } = await anyClient(client).DELETE("/api/logger/adjustment", {});
+  const { error } = await client.DELETE("/api/logger/adjustment", {});
   if (error) throw await apiError(client, "Reset log levels", error);
   return { success: true };
 };
 
 /** Premium token status (paid plans); OSS answers 404, reported as "no token". */
 export const getPremiumTokenStatus = async (client: MetabaseClient) => {
-  const { data, error, response } = await anyClient(client).GET("/api/premium-features/token/status", {});
+  const { data, error, response } = await client.GET("/api/premium-features/token/status", {});
   if (response?.status === 404) return { valid: false, note: "No premium token configured (open-source edition)" };
   if (error) throw await apiError(client, "Get premium token status", error);
   return data;

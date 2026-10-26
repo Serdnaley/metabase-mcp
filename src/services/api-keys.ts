@@ -1,9 +1,6 @@
 import type { MetabaseClient } from "../client.js";
 import { apiError } from "./version.js";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const anyClient = (client: MetabaseClient): any => client;
-
 const compactKey = (k: any) => ({
   id: k.id,
   name: k.name,
@@ -17,13 +14,13 @@ const compactKey = (k: any) => ({
 });
 
 export const listApiKeys = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/api-key", {});
+  const { data, error } = await client.GET("/api/api-key", {});
   if (error) throw await apiError(client, "List API keys", error);
   return (Array.isArray(data) ? data : []).map(compactKey);
 };
 
 export const createApiKey = async (client: MetabaseClient, params: { name: string; group_id: number }) => {
-  const { data, error } = await anyClient(client).POST("/api/api-key", { body: params });
+  const { data, error } = await client.POST("/api/api-key", { body: params });
   if (error) throw await apiError(client, "Create API key", error);
   return compactKey(data);
 };
@@ -36,19 +33,19 @@ export const updateApiKey = async (
   const body: Record<string, unknown> = {};
   if (params.name !== undefined) body.name = params.name;
   if (params.group_id !== undefined) body.group_id = params.group_id;
-  const { data, error } = await anyClient(client).PUT("/api/api-key/{id}", { params: { path: { id } }, body });
+  const { data, error } = await client.PUT("/api/api-key/{id}", { params: { path: { id } }, body });
   if (error) throw await apiError(client, "Update API key", error);
   return compactKey(data);
 };
 
 export const regenerateApiKey = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).PUT("/api/api-key/{id}/regenerate", { params: { path: { id } } });
+  const { data, error } = await client.PUT("/api/api-key/{id}/regenerate", { params: { path: { id } } });
   if (error) throw await apiError(client, "Regenerate API key", error);
   return compactKey(data);
 };
 
 export const deleteApiKey = async (client: MetabaseClient, id: number) => {
-  const { error } = await anyClient(client).DELETE("/api/api-key/{id}", { params: { path: { id } } });
+  const { error } = await client.DELETE("/api/api-key/{id}", { params: { path: { id } } });
   if (error) throw await apiError(client, "Delete API key", error);
   return { success: true };
 };

@@ -12,7 +12,7 @@ export const normalizeDefinition = async (
   definition: Record<string, unknown>
 ): Promise<Record<string, unknown>> => {
   if ("lib/type" in definition || "type" in definition) return definition;
-  const { data, error } = await client.GET("/api/table/{id}", { params: { path: { id: tableId } } } as any);
+  const { data, error } = await client.GET("/api/table/{id}", { params: { path: { id: tableId } } });
   if (error) throw new Error(`Get table ${tableId} failed: ${JSON.stringify(error)}`);
   const databaseId = (data as any)?.db_id;
   return {

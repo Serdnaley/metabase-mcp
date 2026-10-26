@@ -17,7 +17,7 @@ export const updateCacheConfig = async (
 ) => {
   const { data, error } = await client.PUT("/api/cache", {
     body: params as any,
-  } as any);
+  });
   if (error) throw new Error(`Update cache config failed: ${JSON.stringify(error)}`);
   return data;
 };

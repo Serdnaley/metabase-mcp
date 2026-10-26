@@ -8,7 +8,7 @@ export const createModerationReview = async (
     status: "verified" | null;
   }
 ) => {
-  const { data, error } = await (client as any).POST("/api/moderation-review", {
+  const { data, error } = await client.POST("/api/moderation-review", {
     body: {
       moderated_item_id: params.moderated_item_id,
       moderated_item_type: params.moderated_item_type,

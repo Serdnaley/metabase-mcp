@@ -29,7 +29,7 @@ export const getActivity = async (client: MetabaseClient) => {
 };
 
 export const listTasks = async (client: MetabaseClient) => {
-  const { data, error } = await client.GET("/api/task", {} as any);
+  const { data, error } = await client.GET("/api/task", {});
   if (error) throw new Error(`List tasks failed: ${JSON.stringify(error)}`);
   return data;
 };
@@ -37,7 +37,7 @@ export const listTasks = async (client: MetabaseClient) => {
 export const getTask = async (client: MetabaseClient, id: number) => {
   const { data, error } = await client.GET("/api/task/{id}", {
     params: { path: { id } },
-  } as any);
+  });
   if (error) throw new Error(`Get task failed: ${JSON.stringify(error)}`);
   return data;
 };

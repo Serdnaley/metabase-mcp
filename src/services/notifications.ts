@@ -43,13 +43,13 @@ export const listAlerts = async (
   const query: Record<string, unknown> = { payload_type: "notification/card" };
   if (params?.card_id !== undefined) query.card_id = params.card_id;
   if (params?.include_inactive !== undefined) query.include_inactive = params.include_inactive;
-  const { data, error } = await anyClient(client).GET("/api/notification", { params: { query } });
+  const { data, error } = await client.GET("/api/notification", { params: { query } });
   if (error) throw new Error(`List alerts failed: ${JSON.stringify(error)}`);
   return data;
 };
 
 export const getAlert = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/notification/{id}", {
+  const { data, error } = await client.GET("/api/notification/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Get alert failed: ${JSON.stringify(error)}`);
@@ -108,7 +108,7 @@ export const updateAlert = async (
   if (params.cron_schedule !== undefined) body.subscriptions = buildSubscriptions(params.cron_schedule);
   if (params.active !== undefined) body.active = params.active;
 
-  const { data, error } = await anyClient(client).PUT("/api/notification/{id}", {
+  const { data, error } = await client.PUT("/api/notification/{id}", {
     params: { path: { id } },
     body,
   });
@@ -126,7 +126,7 @@ export const deleteAlert = async (client: MetabaseClient, id: number) => {
 // Still pulses: GET/POST /api/pulse, PUT /api/pulse/{id}; no DELETE (archive instead).
 
 export const listDashboardSubscriptions = async (client: MetabaseClient, dashboardId: number) => {
-  const { data, error } = await anyClient(client).GET("/api/pulse", {
+  const { data, error } = await client.GET("/api/pulse", {
     params: { query: { dashboard_id: dashboardId } },
   });
   if (error) throw new Error(`List dashboard subscriptions failed: ${JSON.stringify(error)}`);
@@ -146,7 +146,7 @@ export const createDashboardSubscription = async (
   let cards = params.cards;
   let name = params.name;
   if (!cards || !name) {
-    const { data: dashboard, error } = await anyClient(client).GET("/api/dashboard/{id}", {
+    const { data: dashboard, error } = await client.GET("/api/dashboard/{id}", {
       params: { path: { id: dashboardId } },
     });
     if (error) throw new Error(`Create dashboard subscription failed: ${JSON.stringify(error)}`);
@@ -174,7 +174,7 @@ export const updateDashboardSubscription = async (
   subscriptionId: number,
   params: Record<string, unknown>
 ) => {
-  const { data, error } = await anyClient(client).PUT("/api/pulse/{id}", {
+  const { data, error } = await client.PUT("/api/pulse/{id}", {
     params: { path: { id: subscriptionId } },
     body: params,
   });
@@ -202,7 +202,7 @@ export const listNotifications = async (
 ) => {
   const query: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(params ?? {})) if (v !== undefined) query[k] = v;
-  const { data, error } = await anyClient(client).GET("/api/notification", { params: { query } });
+  const { data, error } = await client.GET("/api/notification", { params: { query } });
   if (error) throw new Error(`List notifications failed: ${JSON.stringify(error)}`);
   return data;
 };
@@ -215,7 +215,7 @@ export const sendNotificationNow = async (
 ) => {
   const body: Record<string, unknown> = {};
   if (params?.handler_ids?.length) body.handler_ids = params.handler_ids;
-  const { error } = await anyClient(client).POST("/api/notification/{id}/send", {
+  const { error } = await client.POST("/api/notification/{id}/send", {
     params: { path: { id } },
     body,
   });

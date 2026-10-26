@@ -79,7 +79,7 @@ export const updateCollection = async (
 
   const { data, error } = await client.PUT("/api/collection/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update collection failed: ${JSON.stringify(error)}`);
   return data;
@@ -88,7 +88,7 @@ export const updateCollection = async (
 export const getCollectionTree = async (client: MetabaseClient) => {
   const { data, error } = await client.GET("/api/collection/tree", {
     params: { query: { "exclude-archived": true } },
-  } as any);
+  });
   if (error) throw new Error(`Get collection tree failed: ${JSON.stringify(error)}`);
   return data;
 };

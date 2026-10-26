@@ -7,7 +7,7 @@ const anyClient = (client: MetabaseClient): any => client;
 
 /** GET /api/setting/:key answers text/plain for strings, JSON otherwise. */
 const getSetting = async (client: MetabaseClient, key: string): Promise<unknown> => {
-  const { data, error } = await anyClient(client).GET("/api/setting/{key}", {
+  const { data, error } = await client.GET("/api/setting/{key}", {
     params: { path: { key } },
     parseAs: "text",
   });
@@ -21,7 +21,7 @@ const getSetting = async (client: MetabaseClient, key: string): Promise<unknown>
 };
 
 const putSetting = async (client: MetabaseClient, key: string, value: unknown) => {
-  const { error } = await anyClient(client).PUT("/api/setting/{key}", { params: { path: { key } }, body: { value } });
+  const { error } = await client.PUT("/api/setting/{key}", { params: { path: { key } }, body: { value } });
   if (error) throw await apiError(client, `Update setting ${key}`, error);
 };
 

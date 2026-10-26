@@ -12,7 +12,7 @@ const isMissingEndpoint = (error: unknown) =>
   JSON.stringify(error ?? "").includes("API endpoint does not exist");
 
 export const listMetrics = async (client: MetabaseClient) => {
-  const { data, error } = await anyClient(client).GET("/api/metric", {});
+  const { data, error } = await client.GET("/api/metric", {});
   if (!error) return data;
   if (!isMissingEndpoint(error)) throw await apiError(client, "List metrics", error);
   // Older Metabase: metrics are only reachable as cards
@@ -21,7 +21,7 @@ export const listMetrics = async (client: MetabaseClient) => {
 };
 
 export const getMetric = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/metric/{id}", { params: { path: { id } } });
+  const { data, error } = await client.GET("/api/metric/{id}", { params: { path: { id } } });
   if (!error) return data;
   if (!isMissingEndpoint(error)) throw await apiError(client, "Get metric", error);
   const card = (await getCard(client, id)) as any;
@@ -45,7 +45,7 @@ export const createMetric = async (
     description: params.description,
     collection_id: params.collection_id,
     type: "metric",
-  } as any);
+  });
 
 export const updateMetric = async (
   client: MetabaseClient,
@@ -120,7 +120,7 @@ export const runMetric = async (client: MetabaseClient, params: RunMetricParams)
 // ── Metric dimensions (0.64+) ─────────────────────────────────────────────
 
 export const listMetricDimensions = async (client: MetabaseClient, id: number) => {
-  const { data, error } = await anyClient(client).GET("/api/metric/{id}/dimension", {
+  const { data, error } = await client.GET("/api/metric/{id}/dimension", {
     params: { path: { id } },
   });
   if (error) throw await apiError(client, "List metric dimensions", error, 64);

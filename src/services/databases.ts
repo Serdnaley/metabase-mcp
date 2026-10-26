@@ -61,7 +61,7 @@ export const getDatabaseSchema = async (client: MetabaseClient, id: number, sche
   // schema as "" — those tables are served by /schema without a name segment.
   const { data, error } =
     schema === ""
-      ? await client.GET("/api/database/{id}/schema/" as any, { params: { path: { id }, query } } as any)
+      ? await client.GET("/api/database/{id}/schema/" as any, { params: { path: { id }, query } })
       : await client.GET("/api/database/{id}/schema/{schema}", { params: { path: { id, schema }, query } });
   if (error) throw new Error(`Get database schema failed: ${JSON.stringify(error)}`);
   return data;
@@ -103,7 +103,7 @@ export const updateDatabase = async (
 
   const { data, error } = await client.PUT("/api/database/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update database failed: ${JSON.stringify(error)}`);
   return data ?? { success: true };
@@ -136,7 +136,7 @@ export const validateDatabase = async (
 export const syncDatabaseSchema = async (client: MetabaseClient, id: number) => {
   const { error } = await client.POST("/api/database/{id}/sync_schema", {
     params: { path: { id } },
-  } as any);
+  });
   if (error) throw new Error(`Sync database schema failed: ${JSON.stringify(error)}`);
   return { success: true };
 };

@@ -32,11 +32,11 @@ export const createCard = async (
     body: {
       name: params.name,
       dataset_query: params.dataset_query as any,
-      display: params.display as any,
+      display: params.display,
       description: params.description ?? null,
       collection_id: params.collection_id ?? null,
       visualization_settings: (params.visualization_settings ?? {}) as any,
-      type: (params.type ?? "question") as any,
+      type: (params.type ?? "question"),
     },
   });
   if (error) throw new Error(`Create card failed: ${JSON.stringify(error)}`);
@@ -73,7 +73,7 @@ export const updateCard = async (
 
   const { data, error } = await client.PUT("/api/card/{id}", {
     params: { path: { id } },
-    body: body as any,
+    body: body,
   });
   if (error) throw new Error(`Update card failed: ${JSON.stringify(error)}`);
   return data;

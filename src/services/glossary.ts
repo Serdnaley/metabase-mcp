@@ -1,7 +1,7 @@
 import type { MetabaseClient } from "../client.js";
 
 export const listGlossaryTerms = async (client: MetabaseClient) => {
-  const { data, error } = await (client as any).GET("/api/glossary", {});
+  const { data, error } = await client.GET("/api/glossary", {});
   if (error) throw new Error(`List glossary terms failed: ${JSON.stringify(error)}`);
   return data;
 };
@@ -19,7 +19,7 @@ export const createGlossaryTerm = async (
   client: MetabaseClient,
   params: { term: string; definition: string }
 ) => {
-  const { data, error } = await (client as any).POST("/api/glossary", {
+  const { data, error } = await client.POST("/api/glossary", {
     body: params,
   });
   if (error) throw new Error(`Create glossary term failed: ${JSON.stringify(error)}`);
@@ -47,7 +47,7 @@ export const updateGlossaryTerm = async (
 };
 
 export const deleteGlossaryTerm = async (client: MetabaseClient, id: number) => {
-  const { error } = await (client as any).DELETE("/api/glossary/{id}", {
+  const { error } = await client.DELETE("/api/glossary/{id}", {
     params: { path: { id } },
   });
   if (error) throw new Error(`Delete glossary term failed: ${JSON.stringify(error)}`);
