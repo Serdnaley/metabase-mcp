@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "metabase-mcp",
   "display_name": "Metabase (headless MCP)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Metabase MCP server with API-key auth (no OAuth): 178 tools for queries, dashboards, admin, transforms and exports.",
   "long_description": "Connects Claude to any Metabase instance (free or paid, 0.59+) with a Metabase API key or email/password. 178 tools across 30 toolsets: questions, dashboards, collections, SQL, metrics, measures, segments, transforms, users and permissions, databases, settings, alerts, exports. Optional read-only mode and toolset/tool filtering.",
   "author": {
