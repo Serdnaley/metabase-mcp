@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Serdnaley/metabase-mcp",
+  "title": "Metabase MCP (headless)",
+  "description": "Headless Metabase MCP: API-key auth, no OAuth. 161 tools, toolsets, stdio or HTTP, all tiers.",
+  "repository": {
+    "url": "https://github.com/Serdnaley/metabase-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://serdnaley.github.io/metabase-mcp/",
+  "version": "0.2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@serdnaley/metabase-mcp",
+      "version": "0.2.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        { "name": "METABASE_URL", "description": "Metabase base URL, e.g. https://metabase.example.com", "isRequired": true, "format": "string" },
+        { "name": "METABASE_API_KEY", "description": "Metabase API key (or set METABASE_EMAIL + METABASE_PASSWORD)", "isRequired": false, "isSecret": true, "format": "string" },
+        { "name": "METABASE_EMAIL", "description": "Login email (alternative to an API key)", "isRequired": false, "format": "string" },
+        { "name": "METABASE_PASSWORD", "description": "Login password (alternative to an API key)", "isRequired": false, "isSecret": true, "format": "string" },
+        { "name": "METABASE_READ_ONLY_MODE", "description": "true hides all write tools", "isRequired": false, "format": "boolean" },
+        { "name": "METABASE_TOOLSETS", "description": "Comma list of toolsets or presets (all, query, content, admin)", "isRequired": false, "format": "string" },
+        { "name": "METABASE_TOOLS_ENABLE", "description": "Extra tools to enable (names or globs)", "isRequired": false, "format": "string" },
+        { "name": "METABASE_TOOLS_DISABLE", "description": "Tools to disable (names or globs); always wins", "isRequired": false, "format": "string" },
+        { "name": "METABASE_CUSTOM_HEADERS", "description": "Extra headers for every Metabase request (e.g. Cloudflare Access)", "isRequired": false, "isSecret": true, "format": "string" }
+      ]
+    }
+  ]
+}
