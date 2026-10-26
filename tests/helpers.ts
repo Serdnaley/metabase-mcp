@@ -71,3 +71,19 @@ export const skipOnEnvError = async (label: string, envErrors: RegExp[], fn: () 
     throw e;
   }
 };
+
+/** ID of the optional Postgres "Test Warehouse" (see tests/setup.ts), or null if absent. */
+export const getWarehouseDbId = async (): Promise<number | null> => {
+  const client = await getTestClient();
+  const { data } = await client.GET("/api/database", {} as any);
+  const dbs: any[] = Array.isArray(data) ? data : ((data as any)?.data ?? []);
+  return dbs.find((d) => d.name === "Test Warehouse")?.id ?? null;
+};
+
+/** Major Metabase version of the test instance, e.g. 64 for v0.64.3.4. */
+export const getMetabaseMajor = async (): Promise<number> => {
+  const client = await getTestClient();
+  const { data } = await client.GET("/api/session/properties", {} as any);
+  const tag: string = (data as any)?.version?.tag ?? "";
+  return Number(/^v?\d+\.(\d+)/.exec(tag)?.[1] ?? 0);
+};
