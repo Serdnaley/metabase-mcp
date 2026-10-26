@@ -7,6 +7,15 @@ All notable changes to this project will be documented in this file.
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See
 `docs/metabase-changes-0.59-to-0.64.md` for the full API diff.
 
+### Distribution
+
+- **One release publishes everywhere**: npm, the official MCP Registry
+  (`io.github.Serdnaley/metabase-mcp`), a Claude Desktop one-click bundle (`.mcpb`) on the GitHub
+  release, Docker image `ghcr.io/serdnaley/metabase-mcp` (amd64 + arm64), and Smithery when its API
+  key is configured. `glama.json` for Glama.
+- `bun run version:set X.Y.Z` / `version:check` keep every version field in sync; CI checks it.
+- Empty env vars now count as unset (bundle hosts pass `""` for blank optional fields).
+
 ### Fixed
 
 - `execute_card_query` with parameters: sends the now-required `parameters[].id`, reads MBQL 5

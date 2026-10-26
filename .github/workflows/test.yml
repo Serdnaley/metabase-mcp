@@ -20,6 +20,8 @@ jobs:
       - run: bunx tsc --noEmit -p .
       - name: README tool tables match the registry
         run: bun run docs:check
+      - name: Version fields agree (package.json, server-info, server.json, mcpb manifest)
+        run: bun run version:check
       - run: docker compose up -d
       - run: ./tests/ci/wait-for-metabase.sh
       - run: bun test

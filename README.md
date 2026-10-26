@@ -30,7 +30,14 @@ How it compares with Metabase's built-in MCP and other Metabase MCP servers: [do
 ## Installation
 
 <details>
-<summary><strong>Claude Desktop</strong></summary>
+<summary><strong>Claude Desktop (one-click bundle)</strong></summary>
+
+Download `metabase-mcp-X.Y.Z.mcpb` from the [latest release](https://github.com/Serdnaley/metabase-mcp/releases/latest) and open it: Claude Desktop shows a form for the Metabase URL and API key. No Node.js setup or JSON editing.
+
+</details>
+
+<details>
+<summary><strong>Claude Desktop (JSON config)</strong></summary>
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -283,6 +290,15 @@ npx -y @serdnaley/metabase-mcp
 ```
 
 Clients connect to `http://<host>:3333/mcp` with `Authorization: Bearer <MCP_HTTP_TOKEN>`. `GET /health` answers without auth and reveals nothing. The endpoint is stateless (no sessions), so it scales horizontally. Put it behind TLS (a reverse proxy) when it leaves localhost. Everyone with the token acts as the Metabase API key's user, so give each audience its own key, token and toolsets.
+
+Or as a container (`ghcr.io/serdnaley/metabase-mcp`, amd64 + arm64, HTTP mode by default):
+
+```bash
+docker run -p 3333:3333 \
+  -e METABASE_URL=https://metabase.example.com -e METABASE_API_KEY=mb_xxx \
+  -e MCP_HTTP_TOKEN="$(openssl rand -hex 32)" \
+  ghcr.io/serdnaley/metabase-mcp
+```
 
 ### Getting a Metabase API Key
 

@@ -68,29 +68,28 @@ src/http.ts       → Streamable HTTP transport with bearer auth (stdio is the d
 
 `scripts/generate-types.ts` downloads the Metabase OpenAPI spec, cleans problematic schema names (double dots, `/` and `%` in property keys, broken `$ref` pointers), then generates types via `openapi-typescript`. The generated types are committed.
 
-## Releasing to npm
+## Releasing (npm, MCP Registry, .mcpb, Smithery, Docker)
 
-Releases are published via GitHub Actions (Trusted Publishing / OIDC — no npm token needed).
+One GitHub release publishes everywhere via `.github/workflows/publish.yml` (no tokens needed except
+the optional `SMITHERY_API_KEY` secret).
 
 ```bash
-# 1. Bump version in package.json, src/server-info.ts and server.json (both "version" fields)
-# 2. Update CHANGELOG.md with new version section
-# 3. bun run docs:readme (tool tables/counts), update test counts in README.md
-# 4. Commit and push to main
-git add package.json src/server-info.ts server.json CHANGELOG.md README.md
-git commit -m "chore: prepare X.Y.Z release"
-git push origin main
-
-# 5. Create a GitHub release — this triggers the publish workflow
-gh release create vX.Y.Z --title "vX.Y.Z" --notes "Release notes here"
+bun run version:set X.Y.Z      # package.json, src/server-info.ts, server.json, packaging/mcpb/manifest.json
+# update CHANGELOG.md (Unreleased → X.Y.Z), bun run docs:readme, test counts in README.md
+git commit -am "chore: prepare X.Y.Z release"   # via PR to main
+gh release create vX.Y.Z --title "vX.Y.Z" --notes "…"
 ```
 
-The CI workflow (`.github/workflows/publish.yml`) runs on `release: [published]`:
-1. Runs full test suite against Metabase in Docker
-2. Builds the bundle (`bun run build`)
-3. Publishes to npm with `--provenance --access public`
+Jobs (each skips what is already published, so a failed run can be repeated with
+"Run workflow" → tag):
+1. `test` — tag must equal every version field (`bun run version:check vX.Y.Z`), tsc, docs check, full suite.
+2. `npm` — `npm publish --provenance` via OIDC trusted publishing.
+3. `mcp-registry` — waits for npm to serve `mcpName`, verifies `mcp-publisher` (cosign), `login github-oidc`, `publish`.
+4. `mcpb` — `bun run mcpb` builds `metabase-mcp-X.Y.Z.mcpb` (Claude Desktop one-click bundle) and attaches it to the release.
+5. `smithery` — publishes the bundle with the Smithery CLI; skipped unless the `SMITHERY_API_KEY` secret is set.
+6. `docker` — builds, smoke-tests `/health`, pushes `ghcr.io/serdnaley/metabase-mcp:X.Y.Z` and `:latest` (amd64 + arm64).
 
-After the npm publish, the MCP Registry listing is updated with `mcp-publisher publish` (see `docs/listing-checklist.md`).
+Glama indexes the repo itself (`glama.json` lists the maintainer); nothing to publish.
 
 The E2E test `tests/e2e/read-only-mode.test.ts` has hardcoded `READ_ONLY_TOOLS` and `WRITE_TOOLS` arrays — update them when adding/removing tools.
 

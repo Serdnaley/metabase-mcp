@@ -1,0 +1,87 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/dist/mcpb-manifest-v0.3.schema.json",
+  "manifest_version": "0.3",
+  "name": "metabase-mcp",
+  "display_name": "Metabase (headless MCP)",
+  "version": "0.2.0",
+  "description": "Metabase MCP server with API-key auth (no OAuth): 161 tools for queries, dashboards, admin, transforms and exports.",
+  "long_description": "Connects Claude to any Metabase instance (free or paid, 0.59+) with a Metabase API key or email/password. 161 tools across 30 toolsets: questions, dashboards, collections, SQL, metrics, measures, segments, transforms, users and permissions, databases, settings, alerts, exports. Optional read-only mode and toolset/tool filtering.",
+  "author": {
+    "name": "Andres Pavliuk",
+    "url": "https://github.com/Serdnaley"
+  },
+  "repository": { "type": "git", "url": "https://github.com/Serdnaley/metabase-mcp" },
+  "homepage": "https://serdnaley.github.io/metabase-mcp/",
+  "documentation": "https://github.com/Serdnaley/metabase-mcp#readme",
+  "support": "https://github.com/Serdnaley/metabase-mcp/issues",
+  "license": "MIT",
+  "keywords": ["metabase", "bi", "analytics", "sql", "dashboards"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "METABASE_URL": "${user_config.metabase_url}",
+        "METABASE_API_KEY": "${user_config.metabase_api_key}",
+        "METABASE_EMAIL": "${user_config.metabase_email}",
+        "METABASE_PASSWORD": "${user_config.metabase_password}",
+        "METABASE_READ_ONLY_MODE": "${user_config.read_only}",
+        "METABASE_TOOLSETS": "${user_config.toolsets}",
+        "METABASE_TOOLS_DISABLE": "${user_config.tools_disable}"
+      }
+    }
+  },
+  "user_config": {
+    "metabase_url": {
+      "type": "string",
+      "title": "Metabase URL",
+      "description": "Base URL of your Metabase, e.g. https://metabase.example.com",
+      "required": true
+    },
+    "metabase_api_key": {
+      "type": "string",
+      "title": "API key",
+      "description": "Metabase API key (Admin settings → Authentication → API keys). Leave empty to use email + password.",
+      "sensitive": true,
+      "required": false
+    },
+    "metabase_email": {
+      "type": "string",
+      "title": "Email (optional)",
+      "description": "Login email, only if you don't use an API key",
+      "required": false
+    },
+    "metabase_password": {
+      "type": "string",
+      "title": "Password (optional)",
+      "description": "Login password, only if you don't use an API key",
+      "sensitive": true,
+      "required": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only mode",
+      "description": "Hide all tools that change Metabase content",
+      "default": false,
+      "required": false
+    },
+    "toolsets": {
+      "type": "string",
+      "title": "Toolsets (optional)",
+      "description": "Comma list of toolsets or presets (all, query, content, admin). Empty = all",
+      "required": false
+    },
+    "tools_disable": {
+      "type": "string",
+      "title": "Disabled tools (optional)",
+      "description": "Comma list of tool names or globs to hide, e.g. delete_*",
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}

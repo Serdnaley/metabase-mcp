@@ -64,6 +64,12 @@ export const parseCustomHeaders = (
   return headers;
 };
 
+/** Unset and empty env vars are the same thing (bundle hosts pass "" for blank optional fields). */
+const envValue = (name: string): string | undefined => {
+  const v = process.env[name];
+  return v !== undefined && v.trim() !== "" ? v : undefined;
+};
+
 export const loadConfig = (): Config => {
   let customHeaders: Record<string, string>;
   try {
@@ -74,10 +80,10 @@ export const loadConfig = (): Config => {
   }
 
   const raw = {
-    metabaseUrl: process.env.METABASE_URL?.replace(/\/+$/, ""),
-    apiKey: process.env.METABASE_API_KEY,
-    email: process.env.METABASE_EMAIL,
-    password: process.env.METABASE_PASSWORD,
+    metabaseUrl: envValue("METABASE_URL")?.replace(/\/+$/, ""),
+    apiKey: envValue("METABASE_API_KEY"),
+    email: envValue("METABASE_EMAIL"),
+    password: envValue("METABASE_PASSWORD"),
     readOnly: process.env.METABASE_READ_ONLY_MODE === "true",
     customHeaders,
   };
