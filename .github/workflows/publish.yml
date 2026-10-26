@@ -1,7 +1,7 @@
 name: Release
 # One GitHub release (tag vX.Y.Z) publishes everywhere:
 #   npm (OIDC trusted publishing) → official MCP Registry (OIDC)
-#   .mcpb bundle → GitHub release asset → Smithery (only if SMITHERY_API_KEY is set)
+#   .mcpb bundle → GitHub release asset
 #   Docker image → ghcr.io/serdnaley/metabase-mcp
 # Every publish step skips what is already published, so the whole workflow can be re-run
 # for a tag with "Run workflow" (workflow_dispatch) after fixing a failed job.
@@ -24,7 +24,6 @@ env:
   MCP_NAME: io.github.Serdnaley/metabase-mcp
   MCP_PUBLISHER_VERSION: v1.8.4
   MCPB_CLI: "@anthropic-ai/mcpb@2.1.2"
-  SMITHERY_CLI: smithery@1.2.0
 
 permissions:
   contents: read
@@ -159,30 +158,6 @@ jobs:
         with:
           name: mcpb
           path: metabase-mcp-*.mcpb
-
-  smithery:
-    # Needs a Smithery API key in the repo secret SMITHERY_API_KEY (smithery.ai → account → API keys).
-    # Optional repo variable SMITHERY_SERVER_NAME (default serdnaley/metabase-mcp).
-    needs: mcpb
-    runs-on: ubuntu-latest
-    env:
-      SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
-      SMITHERY_SERVER_NAME: ${{ vars.SMITHERY_SERVER_NAME || 'serdnaley/metabase-mcp' }}
-    steps:
-      - name: Skip without a Smithery API key
-        if: env.SMITHERY_API_KEY == ''
-        run: echo "::notice::SMITHERY_API_KEY is not set, skipping Smithery"
-      - uses: actions/setup-node@v4
-        if: env.SMITHERY_API_KEY != ''
-        with:
-          node-version: 24
-      - uses: actions/download-artifact@v4
-        if: env.SMITHERY_API_KEY != ''
-        with:
-          name: mcpb
-      - name: Publish the bundle to Smithery
-        if: env.SMITHERY_API_KEY != ''
-        run: npx -y "$SMITHERY_CLI" mcp publish "metabase-mcp-${TAG#v}.mcpb" -n "$SMITHERY_SERVER_NAME"
 
   docker:
     needs: test

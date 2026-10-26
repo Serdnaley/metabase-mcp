@@ -68,10 +68,9 @@ src/http.ts       → Streamable HTTP transport with bearer auth (stdio is the d
 
 `scripts/generate-types.ts` downloads the Metabase OpenAPI spec, cleans problematic schema names (double dots, `/` and `%` in property keys, broken `$ref` pointers), then generates types via `openapi-typescript`. The generated types are committed.
 
-## Releasing (npm, MCP Registry, .mcpb, Smithery, Docker)
+## Releasing (npm, MCP Registry, .mcpb, Docker)
 
-One GitHub release publishes everywhere via `.github/workflows/publish.yml` (no tokens needed except
-the optional `SMITHERY_API_KEY` secret).
+One GitHub release publishes everywhere via `.github/workflows/publish.yml` (no tokens needed).
 
 ```bash
 bun run version:set X.Y.Z      # package.json, src/server-info.ts, server.json, packaging/mcpb/manifest.json
@@ -86,10 +85,10 @@ Jobs (each skips what is already published, so a failed run can be repeated with
 2. `npm` — `npm publish --provenance` via OIDC trusted publishing.
 3. `mcp-registry` — waits for npm to serve `mcpName`, verifies `mcp-publisher` (cosign), `login github-oidc`, `publish`.
 4. `mcpb` — `bun run mcpb` builds `metabase-mcp-X.Y.Z.mcpb` (Claude Desktop one-click bundle) and attaches it to the release.
-5. `smithery` — publishes the bundle with the Smithery CLI; skipped unless the `SMITHERY_API_KEY` secret is set.
-6. `docker` — builds, smoke-tests `/health`, pushes `ghcr.io/serdnaley/metabase-mcp:X.Y.Z` and `:latest` (amd64 + arm64).
+5. `docker` — builds, smoke-tests `/health`, pushes `ghcr.io/serdnaley/metabase-mcp:X.Y.Z` and `:latest` (amd64 + arm64).
 
-Glama indexes the repo itself (`glama.json` lists the maintainer); nothing to publish.
+Glama indexes the repo itself (`glama.json` lists the maintainer); nothing to publish. Smithery is not
+used: it only lists hosted HTTPS servers.
 
 The E2E test `tests/e2e/read-only-mode.test.ts` has hardcoded `READ_ONLY_TOOLS` and `WRITE_TOOLS` arrays — update them when adding/removing tools.
 
