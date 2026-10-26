@@ -10,7 +10,6 @@ Where `@serdnaley/metabase-mcp` is published and what still needs a human accoun
 | Official MCP Registry `io.github.Serdnaley/metabase-mcp` | `mcp-publisher login github-oidc` + `publish` | nothing: GitHub OIDC proves the `io.github.Serdnaley/*` namespace |
 | GitHub release asset `metabase-mcp-X.Y.Z.mcpb` | `bun run mcpb` | nothing |
 | GHCR `ghcr.io/serdnaley/metabase-mcp` | docker build-push | once: make the package public (see below) |
-| Smithery | `smithery mcp publish <bundle> -n serdnaley/metabase-mcp` | once: add the `SMITHERY_API_KEY` secret (see below) |
 
 PulseMCP and several other directories import from the official MCP Registry on their own.
 
@@ -24,14 +23,11 @@ already published.
 GitHub creates new container packages as private. github.com/Serdnaley?tab=packages → `metabase-mcp` →
 Package settings → Change visibility → Public. Also "Connect repository" if it is not linked yet.
 
-### Smithery (5 min)
+### Smithery: not used
 
-1. smithery.ai → sign in with GitHub.
-2. Account → API keys → create a key.
-3. Repo → Settings → Secrets and variables → Actions → New secret `SMITHERY_API_KEY`.
-4. If Smithery gives the server a different name than `serdnaley/metabase-mcp`, set the repo variable
-   `SMITHERY_SERVER_NAME` to it.
-5. Re-run the Release workflow for the latest tag (or wait for the next release).
+Dropped on 26.10.2026 (Andres). Smithery's API rejects stdio bundles ("Updating servers has been removed")
+and its web form only accepts an already hosted HTTPS server, i.e. a public multi-tenant gateway that
+would relay users' Metabase API keys. Not worth it next to npm, the MCP Registry, Glama and `.mcpb`.
 
 ### Glama (3 min)
 
