@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-26
+
+### Breaking
+
+- Query tools return compact output by default; pass `verbose: true` for the raw Metabase response.
+- `list_tasks` moved from the `activity` toolset to `diagnostics`.
+
 ### Large-result safety
 
 - Query tools (`execute_query`, `execute_card_query`, `run_metric`) return a compact view by default:
