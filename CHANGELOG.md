@@ -15,6 +15,13 @@ All notable changes to this project will be documented in this file.
   (default 100000) with a truncation notice.
 - Measured on a 10 / 100 / 500-row `SELECT * FROM ORDERS`: 94% / 76% / 60% fewer characters than 0.3.0.
 
+### Resources and prompts
+
+- MCP resources: `metabase://databases`, `metabase://database/{id}/schema`, `metabase://card/{id}`,
+  `metabase://dashboard/{id}`, `metabase://collection/{id}` (compact JSON summaries).
+- Prompts: `explore-database`, `build-dashboard`, `explain-card`, `audit-permissions`.
+- Both follow the tool selection: resources need their toolset, prompts need every tool they use.
+
 ## [0.3.0] - 2026-10-26
 
 Compatibility release for Metabase 0.60–0.64 (verified on v0.59.6 and v0.64.3.4). See

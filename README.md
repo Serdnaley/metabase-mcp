@@ -24,6 +24,8 @@ How it compares with Metabase's built-in MCP and other Metabase MCP servers: [do
 - **Tool annotations**: `readOnlyHint` / `destructiveHint` / `idempotentHint` on every tool
 - **stdio or HTTP**: Streamable HTTP with bearer auth for shared deployments
 - **Read-only mode**: hide every write tool with one env var
+- **Large-result safety**: compact query results, row and response-size caps, paging
+- **Resources & prompts**: browse databases, cards, dashboards and collections; ready-made workflows
 - **Admin automation**: users, groups, permissions, settings, database connections, transforms
 - **Type-safe**: HTTP client generated from Metabase's OpenAPI spec
 - **Zero config**: runs via `npx`, no installation needed
@@ -238,6 +240,8 @@ Generic JSON config (Cursor, VS Code and others):
 | `METABASE_TOOLSETS` | No | Comma list of toolsets or presets to load (default: all). See [Toolsets](#toolsets) |
 | `METABASE_TOOLS_ENABLE` | No | Extra tools to load on top of the toolsets (names or globs, e.g. `get_card,export_*`) |
 | `METABASE_TOOLS_DISABLE` | No | Tools never to load (names or globs); always wins over enable |
+| `METABASE_MAX_ROWS` | No | Row cap for query tools (default `500`); see [Large results](#large-results) |
+| `METABASE_MAX_RESPONSE_CHARS` | No | Size cap for any tool response (default `100000`) |
 | `MCP_TRANSPORT` | No | `stdio` (default) or `http`. `--http` on the command line does the same |
 | `MCP_HTTP_HOST` / `MCP_HTTP_PORT` | No | HTTP bind address, default `127.0.0.1:3333` (`PORT` also works) |
 | `MCP_HTTP_TOKEN` | HTTP mode | Bearer token clients must send (min. 16 chars) |
@@ -279,6 +283,25 @@ METABASE_TOOLS_DISABLE='delete_*'       # never delete anything
 ```
 
 Precedence, strongest first: **read-only mode > `METABASE_TOOLS_DISABLE` > `METABASE_TOOLS_ENABLE` > `METABASE_TOOLSETS`**. An unknown toolset stops the server at startup; an enable/disable pattern that matches nothing logs a warning. The startup log (stderr) shows how many tools are enabled.
+
+### Large results
+
+Query tools (`execute_query`, `execute_card_query`, `run_metric`) return a compact view: `columns`
+(name, type) and `rows`, without Metabase's column internals, `results_metadata` and insights. Pass
+`verbose: true` for the raw response. Results are capped at `METABASE_MAX_ROWS` rows (per call:
+`max_rows`, never above the cap) and paged with `offset`; a `note` says how to get the rest. Every tool
+response is compact JSON capped at `METABASE_MAX_RESPONSE_CHARS`. For a 10 / 100 / 500-row
+`SELECT * FROM ORDERS` this is 94% / 76% / 60% smaller than the raw pretty-printed response. For
+full result sets use the export tools with `output_path`.
+
+### Resources and prompts
+
+Besides tools the server offers MCP **resources** for browsing (compact JSON):
+`metabase://databases`, `metabase://database/{id}/schema`, `metabase://card/{id}`,
+`metabase://dashboard/{id}`, `metabase://collection/{id}` (`root` for the root collection), and
+**prompts** for common workflows: `explore-database`, `build-dashboard`, `explain-card`,
+`audit-permissions`. Both follow the tool selection: a resource needs its toolset, a prompt needs
+every tool it uses (so `build-dashboard` disappears in read-only mode).
 
 ### HTTP mode (shared / server deployments)
 
