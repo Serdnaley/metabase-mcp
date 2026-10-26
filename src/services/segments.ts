@@ -6,7 +6,7 @@ import type { MetabaseClient } from "../client.js";
  * (`{ filter: [...] }`), so wrap it into a legacy `type: "query"` query, which every
  * supported Metabase version accepts.
  */
-const normalizeDefinition = async (
+export const normalizeDefinition = async (
   client: MetabaseClient,
   tableId: number,
   definition: Record<string, unknown>
