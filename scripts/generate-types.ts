@@ -4,7 +4,7 @@ import openapiTS, { astToString } from "openapi-typescript";
 
 // Pinned to the Metabase version CI tests against (bump together with docker-compose / CI).
 // Override with METABASE_SPEC=<url or local path>.
-const SPEC_URL = process.env.METABASE_SPEC ?? "https://www.metabase.com/docs/v0.64/api.json";
+const SPEC_URL = process.env.METABASE_SPEC ?? "https://www.metabase.com/docs/v0.65/api.json";
 const SPEC_PATH = "generated/metabase-api.json";
 const OUTPUT_PATH = "generated/metabase-api.d.ts";
 
