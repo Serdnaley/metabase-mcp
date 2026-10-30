@@ -8,8 +8,9 @@ export interface paths {
         };
         /**
          * GET /api/action
-         * @description Returns actions that can be used for QueryActions. By default lists all viewable actions. Pass optional
-         *       `?model-id=<model-id>` to limit to actions on a particular model.
+         * @description Returns the actions the current user can read, unarchived unless `?archived=true`. Pass optional
+         *       `?model-id=<model-id>` to limit to the actions of a particular model, and optional `?type=<type>` to limit to actions
+         *       of that type.
          */
         get: operations["get-api-action"];
         put?: never;
@@ -873,226 +874,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/apps": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/apps
-         * @description List the data apps provided by the connected repository. Pass `available=true`
-         *        to return only enabled apps without sync errors.
-         */
-        get: operations["get-api-apps"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/repo-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/apps/repo-status
-         * @description Status of the connected repository as it relates to data apps. Data apps are
-         *        pulled by the remote-sync import (manual "Pull changes", auto-import, or
-         *        startup); the connection is configured on the remote-sync settings page.
-         */
-        get: operations["get-api-apps-repo-status"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/sandbox-host": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/apps/sandbox-host
-         * @description Serve the document used as the `src` of the Near-Membrane realm iframe, carrying a
-         *        per-document CSP that confines `'unsafe-eval'` to that realm. See [[sandbox-host-csp]].
-         */
-        get: operations["get-api-apps-sandbox-host"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/apps/{slug}
-         * @description Fetch metadata for a single enabled data app by its slug.
-         */
-        get: operations["get-api-apps-slug"];
-        /**
-         * PUT /api/apps/{slug}
-         * @description Enable or disable a single data app. Disabled apps are not served.
-         */
-        put: operations["put-api-apps-slug"];
-        post?: never;
-        /**
-         * DELETE /api/apps/{slug}
-         * @description Remove a single data app (its row and cached bundle). Intended for clearing out
-         *        apps left behind by a repository that is no longer connected: while a repo is
-         *        connected, an app still in it is re-materialized by the next sync, and one no
-         *        longer in it is pruned by that sync anyway.
-         */
-        delete: operations["delete-api-apps-slug"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/bundle": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/apps/{slug}/bundle
-         * @description Serve the cached JS bundle for a single enabled data app by slug. Honors
-         *        `If-None-Match` against the content-hash ETag with a 304.
-         */
-        get: operations["get-api-apps-slug-bundle"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/draft": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/apps/{slug}/draft
-         * @description Create or reuse a data app draft before its first repository import.
-         */
-        post: operations["post-api-apps-slug-draft"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/query": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/apps/{slug}/query
-         * @description Resolve an authored data-app query definition into a serializable Metabase query.
-         */
-        post: operations["post-api-apps-slug-query"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/query-table-dependencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/apps/{slug}/query-table-dependencies
-         * @description Return the tables read by already-saved queries, including ones reached only through an implicit join.
-         *
-         *        Sync copies models, actions and metrics whose queries it never resolves through `/query`, and only
-         *        this metadata-based lookup sees an implicit join: the id of a table reached through a foreign key
-         *        appears nowhere in the query itself.
-         */
-        post: operations["post-api-apps-slug-query-table-dependencies"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/table-dependencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * PUT /api/apps/{slug}/table-dependencies
-         * @description Store the tables used by the resources from a successful data app resource synchronization.
-         */
-        put: operations["put-api-apps-slug-table-dependencies"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/apps/{slug}/user-permission-warnings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/apps/{slug}/user-permission-warnings
-         * @description Return warnings for users who cannot access every table used by a data app.
-         */
-        post: operations["post-api-apps-slug-user-permission-warnings"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/automagic-dashboards/database/{id}/candidates": {
         parameters: {
             query?: never;
@@ -1501,7 +1282,8 @@ export interface paths {
         put?: never;
         /**
          * POST /api/card
-         * @description Create a new `Card`. Card `type` can be `question`, `metric`, or `model`.
+         * @description Create a new `Card`. Card `type` can be `question`, `metric`, or `model`. `source_card_id`, if given, must be a
+         *       Card the current user can read; the new Card is then treated as a copy of it for timeline-permission purposes.
          */
         post: operations["post-api-card"];
         delete?: never;
@@ -3129,18 +2911,18 @@ export interface paths {
          *       * `saved` means we should include the saved questions virtual database. Default: `false`.
          *
          *       * `include_editable_data_model` will only include DBs for which the current user has data model editing
-         *         permissions. (If `include=tables`, this also applies to the list of tables in each DB). Should only be used if
-         *         Enterprise Edition code is available the advanced-permissions feature is enabled.
+         *         permissions. (If `include=tables`, this also applies to the list of tables in each DB). Granting those
+         *         permissions to non-admins requires Enterprise Edition code and the advanced-permissions feature; without both,
+         *         this is admin-only.
          *
          *       * `exclude_uneditable_details` will only include DBs for which the current user can edit the DB details. Has no
          *         effect unless Enterprise Edition code is available and the advanced-permissions feature is enabled.
          *
          *       * `include_only_uploadable` will only include DBs into which Metabase can insert new data.
          *
-         *       * `can-query` will only include DBs for which the current user has query permissions. Default: `false`.
+         *       * `include_stubs` includes stub DBs, which serialization creates for missing databases. Default: `false`.
          *
-         *       * `can-write-metadata` will only include DBs for which the current user has data model editing permissions
-         *         for at least one table in the database. Default: `false`.
+         *       * `can-query` will only include DBs for which the current user has query permissions. Default: `false`.
          *
          *       Independently of these flags, the implementation of [[metabase.models.interface/to-json]] for `:model/Database` in
          *       [[metabase.warehouses.models.database]] uses the implementation of [[metabase.models.interface/can-write?]] for
@@ -3192,6 +2974,10 @@ export interface paths {
         /**
          * POST /api/database/validate
          * @description Validate that we can connect to a database given a set of details.
+         *
+         *       Pass the `id` of an existing Database to test edited details against it: sensitive values the client left redacted
+         *       are resolved from the stored Database, and its own engine may be tested even when creating new Databases of that
+         *       engine is disallowed.
          */
         post: operations["post-api-database-validate"];
         delete?: never;
@@ -3216,9 +3002,9 @@ export interface paths {
          *        returned details (see [[metabase.secrets.models.secret/expand-db-details-inferred-secret-values]] for full details).
          *
          *        Passing include_editable_data_model will only return tables for which the current user has data model editing
-         *        permissions, if Enterprise Edition code is available and a token with the advanced-permissions feature is present.
-         *        In addition, if the user has no data access for the DB (aka block permissions), it will return only the DB name, ID
-         *        and tables, with no additional metadata.
+         *        permissions. Granting data model permissions to non-admins requires Enterprise Edition code and a token with the
+         *        advanced-permissions feature; without both, this is admin-only. In addition, if the user has no data access for the
+         *        DB (aka block permissions), it will return only the DB name, ID and tables, with no additional metadata.
          *
          *        Independently of these flags, the implementation of [[metabase.models.interface/to-json]] for `:model/Database` in
          *        [[metabase.warehouses.models.database]] uses the implementation of [[metabase.models.interface/can-write?]] for `:model/Database`
@@ -3403,12 +3189,15 @@ export interface paths {
         /**
          * GET /api/database/{id}/metadata
          * @description Get metadata about a `Database`, including all of its `Tables` and `Fields`. Returns DB, fields, and field values.
-         *       By default only non-hidden tables and fields are returned. Passing include_hidden=true includes them.
+         *       By default only non-hidden tables are returned. Passing include_hidden=true includes them.
+         *
+         *       Passing include_sensitive_fields=true includes fields with visibility_type sensitive, for tables whose data model the
+         *       current user can edit.
          *
          *       Passing include_editable_data_model will only return tables for which the current user has data model editing
-         *       permissions, if Enterprise Edition code is available and a token with the advanced-permissions feature is present.
-         *       In addition, if the user has no data access for the DB (aka block permissions), it will return only the DB name, ID
-         *       and tables, with no additional metadata.
+         *       permissions. Granting data model permissions to non-admins requires Enterprise Edition code and a token with the
+         *       advanced-permissions feature; without both, this is admin-only. In addition, if the user has no data access for the
+         *       DB (aka block permissions), it will return only the DB name, ID and tables, with no additional metadata.
          */
         get: operations["get-api-database-id-metadata"];
         put?: never;
@@ -3455,7 +3244,6 @@ export interface paths {
          *
          *       Optional filters:
          *       - `can-query=true` - filter to only tables the user can query
-         *       - `can-write-metadata=true` - filter to only tables the user can edit metadata for
          */
         get: operations["get-api-database-id-schema"];
         put?: never;
@@ -3483,7 +3271,6 @@ export interface paths {
          *
          *       Optional filters:
          *       - `can-query=true` - filter to only tables the user can query
-         *       - `can-write-metadata=true` - filter to only tables the user can edit metadata for
          */
         get: operations["get-api-database-id-schema-schema"];
         put?: never;
@@ -3507,7 +3294,6 @@ export interface paths {
          *
          *       Optional filters:
          *       - `can-query=true` - filter to only schemas containing tables the user can query
-         *       - `can-write-metadata=true` - filter to only schemas containing tables the user can edit metadata for
          */
         get: operations["get-api-database-id-schemas"];
         put?: never;
@@ -4187,6 +3973,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ee/ai-controls/mcp-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/ai-controls/mcp-permissions
+         * @description List the MCP tool policy of every group, with the tools it can name and the current permission mode.
+         */
+        get: operations["get-api-ee-ai-controls-mcp-permissions"];
+        /**
+         * PUT /api/ee/ai-controls/mcp-permissions
+         * @description Set the MCP tool policy of the given groups, in one transaction, and return the policy of every group.
+         */
+        put: operations["put-api-ee-ai-controls-mcp-permissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/ai-controls/mcp-permissions/advanced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/ee/ai-controls/mcp-permissions/advanced
+         * @description Switch to group-level MCP tool access. Removes the rows of All Users and All tenant users, so access comes only
+         *        from the rows of the other groups, and enables Data Analysts with every tool at its default when it has no row.
+         */
+        post: operations["post-api-ee-ai-controls-mcp-permissions-advanced"];
+        /**
+         * DELETE /api/ee/ai-controls/mcp-permissions/advanced
+         * @description Switch back to All Users only. Removes the rows of every group other than Administrators, All Users and All
+         *        tenant users, and enables All Users and All tenant users with every tool at its default, the state the migration
+         *        leaves.
+         */
+        delete: operations["delete-api-ee-ai-controls-mcp-permissions-advanced"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ee/ai-controls/permissions": {
         parameters: {
             query?: never;
@@ -4343,6 +4180,213 @@ export interface paths {
          * @description Set or update the metabot usage limit for a specific tenant. Pass `max_usage: null` to remove the limit.
          */
         put: operations["put-api-ee-ai-controls-usage-tenant-tenant-id"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps
+         * @description List the data apps the user can read. Disabled and outdated apps are listed only to superusers, who see them
+         *       badged.
+         */
+        get: operations["get-api-ee-apps"];
+        put?: never;
+        /**
+         * POST /api/ee/apps
+         * @description Create a data app with its resource collection and an empty bundle. It is enabled unless the request says
+         *       otherwise.
+         */
+        post: operations["post-api-ee-apps"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/repo-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/repo-status
+         * @description Status of the connected repository as it relates to data apps. Data apps are
+         *        pulled by the remote-sync import (manual "Pull changes", auto-import, or
+         *        startup); the connection is configured on the remote-sync settings page.
+         */
+        get: operations["get-api-ee-apps-repo-status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/sandbox-host": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/sandbox-host
+         * @description Serve the document used as the `src` of the Near-Membrane realm iframe, carrying a
+         *        per-document CSP that confines `'unsafe-eval'` to that realm. See [[sandbox-host-csp]].
+         */
+        get: operations["get-api-ee-apps-sandbox-host"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/{slug}
+         * @description Fetch metadata for a single data app by its slug, disabled ones to superusers only.
+         */
+        get: operations["get-api-ee-apps-slug"];
+        /**
+         * PUT /api/ee/apps/{slug}
+         * @description Update a data app's manifest fields, or enable or disable it. A disabled app is served to superusers only.
+         */
+        put: operations["put-api-ee-apps-slug"];
+        post?: never;
+        /**
+         * DELETE /api/ee/apps/{slug}
+         * @description Delete a data app, its bundle, and its collection with the grants on it.
+         */
+        delete: operations["delete-api-ee-apps-slug"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}/bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/{slug}/bundle
+         * @description Serve the cached JS bundle for a single data app by slug, disabled ones to superusers only. Honors
+         *        `If-None-Match` against the content-hash ETag with a 304.
+         */
+        get: operations["get-api-ee-apps-slug-bundle"];
+        /**
+         * PUT /api/ee/apps/{slug}/bundle
+         * @description Replace a data app's bundle.
+         */
+        put: operations["put-api-ee-apps-slug-bundle"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}/group-permission-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/{slug}/group-permission-warnings
+         * @description Return missing table access for the groups listed for this app.
+         */
+        get: operations["get-api-ee-apps-slug-group-permission-warnings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/{slug}/groups
+         * @description List the groups other than Administrators that can read a data app's resource collection.
+         */
+        get: operations["get-api-ee-apps-slug-groups"];
+        put?: never;
+        /**
+         * POST /api/ee/apps/{slug}/groups
+         * @description Grant a batch of internal groups read access to a data app's resource collection atomically.
+         */
+        post: operations["post-api-ee-apps-slug-groups"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}/groups/{group-id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * DELETE /api/ee/apps/{slug}/groups/{group-id}
+         * @description Revoke a group's access to a data app's resource collection.
+         */
+        delete: operations["delete-api-ee-apps-slug-groups-group-id"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/apps/{slug}/typed-schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/apps/{slug}/typed-schema
+         * @description Return the TypeScript module of the data app's queries and actions: a `defineQuery` call for each question and metric
+         *       and a `defineAction` call for each action in the app's collection, addressed by entity ID. Superusers only.
+         */
+        get: operations["get-api-ee-apps-slug-typed-schema"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -4519,6 +4563,170 @@ export interface paths {
          *        All parameters for the operation are taken in the POST body.
          */
         post: operations["post-api-ee-cloud-proxy-operation-id"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/content-diagnostics/duplicated": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/content-diagnostics/duplicated
+         * @description List **duplicated** findings - the latest valid finding per (entity, finding-type) across the
+         *       duplicated finding types (currently just `duplicate_name`), permission-filtered for the current user.
+         *       Each item is a flat identity + a top-level `duplicate_count` (the number of other same-type entities
+         *       sharing the normalized name) + a nested `details` (collection, `description`, `owner`, `creator`,
+         *       `normalized_name`, and the hydrated same-type `duplicate_entities` peers). Card items also carry a
+         *       top-level `card_type` (`question`|`model`|`metric`) - card findings only, denormalized at scan time.
+         *       Paginated via `limit`/`offset`; `total` is the full valid count.
+         *
+         *       Params: `include-personal-collections` (default false) - when false, entities currently in a personal
+         *       collection are excluded and personal-collection peers are omitted from `duplicate_entities`.
+         *       `entity-types` (repeatable, omitted = all) narrows the flagged entity by type; the card sub-kinds are
+         *       valid values, `card` means any card type, and `collection` finds same-named collections instance-wide,
+         *       regardless of parent. Peers are not filtered - cards cluster across sub-kinds, so a model's peers can
+         *       be questions.
+         *       `min-duplicate-count` (positive int) keeps findings with at least that many peers. `query`
+         *       case-insensitively substring-matches the entity name. `sort-column`
+         *       (`detected-at`|`entity-type`|`name`|`created-at`|`created-by`|`collection-name`|`duplicate-count`,
+         *       default `detected-at`) + `sort-direction` (`asc`|`desc`, default `asc`); `id` is the stable
+         *       tiebreak.
+         */
+        get: operations["get-api-ee-content-diagnostics-duplicated"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/content-diagnostics/imbalanced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/content-diagnostics/imbalanced
+         * @description List **imbalanced** findings - the latest valid finding per (entity, finding-type) across the
+         *       `empty`/`sparse`/`crowded` checkers, permission-filtered for the current user. The checkers run
+         *       independently, so one entity can appear once per finding type (a collection whose items are all empty
+         *       is both `crowded` and `empty`) - rows are findings, not entities, and `total` counts findings. Each
+         *       item is a flat identity plus a top-level `content_count` and a nested `details` (collection breadcrumb,
+         *       description, owner, creator, the `threshold` crossed, and its `unit`). Card items (card only ever emits
+         *       `empty`) also carry a top-level `card_type`, denormalized at scan time. Paginated via `limit`/`offset`.
+         *
+         *       Params: `include-personal-collections` (default false) excludes entities in personal collections.
+         *       `entity-types` and `finding-types` (both repeatable) narrow the results; the card sub-kinds are valid
+         *       `entity-types` values, and `card` means any card type. `query` substring-matches the entity name.
+         *       `sort-column` (default `detected-at`) + `sort-direction` (default `asc`); `id` breaks ties.
+         */
+        get: operations["get-api-ee-content-diagnostics-imbalanced"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/content-diagnostics/invalidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/ee/content-diagnostics/invalidate
+         * @description Dismiss the findings with `ids`. Invalidation is soft and global: the row is kept, but the finding leaves
+         *       every caller's lists. If the write fails, nothing is dismissed.
+         *
+         *       `invalidated` lists the ids this call found active and dismissed (a racing call may list the same id);
+         *       `skipped` lists every other requested id - nonexistent, already invalidated, superseded by a newer
+         *       finding for the same entity, or not visible to the caller - without saying which. Both keep the request
+         *       order, de-duplicated.
+         */
+        post: operations["post-api-ee-content-diagnostics-invalidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/content-diagnostics/slow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/content-diagnostics/slow
+         * @description List **slow** findings - the latest valid `slow` finding per entity, permission-filtered for the
+         *       current user. Each item is a flat identity + a top-level `duration_ms` + a nested `details`. `details`
+         *       varies by `entity_type`: leaves (card/transform) freeze `threshold_ms`; containers (dashboard/document)
+         *       carry the hydrated `slow_entities` culprit cards. Card items also carry a top-level `card_type`
+         *       (`question`|`model`|`metric`) - card findings only, denormalized at scan time. Paginated via
+         *       `limit`/`offset`; `total` is the full valid count.
+         *
+         *       Params: `include-personal-collections` (default false) - when false, entities currently in a personal
+         *       collection are excluded and personal-collection culprit cards are omitted from `slow_entities`.
+         *       `entity-types` (repeatable, omitted = all) narrows the flagged entity by type; the card sub-kinds are
+         *       valid values, and `card` means any card type. Containers rolled up from slow cards are matched on
+         *       their own type.
+         *       `min-duration-ms` (positive int) keeps findings whose `duration_ms` is at least that (containers
+         *       filter on their representative duration). `query` case-insensitively substring-matches the entity name.
+         *       `sort-column` (`detected-at`|`entity-type`|`name`|`created-at`|`created-by`|`collection-name`|
+         *       `duration-ms`, default `detected-at`) + `sort-direction` (`asc`|`desc`, default `asc`); `id` is the
+         *       stable tiebreak.
+         */
+        get: operations["get-api-ee-content-diagnostics-slow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/content-diagnostics/stale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/content-diagnostics/stale
+         * @description List **stale** findings - the latest valid `stale` finding per entity, permission-filtered
+         *       for the current user. Each item is a flat identity + a nested `details` (collection, `description`, `owner`,
+         *       `creator`, `threshold_days`). Card items also carry a top-level `card_type`
+         *       (`question`|`model`|`metric`) - card findings only, denormalized at scan time. Paginated via
+         *       `limit`/`offset`; `total` is the full valid count.
+         *
+         *       Params: `include-personal-collections` (default false) - when false, entities currently in a personal
+         *       collection are excluded. `entity-types` (repeatable, omitted = all) narrows by type; the card sub-kinds
+         *       are valid values, and `card` means any card type.
+         *       `threshold-days` (positive int) keeps findings with `last_active_at` on or before `today -
+         *       threshold-days` (never-used always pass). `query` case-insensitively substring-matches the entity name.
+         *       `sort-column` (`detected-at`|`entity-type`|`name`|`created-at`|`created-by`|`collection-name`|
+         *       `last-active-at`, default `detected-at`) + `sort-direction` (`asc`|`desc`, default `asc`); `id` is
+         *       the stable tiebreak.
+         */
+        get: operations["get-api-ee-content-diagnostics-stale"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5029,8 +5237,7 @@ export interface paths {
         };
         /**
          * GET /api/ee/dependencies/backfill-status
-         * @description Returns whether the dependency backfill has pending work.
-         *       `complete` is true when there are no stale or outdated entities awaiting processing.
+         * @description Whether no entity awaits the computation of its dependencies, as `complete`, for superusers.
          */
         get: operations["get-api-ee-dependencies-backfill-status"];
         put?: never;
@@ -5225,26 +5432,6 @@ export interface paths {
          * @description Clear all cloud email related settings. You must be a superuser or have `setting` permission to do this.
          */
         delete: operations["delete-api-ee-email-override"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ee/embedding-hub/checklist": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/ee/embedding-hub/checklist
-         * @description Get the setup guide checklist status, indicating which setup steps have been completed.
-         */
-        get: operations["get-api-ee-embedding-hub-checklist"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6509,6 +6696,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ee/session-management": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/session-management
+         * @description List sessions. By default the ones that are currently live — the ones that would still authenticate a request.
+         *       `status=ended` lists instead the sessions that have ended: revoked, logged out, expired, idle past the session
+         *       timeout, or belonging to a deactivated user or an inactive tenant. An ended session stays on record for thirty
+         *       days, with when and why it ended (`ended_at`, `end_reason`) and who ended it (`ended_by`) once the nightly sweep
+         *       or the ending itself has recorded that; a session that has merely stopped being live since the last sweep is
+         *       already `ended`, with those three null. `status=all` lists both. `total` counts whatever the filters match.
+         *
+         *       Superuser only.
+         */
+        get: operations["get-api-ee-session-management"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/session-management/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/ee/session-management/revoke
+         * @description Revoke — end — every live session matching the given criteria, which are the filters the list endpoint takes.
+         *       All of them have to hold, so a revoke ends exactly the sessions the same filters would have listed. An empty
+         *       body matches every live session: that is how an admin logs everybody out. A revoked session is destroyed as a
+         *       credential at once, and stays on record as ended for thirty days.
+         *
+         *       Only live sessions can be revoked, so `status` may only be `live` (or absent), and `reason`, `ended-before` and
+         *       `ended-after` — which only match ended sessions — are rejected with a 400.
+         *
+         *       `exclude-current` (default true) excludes the session this request was made with. Pass false to log the caller
+         *       out too, in which case the response also clears their session cookie.
+         *
+         *       Sessions that are no longer live are left for the nightly cleanup task to record rather than revoked, and sessions
+         *       belonging to MCP clients are never matched.
+         *
+         *       Returns how many sessions were `revoked`, how many live sessions still match the criteria afterwards (`remaining`,
+         *       non-zero only when a login raced the revoke), and the `user_ids` whose sessions were revoked. Superuser only.
+         */
+        post: operations["post-api-ee-session-management-revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ee/stale/{id}": {
         parameters: {
             query?: never;
@@ -6652,6 +6901,89 @@ export interface paths {
          */
         put: operations["put-api-ee-tenant-id"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/transform-test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/transform-test
+         * @description List the transform tests with their newest runs, optionally only those of one transform.
+         */
+        get: operations["get-api-ee-transform-test"];
+        put?: never;
+        /**
+         * POST /api/ee/transform-test
+         * @description Create a transform test.
+         */
+        post: operations["post-api-ee-transform-test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/transform-test/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/transform-test/{id}
+         * @description Get a transform test with its newest run.
+         */
+        get: operations["get-api-ee-transform-test-id"];
+        /**
+         * PUT /api/ee/transform-test/{id}
+         * @description Update a transform test.
+         */
+        put: operations["put-api-ee-transform-test-id"];
+        post?: never;
+        /**
+         * DELETE /api/ee/transform-test/{id}
+         * @description Delete a transform test.
+         */
+        delete: operations["delete-api-ee-transform-test-id"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ee/transform-test/{id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/ee/transform-test/{id}/run
+         * @description List the runs of a transform test, newest first.
+         */
+        get: operations["get-api-ee-transform-test-id-run"];
+        put?: never;
+        /**
+         * POST /api/ee/transform-test/{id}/run
+         * @description Run a transform test.
+         *
+         *       A 200 means the run happened: `:status` is then `passed` or `failed`, and every expectation
+         *       reports what it found — including one that could not be evaluated, which comes back as that
+         *       expectation's own `:error` rather than discarding the answers of the others.
+         *
+         *       Any other status means the run was refused and nothing meaningful ran; the body then carries the `:error-code`
+         *       naming which refusal it was, as [[refusing]] describes.
+         */
+        post: operations["post-api-ee-transform-test-id-run"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7397,6 +7729,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/embedding-hub/checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/embedding-hub/checklist
+         * @description Get the setup guide checklist status, indicating which setup steps have been completed.
+         */
+        get: operations["get-api-embedding-hub-checklist"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/embedding-sdk/react-18-hosts": {
         parameters: {
             query?: never;
@@ -7433,6 +7785,302 @@ export interface paths {
         get: operations["get-api-eval-trace-session-id"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/exploration
+         * @description Create a new exploration with a single thread, persist the user's selected metrics, dimensions,
+         *       and timelines, and stamp the thread as started. Also auto-creates a placeholder Summary
+         *       document in the same collection. Actual planning is async; this endpoint returns immediately
+         *       with an empty queries list. Clients should poll `GET /:id` until the queries appear and reach
+         *       a terminal status.
+         *
+         *       Accepts the per-area `:blocks` payload (one entry per Research-plan block), persisted
+         *       verbatim, plus a thread-scoped `:timeline_ids`.
+         */
+        post: operations["post-api-exploration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/dimensions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/exploration/dimensions
+         * @description Hydrated metrics plus a deduplicated dimension list, for the Exploration data modal.
+         *
+         *       Optional `q` filters case-insensitively across metric name and dimension display-name.
+         */
+        get: operations["get-api-exploration-dimensions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/exploration/mine
+         * @description Explorations the current user created or edited, most-recently-touched first, paginated.
+         *
+         *       "Touched" composes the user's own edits to the exploration, to its Summary document, and its
+         *       creation — see [[metabase.explorations.db/my-explorations]]. Explorations that were moved into a
+         *       collection the user can no longer read are excluded, as are archived ones. Returns the
+         *       collection-items envelope: `{:total :limit :offset :data}`.
+         */
+        get: operations["get-api-exploration-mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/page/{id}/starred": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * PUT /api/exploration/page/{id}/starred
+         * @description Set whether an exploration page is starred.
+         */
+        put: operations["put-api-exploration-page-id-starred"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/pages/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * PUT /api/exploration/pages/hidden
+         * @description Set whether one or more exploration pages are hidden from the sidebar. Hiding a single
+         *       page passes a one-element `page_ids`; hiding a whole group passes all its page ids.
+         */
+        put: operations["put-api-exploration-pages-hidden"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/query/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/exploration/query/{id}
+         * @description Stream the result of a single completed exploration query. The optional `format` query param
+         *       is one of `api`, `json`, `csv`, `xlsx` (default `api`). When the underlying query is still
+         *       pending or has errored, returns a 409 with status info instead of streaming.
+         */
+        get: operations["get-api-exploration-query-id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/thread/{thread-id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/exploration/thread/{thread-id}/cancel
+         * @description Cancel an in-flight exploration thread. Stamps `canceled_at` and `completed_at` on the thread,
+         *       and bulk-flips any still-`pending` ExplorationQuery rows to `canceled`. In-flight queries
+         *       currently mid-QP-execution are left to run to natural completion — their result rows are
+         *       orphaned but harmless (timeline scoring skips canceled threads).
+         *
+         *       Idempotent: a thread with `completed_at IS NOT NULL` (already terminal — natural completion or
+         *       prior cancel) returns 200 with its existing state. Authorization is the same write check as
+         *       other thread-mutating endpoints.
+         */
+        post: operations["post-api-exploration-thread-thread-id-cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/thread/{thread-id}/restart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/exploration/thread/{thread-id}/restart
+         * @description Re-run one exploration thread in place, keeping its selections: drops the thread's materialized
+         *       queries and clears the terminal-state gates so the background planner re-claims it. Returns the
+         *       parent exploration. Only a terminal thread (completed, failed, or canceled) can restart; while
+         *       planning, execution, or analysis is still in flight this returns a 409 — cancel the thread
+         *       first, then restart.
+         *
+         *       No `:event/exploration-update` is published: nothing on the Exploration row changes, so there
+         *       is no revision to record (the revision push skips unchanged objects).
+         */
+        post: operations["post-api-exploration-thread-thread-id-restart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GET /api/exploration/{id}
+         * @description Fetch an exploration with its thread, selections, and generated queries.
+         */
+        get: operations["get-api-exploration-id"];
+        /**
+         * PUT /api/exploration/{id}
+         * @description Update an exploration's metadata, archive state, or move it to a different collection.
+         *
+         *       When `collection_id` changes, the caller must have write perms on the destination collection
+         *       (or the root collection when `collection_id` is nil). Source perms are enforced by
+         *       `api/write-check` against the exploration itself via `:perms/use-parent-collection-perms`.
+         *       Moving an exploration cascades the new `collection_id` onto its Summary document; flipping
+         *       `archived` cascades to the same document (skipping any that were directly user-archived,
+         *       mirroring the dashboard / dashboard-question cascade).
+         */
+        put: operations["put-api-exploration-id"];
+        post?: never;
+        /**
+         * DELETE /api/exploration/{id}
+         * @description Hard-delete an exploration. Soft delete is `PUT /api/exploration/:id {archived: true}`.
+         *
+         *       Cascades to every `exploration_thread`, `exploration_query`, and attached Summary `document`
+         *       via the on-delete-cascade FKs configured in the explorations migration.
+         */
+        delete: operations["delete-api-exploration-id"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/{id}/explore-further": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/exploration/{id}/explore-further
+         * @description Start a follow-up investigation scoped to a clicked chart segment.
+         *
+         *       The user clicked a bar/point on the chart for `page_id`; we copy that page's block (its metric
+         *       selection + the same dimensions) into a brand-new thread and append each `explore_filters`
+         *       entry onto every metric selection's `:explore_filters` vector. The background planner then
+         *       materializes the same set of charts, but every query is scoped to those filters — and to any
+         *       filters the source block already carried, so drilling from within an already-drilled thread
+         *       keeps the earlier scope (see
+         *       `metabase.explorations.query-plan.context/build-row-context`). Returns immediately with the new
+         *       thread stamped `started_at`; clients poll `GET /:id` for the queries to land, exactly like create.
+         */
+        post: operations["post-api-exploration-id-explore-further"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exploration/{id}/summary/append": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * POST /api/exploration/{id}/summary/append
+         * @description Append a static `cardEmbed` representing a *composite chart* — built from one or more
+         *       `ExplorationQuery` snapshots combined into a single qp-result — to the exploration's
+         *       Summary document.
+         *
+         *       The body `:exploration_query_ids` is the FE-rendered SeriesGroup's full set (one entry
+         *       for single-query charts; multiple for combined cartesian / heat-map charts). The BE
+         *       combines those source snapshots (`metabase.explorations.composite/combine`) into one
+         *       ephemeral `stored_result` and materializes one ephemeral `report_card` referencing it.
+         *       The cardEmbed node remains single-card.
+         *
+         *       - `chart_href` / `child_target_id` / `host_data` are written onto the node so the FE
+         *         can deep-link the embed title back to the source page, share that page's comment
+         *         stream (`child_target_id`), and resolve highlight hover and explore-further filter
+         *         pills via opaque `host_data`.
+         *       - `display` / `visualization_settings` are required FE-computed render settings (from
+         *         `buildSeries` / `getDisplay`); the BE bakes them onto the ephemeral card.
+         *
+         *       All source EQs must belong to a thread of this exploration. Appending clears
+         *       `is_placeholder` when it was set.
+         */
+        post: operations["post-api-exploration-id-summary-append"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7921,33 +8569,6 @@ export interface paths {
          *         or field value fetching.
          */
         post: operations["post-api-llm-extract-sources"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/llm/generate-sql": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/llm/generate-sql
-         * @description Generate SQL from a natural language prompt.
-         *
-         *        Requires:
-         *        - LLM to be configured (Anthropic API key set in admin settings)
-         *        - At least one table reference (explicit @mention or implicit from source_sql)
-         *        - A database_id parameter
-         *
-         *        Returns generated SQL and the list of tables used for context.
-         */
-        post: operations["post-api-llm-generate-sql"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9743,8 +10364,8 @@ export interface paths {
          * @description IDs of the permission groups holding a stored read (or read-write) grant on the collection of a shareable item (a
          *       `dashboard` or a `question`). The "invite someone to view" group picker lists all groups and uses these ids to mark
          *       the ones whose members can already see the item; the Administrators group has implicit access to everything and is
-         *       never included. The ids are otherwise unfiltered; system-managed groups like Data Analysts appear when they hold a
-         *       grant, and clients intersect the ids with the groups they display. Superuser-only, like the invite action itself.
+         *       never included. The Data Analysts group is omitted unless `advanced-permissions` is enabled. The ids are otherwise
+         *       unfiltered. Superuser-only, like the invite action itself.
          */
         get: operations["get-api-permissions-invite-group-ids"];
         put?: never;
@@ -10349,26 +10970,6 @@ export interface paths {
         get: operations["get-api-preview_embed-tiles-dashboard-token-dashcard-dashcard-id-card-card-id-zoom-x-y"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/product-feedback": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * POST /api/product-feedback
-         * @description Endpoint to provide feedback from the product
-         */
-        post: operations["post-api-product-feedback"];
         delete?: never;
         options?: never;
         head?: never;
@@ -11722,14 +12323,15 @@ export interface paths {
          *
          *       Optional filters:
          *       - `can-query=true` - filter to only tables the user can execute queries against
-         *       - `can-write=true` - filter to only tables the user can edit metadata for
+         *       - `include-editable-data-model=true` - filter to only tables the user can edit the data model of, instead of the
+         *         tables the user can read
          */
         get: operations["get-api-table"];
         /**
          * PUT /api/table
          * @description Update all `Table` in `ids`.
          *
-         *       Deprecated, should use PUT /table/edit from now on.
+         *       Deprecated: use `POST /api/data-studio/table/edit`.
          */
         put: operations["put-api-table"];
         post?: never;
@@ -11900,13 +12502,17 @@ export interface paths {
          * @description Get metadata about a `Table` useful for running queries.
          *        Returns DB, fields, field FKs, and field values.
          *
-         *        Passing `include_hidden_fields=true` will include any hidden `Fields` in the response. Defaults to `false`
-         *        Passing `include_sensitive_fields=true` will include any sensitive `Fields` in the response. Defaults to `false`.
+         *        Passing `include_hidden_fields=true` will include any hidden `Fields` in the response. Defaults to `false`.
+         *        Passing `include_sensitive_fields=true` will include any sensitive `Fields` in the response if the current user has
+         *        data model editing permissions for the table. Defaults to `false`.
          *
-         *        Passing `include_editable_data_model=true` will check that the current user has write permissions for the table's
-         *        data model, while `false` checks that they have data access perms for the table. Defaults to `false`.
+         *        Passing `include_editable_data_model=true` will check that the current user has data model editing permissions for
+         *        the table, even when Remote Sync makes the table read-only, while `false` checks that they can read the table.
+         *        Defaults to `false`.
          *
-         *        These options are provided for use in the Admin Edit Metadata page.
+         *        The response includes `can_write`, which is false when the user cannot edit the table's metadata right now.
+         *
+         *        These options are provided for use in the data model pages.
          */
         get: operations["get-api-table-id-query_metadata"];
         put?: never;
@@ -12896,26 +13502,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/typed-schemas/v1/typescript": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * GET /api/typed-schemas/v1/typescript
-         * @description Generate a TypeScript semantic schema module.
-         */
-        get: operations["get-api-typed-schemas-v1-typescript"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/upload/csv": {
         parameters: {
             query?: never;
@@ -13742,116 +14328,6 @@ export interface components {
         "metabase-enterprise.action-v2.api.api-action-id": number | string;
         /** @description All the various ways of referring to an action with the v2 APIs. */
         "metabase-enterprise.action-v2.api.api-action-id-or-expression": components["schemas"]["metabase-enterprise.action-v2.api.api-action-id"] | components["schemas"]["metabase-enterprise.action-v2.api.api-action-expression"];
-        "metabase-enterprise.data-apps.query-definition.aggregation": components["schemas"]["metabase-enterprise.data-apps.query-definition.expression"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.measure"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.metric"];
-        /** @constant */
-        "metabase-enterprise.data-apps.query-definition.auto-bin": "auto";
-        "metabase-enterprise.data-apps.query-definition.bin-count-bucket": {
-            bins?: (number | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-        };
-        "metabase-enterprise.data-apps.query-definition.bin-width-bucket": {
-            "bin-width"?: (components["schemas"]["metabase.lib.schema.common.positive-number"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-        };
-        "metabase-enterprise.data-apps.query-definition.binning": {
-            /** @constant */
-            strategy: "default";
-        } | {
-            "num-bins": number;
-            /** @constant */
-            strategy: "num-bins";
-        } | {
-            "bin-width": components["schemas"]["metabase.lib.schema.common.positive-number"];
-            /** @constant */
-            strategy: "bin-width";
-        };
-        "metabase-enterprise.data-apps.query-definition.breakout": components["schemas"]["metabase-enterprise.data-apps.query-definition.column-with-binning"];
-        "metabase-enterprise.data-apps.query-definition.column": {
-            "display-name"?: string | null;
-            index?: number | null;
-            name: string;
-            "source-field-id"?: components["schemas"]["metabase.lib.schema.id.field"] | null;
-            "source-name"?: string | null;
-            "table-id"?: components["schemas"]["metabase.lib.schema.id.table"] | null;
-            /** @constant */
-            type: "column";
-        };
-        "metabase-enterprise.data-apps.query-definition.column-with-binning": {
-            binning?: components["schemas"]["metabase-enterprise.data-apps.query-definition.binning"];
-            index?: number | null;
-            "table-id"?: components["schemas"]["metabase.lib.schema.id.table"] | null;
-            "display-name"?: string | null;
-            "bin-width"?: (components["schemas"]["metabase.lib.schema.common.positive-number"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-            "source-name"?: string | null;
-            name: string;
-            "source-field-id"?: components["schemas"]["metabase.lib.schema.id.field"] | null;
-            /** @constant */
-            type: "column";
-            unit?: components["schemas"]["metabase.lib.schema.temporal-bucketing.unit"] | null;
-            bins?: (number | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-        };
-        "metabase-enterprise.data-apps.query-definition.expression": components["schemas"]["metabase-enterprise.data-apps.query-definition.column"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.literal-expression"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.operator-expression"];
-        "metabase-enterprise.data-apps.query-definition.literal-expression": {
-            /** @constant */
-            type: "literal";
-            value: components["schemas"]["metabase.lib.schema.literal.literal"];
-        };
-        "metabase-enterprise.data-apps.query-definition.measure": {
-            id: components["schemas"]["metabase.lib.schema.id.measure"];
-            /** @constant */
-            type: "measure";
-        };
-        "metabase-enterprise.data-apps.query-definition.metric": {
-            id: components["schemas"]["metabase.lib.schema.id.metric"];
-            /** @constant */
-            type: "metric";
-        };
-        "metabase-enterprise.data-apps.query-definition.operator": string;
-        "metabase-enterprise.data-apps.query-definition.operator-expression": {
-            /** @default [] */
-            args: components["schemas"]["metabase-enterprise.data-apps.query-definition.expression"][];
-            operator: components["schemas"]["metabase-enterprise.data-apps.query-definition.operator"];
-            /** @constant */
-            type: "operator";
-        };
-        "metabase-enterprise.data-apps.query-definition.order-by": {
-            binning?: components["schemas"]["metabase-enterprise.data-apps.query-definition.binning"];
-            index?: number | null;
-            "table-id"?: components["schemas"]["metabase.lib.schema.id.table"] | null;
-            "display-name"?: string | null;
-            "bin-width"?: (components["schemas"]["metabase.lib.schema.common.positive-number"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-            "source-name"?: string | null;
-            name: string;
-            direction?: ("asc" | "desc") | null;
-            "source-field-id"?: components["schemas"]["metabase.lib.schema.id.field"] | null;
-            /** @constant */
-            type: "column";
-            unit?: components["schemas"]["metabase.lib.schema.temporal-bucketing.unit"] | null;
-            bins?: (number | components["schemas"]["metabase-enterprise.data-apps.query-definition.auto-bin"]) | null;
-        };
-        "metabase-enterprise.data-apps.query-definition.query-definition": {
-            stages: components["schemas"]["metabase-enterprise.data-apps.query-definition.stage"][];
-        };
-        "metabase-enterprise.data-apps.query-definition.segment": {
-            id: components["schemas"]["metabase.lib.schema.id.segment"];
-            /** @constant */
-            type: "segment";
-        };
-        "metabase-enterprise.data-apps.query-definition.stage": {
-            aggregations?: components["schemas"]["metabase-enterprise.data-apps.query-definition.aggregation"][] | null;
-            breakouts?: components["schemas"]["metabase-enterprise.data-apps.query-definition.breakout"][] | null;
-            fields?: components["schemas"]["metabase-enterprise.data-apps.query-definition.column"][] | null;
-            filters?: (components["schemas"]["metabase-enterprise.data-apps.query-definition.expression"] | components["schemas"]["metabase-enterprise.data-apps.query-definition.segment"])[] | null;
-            limit?: number | null;
-            "order-bys"?: components["schemas"]["metabase-enterprise.data-apps.query-definition.order-by"][] | null;
-            source: components["schemas"]["metabase-enterprise.data-apps.query-definition.table-source"];
-        };
-        "metabase-enterprise.data-apps.query-definition.table-source": {
-            id: components["schemas"]["metabase.lib.schema.id.table"];
-            /** @constant */
-            type: "table";
-        };
-        "metabase-enterprise.data-apps.query-definition.temporal-bucket": {
-            unit?: components["schemas"]["metabase.lib.schema.temporal-bucketing.unit"] | null;
-        };
         "metabase-enterprise.data-complexity-score.api.node": {
             error: string;
         } | {
@@ -13882,6 +14358,25 @@ export interface components {
             database_ids?: number[];
             schema_ids?: string[];
             table_ids?: number[];
+        };
+        "metabase-enterprise.dependencies.api.action-entity": {
+            data: {
+                collection?: unknown;
+                creator?: unknown;
+                name?: unknown;
+                collection_id?: unknown;
+                type?: unknown;
+                created_at?: unknown;
+                model_id?: unknown;
+                parameters?: unknown;
+                creator_id?: unknown;
+                description?: unknown;
+            };
+            dependents_count: components["schemas"]["metabase-enterprise.dependencies.api.usages"] | null;
+            dependents_errors?: components["schemas"]["metabase-enterprise.dependencies.api.dependent-error"][];
+            id: number;
+            /** @constant */
+            type: "action";
         };
         "metabase-enterprise.dependencies.api.base-entity": {
             data: Record<string, never>;
@@ -13942,15 +14437,26 @@ export interface components {
             /** @constant */
             type: "dashboard";
         };
+        "metabase-enterprise.dependencies.api.data-app-entity": {
+            data: {
+                created_at?: unknown;
+                description?: unknown;
+                display_name?: unknown;
+                name?: unknown;
+            };
+            dependents_count: components["schemas"]["metabase-enterprise.dependencies.api.usages"] | null;
+            dependents_errors?: components["schemas"]["metabase-enterprise.dependencies.api.dependent-error"][];
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            /** @constant */
+            type: "data-app";
+        };
         /**
          * @description One entry of `::base-entity`'s `:dependents_errors`: either the slim `{:type :detail}` shape
          *       [[normalize-finding-error]] produces for an entity's own errors (`node-errors`), or the raw AnalysisFindingError row
          *       `node-downstream-errors` keeps so callers can tell which downstream entity each error belongs to.
          */
-        "metabase-enterprise.dependencies.api.dependent-error": {
-            detail?: string | null;
-            type: components["schemas"]["metabase.lib.schema.validate.validate-error-type"];
-        } | components["schemas"]["metabase-enterprise.dependencies.models.analysis-finding-error.analysis-finding-error"];
+        "metabase-enterprise.dependencies.api.dependent-error": components["schemas"]["metabase-enterprise.dependencies.api.normalized-finding-error"] | components["schemas"]["metabase-enterprise.dependencies.models.analysis-finding-error.analysis-finding-error"];
         "metabase-enterprise.dependencies.api.document-entity": {
             data: {
                 collection?: unknown;
@@ -13967,7 +14473,7 @@ export interface components {
             /** @constant */
             type: "document";
         };
-        "metabase-enterprise.dependencies.api.entity": components["schemas"]["metabase-enterprise.dependencies.api.table-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.card-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.snippet-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.transform-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.dashboard-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.document-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.sandbox-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.segment-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.measure-entity"];
+        "metabase-enterprise.dependencies.api.entity": components["schemas"]["metabase-enterprise.dependencies.api.table-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.card-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.snippet-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.transform-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.dashboard-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.document-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.sandbox-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.segment-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.measure-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.action-entity"] | components["schemas"]["metabase-enterprise.dependencies.api.data-app-entity"];
         "metabase-enterprise.dependencies.api.graph-response": {
             edges: {
                 from_entity_id: components["schemas"]["metabase-enterprise.dependencies.dependency-types.entity-id"];
@@ -13992,6 +14498,11 @@ export interface components {
             id: number;
             /** @constant */
             type: "measure";
+        };
+        /** @description The slim `{:type :detail}` shape [[normalize-finding-error]] produces from an AnalysisFindingError. */
+        "metabase-enterprise.dependencies.api.normalized-finding-error": {
+            detail?: string | null;
+            type: components["schemas"]["metabase.lib.schema.validate.validate-error-type"];
         };
         "metabase-enterprise.dependencies.api.sandbox-entity": {
             data: {
@@ -14088,7 +14599,7 @@ export interface components {
             [key: string]: components["schemas"]["metabase-enterprise.dependencies.dependency-types.entity-id"];
         };
         /** @enum {string} */
-        "metabase-enterprise.dependencies.dependency-types.dependency-types": "transform" | "table" | "snippet" | "dashboard" | "sandbox" | "measure" | "card" | "document" | "segment";
+        "metabase-enterprise.dependencies.dependency-types.dependency-types": "transform" | "table" | "snippet" | "dashboard" | "sandbox" | "measure" | "card" | "document" | "segment" | "action" | "data-app";
         "metabase-enterprise.dependencies.dependency-types.entity-id": number;
         /** @description Schema for an AnalysisFindingError record. */
         "metabase-enterprise.dependencies.models.analysis-finding-error.analysis-finding-error": {
@@ -14219,6 +14730,161 @@ export interface components {
         } | null;
         /** @description A single attribute value in a PATCH operation. The strings clients send for booleans are parsed by the handler. */
         "metabase-enterprise.scim.v2.api.patch-value": string | boolean;
+        "metabase-enterprise.session-management.api.EndedOnlyCriterion": unknown;
+        /** @description The criteria the list and the revoke share: every one of them can match a live session. */
+        "metabase-enterprise.session-management.api.FilterParams": {
+            /** @description value must be a valid date string */
+            "last-active-before"?: string;
+            provider?: ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[] & ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[];
+            ids?: string[] & string[];
+            /**
+             * @default all
+             * @enum {string}
+             */
+            tenancy: "all" | "internal" | "external";
+            /** @description value must be an integer greater than zero. */
+            "user-id"?: number;
+            /** @description value must be a valid date string */
+            "last-active-after"?: string;
+            type?: components["schemas"]["metabase-enterprise.session-management.schema.session-type"];
+            /** @description value must be a valid date string */
+            "created-after"?: string;
+            /** @description value must be a valid date string */
+            "created-before"?: string;
+        };
+        /** @description The criteria the list and the revoke share: every one of them can match a live session. */
+        "metabase-enterprise.session-management.api.ListParams": {
+            /** @description value must be a valid date string */
+            "last-active-before"?: string;
+            query?: string;
+            /** @description value must be a valid date string */
+            "ended-after"?: string;
+            provider?: ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[] & ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[];
+            ids?: string[] & string[];
+            /**
+             * @default all
+             * @enum {string}
+             */
+            tenancy: "all" | "internal" | "external";
+            /**
+             * @default desc
+             * @enum {string}
+             */
+            "sort-direction": "asc" | "desc";
+            /** @default live */
+            status: components["schemas"]["metabase-enterprise.session-management.schema.session-status"];
+            /** @description value must be an integer greater than zero. */
+            "user-id"?: number;
+            /** @description value must be a valid date string */
+            "last-active-after"?: string;
+            type?: components["schemas"]["metabase-enterprise.session-management.schema.session-type"];
+            reason?: components["schemas"]["metabase.session.schema.end-reason"];
+            /** @description value must be a valid date string */
+            "ended-before"?: string;
+            /** @description value must be a valid date string */
+            "created-after"?: string;
+            /** @default created_at */
+            "sort-column": components["schemas"]["metabase-enterprise.session-management.schema.session-sort-column"];
+            /** @description value must be a valid date string */
+            "created-before"?: string;
+        };
+        /** @description The criteria the list and the revoke share: every one of them can match a live session. */
+        "metabase-enterprise.session-management.api.RevokeByCriteriaParams": {
+            /** @description value must be a valid date string */
+            "last-active-before"?: string;
+            query?: unknown;
+            "ended-after"?: components["schemas"]["metabase-enterprise.session-management.api.EndedOnlyCriterion"];
+            provider?: ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[] & ("password" | "ldap" | "google" | "slack-connect" | "custom-oidc" | "jwt" | "saml" | "support-access-grant" | "unknown")[];
+            ids?: string[];
+            /**
+             * @default all
+             * @enum {string}
+             */
+            tenancy: "all" | "internal" | "external";
+            /** @enum {string} */
+            status?: "live";
+            /** @description value must be an integer greater than zero. */
+            "user-id"?: number;
+            /** @description value must be a valid date string */
+            "last-active-after"?: string;
+            type?: components["schemas"]["metabase-enterprise.session-management.schema.session-type"];
+            reason?: components["schemas"]["metabase-enterprise.session-management.api.EndedOnlyCriterion"];
+            /** @default true */
+            "exclude-current": boolean;
+            "ended-before"?: components["schemas"]["metabase-enterprise.session-management.api.EndedOnlyCriterion"];
+            /** @description value must be a valid date string */
+            "created-after"?: string;
+            /** @description value must be a valid date string */
+            "created-before"?: string;
+        };
+        "metabase-enterprise.session-management.api.RevokeByCriteriaResult": {
+            /** @description value must be an integer greater or equal to than zero. */
+            remaining: number;
+            /** @description value must be an integer greater or equal to than zero. */
+            revoked: number;
+            user_ids: number[];
+        };
+        "metabase-enterprise.session-management.api.Session": {
+            end_reason: components["schemas"]["metabase.session.schema.end-reason"] | null;
+            last_active_at: string | null;
+            user: {
+                common_name: string | null;
+                email: string;
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            device_id: string | null;
+            id: string;
+            /** Format: date-time */
+            expires_at: string;
+            provider: string;
+            ended_at: string | null;
+            /** @enum {string} */
+            status: "live" | "ended";
+            ended_by: number | null;
+            current: boolean;
+            type: components["schemas"]["metabase-enterprise.session-management.schema.session-type"];
+            /** Format: date-time */
+            created_at: string;
+            device_description: string | null;
+            ip_address: string | null;
+            user_agent: string | null;
+        };
+        "metabase-enterprise.session-management.api.SessionsResponse": {
+            data: components["schemas"]["metabase-enterprise.session-management.api.Session"][];
+            limit: number | null;
+            offset: number | null;
+            /** @description value must be an integer greater or equal to than zero. */
+            total: number;
+        };
+        "metabase-enterprise.session-management.api.SortParams": {
+            /** @default created_at */
+            "sort-column": components["schemas"]["metabase-enterprise.session-management.schema.session-sort-column"];
+            /**
+             * @default desc
+             * @enum {string}
+             */
+            "sort-direction": "asc" | "desc";
+        };
+        /**
+         * @description Columns the session list can be sorted by. `:last_active_at` sorts on the same
+         *       `COALESCE(last_active_at, created_at)` the idle-timeout predicate uses, so a session that has never been touched
+         *       sorts by when it was created rather than last. `:ended_at` is null for a live session, and for an ended one whose
+         *       ending the nightly sweep has not recorded yet.
+         * @enum {string}
+         */
+        "metabase-enterprise.session-management.schema.session-sort-column": "created_at" | "last_active_at" | "user_email" | "provider" | "ended_at";
+        /**
+         * @description Which sessions a query is about: the `live` ones (the default), the `ended` ones, or `all` of them.
+         * @enum {string}
+         */
+        "metabase-enterprise.session-management.schema.session-status": "live" | "ended" | "all";
+        /**
+         * @description How a session was created: an ordinary login, or a full-app embedding one. Derived from whether the `core_session`
+         *       row carries an anti-CSRF token, which only full-app-embed sessions do.
+         * @enum {string}
+         */
+        "metabase-enterprise.session-management.schema.session-type": "normal" | "full-app-embed";
         /** @description Schema for POST /api/ee/support-access-grants request body. */
         "metabase-enterprise.support-access-grants.schema.create-grant-request": {
             grant_duration_minutes: number;
@@ -14254,6 +14920,248 @@ export interface components {
             total: number;
         };
         "metabase-enterprise.support-access-grants.schema.timestamp": unknown | unknown;
+        /**
+         * @description What an `empty` expectation found.
+         *
+         *       A pass carries nothing beyond the shared keys. A failure adds the rows the query returned as
+         *       `:sample`, with `:columns` describing them; the sample is capped, and `:truncated` is how many
+         *       rows that cap dropped.
+         */
+        "metabase-enterprise.transform-testing.expectations.empty.result": {
+            columns?: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            /** @constant */
+            type: "empty";
+        } | {
+            columns?: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            /** @constant */
+            type: "empty";
+        } | {
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            sample: components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            truncated: number;
+            /** @constant */
+            type: "empty";
+        };
+        /**
+         * @description What an `equals` expectation found.
+         *
+         *       Unless `:status` is `error`, every key is present on a pass as well as a failure:
+         *       `:extra-rows`, `:missing-rows` and `:cell-mismatches` come back empty rather than missing.
+         *       `:row-counts` sets the output's row count against the number of rows the expectation declared.
+         *       `:cell-mismatches` is filled only when exactly one row is missing and exactly one is extra.
+         *       `:extra-rows` and `:missing-rows` are capped; `:truncated` is how many rows that cap dropped.
+         */
+        "metabase-enterprise.transform-testing.expectations.equals.result": {
+            columns?: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            /** @constant */
+            type: "equals";
+        } | {
+            truncated: number;
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            "extra-rows": components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            /** @constant */
+            type: "equals";
+            "missing-rows": components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            "cell-mismatches": {
+                actual: (boolean | number | string) | null;
+                column: string;
+                expected: (boolean | number | string) | null;
+            }[];
+            "row-counts": {
+                actual: number;
+                expected: number;
+            };
+        } | {
+            truncated: number;
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            "extra-rows": components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            /** @constant */
+            type: "equals";
+            "missing-rows": components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            "cell-mismatches": {
+                actual: (boolean | number | string) | null;
+                column: string;
+                expected: (boolean | number | string) | null;
+            }[];
+            "row-counts": {
+                actual: number;
+                expected: number;
+            };
+        };
+        /**
+         * @description A column of inline test data, with the type its cells are cast to.
+         *
+         *       A cast target, which on some engines is not a type name the warehouse ever reports: MySQL takes
+         *       `SIGNED` and reports `BIGINT`.
+         */
+        "metabase-enterprise.transform-testing.schema.column": {
+            cast_type: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+        };
+        /** @description A check on the output of the transform under test. */
+        "metabase-enterprise.transform-testing.schema.expectation": components["schemas"]["metabase-enterprise.transform-testing.schema.expectation.equals"] | components["schemas"]["metabase-enterprise.transform-testing.schema.expectation.empty"];
+        /**
+         * @description What one expectation found. Each type owns the schema of its own result, registered under the key
+         *       named here.
+         */
+        "metabase-enterprise.transform-testing.schema.expectation-result": components["schemas"]["metabase-enterprise.transform-testing.expectations.equals.result"] | components["schemas"]["metabase-enterprise.transform-testing.expectations.empty.result"];
+        /**
+         * @description The checks run against the transform's output. Names must be unique within a test,
+         *       case-sensitively.
+         */
+        "metabase-enterprise.transform-testing.schema.expectations": components["schemas"]["metabase-enterprise.transform-testing.schema.expectation"][];
+        /** @description An input table of the transform under test, replaced with test data. */
+        "metabase-enterprise.transform-testing.schema.input": {
+            /** @constant */
+            format: "sql";
+            sql: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            table: components["schemas"]["metabase-enterprise.transform-testing.schema.table"];
+        } | {
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.column"][];
+            /** @constant */
+            format: "rows";
+            rows: components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            table: components["schemas"]["metabase-enterprise.transform-testing.schema.table"];
+        };
+        /**
+         * @description Test data for the tables the transform reads. Every table it reads needs one, and an input for
+         *       a table it does not read is refused.
+         */
+        "metabase-enterprise.transform-testing.schema.inputs": components["schemas"]["metabase-enterprise.transform-testing.schema.input"][];
+        /** @description A column reported by a test run, with its database native type. */
+        "metabase-enterprise.transform-testing.schema.result-column": {
+            database_type: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+        };
+        /** @description Value must be a map. */
+        "metabase-enterprise.transform-testing.schema.row": {
+            [key: string]: (boolean | number | string) | null;
+        } | unknown;
+        /**
+         * @description Test data written out in the request: the columns, with the type each is cast to, and the rows.
+         *
+         *       A row's keys are the declared column names, exactly: the query reads each row by those names, so a key that names
+         *       no column would be dropped and a column a row leaves out would become a null cell, neither of which the author
+         *       asked for.
+         */
+        "metabase-enterprise.transform-testing.schema.rows-data": {
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.column"][];
+            /** @constant */
+            format: "rows";
+            rows: components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+        };
+        /**
+         * @description The outcome of a transform test run.
+         *
+         *       `:tables` maps each temp table the run created to the table it stood in for.
+         */
+        "metabase-enterprise.transform-testing.schema.run-result": {
+            expectations: components["schemas"]["metabase-enterprise.transform-testing.schema.expectation-result"][];
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            tables: {
+                [key: string]: string;
+            };
+        };
+        /**
+         * @description The persisted lifecycle state of a transform test run.
+         * @enum {string}
+         */
+        "metabase-enterprise.transform-testing.schema.run-status": "started" | "passed" | "failed" | "error" | "timeout";
+        /** @description Test data returned by a SQL query run against the transform's source database. */
+        "metabase-enterprise.transform-testing.schema.sql-data": {
+            /** @constant */
+            format: "sql";
+            sql: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+        };
+        /**
+         * @description The outcome of a transform test run, or of one of its expectations.
+         *
+         *       `:error` is an expectation outcome only: that expectation's own query could not be run, while
+         *       the rest of the run completed and still reported.
+         * @enum {string}
+         */
+        "metabase-enterprise.transform-testing.schema.status": "passed" | "failed" | "error";
+        /** @description A table read by the transform under test, by schema and name. */
+        "metabase-enterprise.transform-testing.schema.table": {
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            schema?: components["schemas"]["metabase.lib.schema.common.non-blank-string"] | null;
+        };
+        /**
+         * @description A saved transform test: the transform it covers, the inputs that stand in for its source
+         *       tables, and the expectations checked against its output.
+         */
+        "metabase-enterprise.transform-testing.schema.transform-test": {
+            entity_id: string;
+            expectations: components["schemas"]["metabase-enterprise.transform-testing.schema.expectations"];
+            transform_id: components["schemas"]["metabase.lib.schema.id.transform"];
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            name: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            created_at: string;
+            inputs: components["schemas"]["metabase-enterprise.transform-testing.schema.inputs"];
+            creator_id: components["schemas"]["metabase.lib.schema.id.user"];
+            description: string | null;
+        };
+        /** @description A persisted execution of a transform test. */
+        "metabase-enterprise.transform-testing.schema.transform-test-run": {
+            end_time: string | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            initiated_by: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            /** Format: date-time */
+            last_heartbeat: string;
+            /** Format: date-time */
+            start_time: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.run-status"];
+            transform_test_id: number | null;
+        };
+        /** @description The user who started a run. */
+        "metabase-enterprise.transform-testing.schema.user": {
+            common_name?: string | null;
+            email: string;
+            first_name: string | null;
+            id: components["schemas"]["metabase.lib.schema.id.user"];
+            last_name: string | null;
+        };
         /**
          * @description Definition for conditional alerts.
          *        FE evaluates condition against card results and shows alert if triggered.
@@ -14456,8 +15364,8 @@ export interface components {
         /** @description An Action as it should appear when we `SELECT` it from the app DB. */
         "metabase.actions.schema.action": {
             visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
             entity_id?: string | null;
+            collection?: components["schemas"]["metabase.collections.schema.collection-or-root"] | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
             id: components["schemas"]["metabase.actions.schema.id"];
             creator?: components["schemas"]["metabase.users.schema.user"] | null;
@@ -14466,42 +15374,24 @@ export interface components {
             archived?: boolean;
             database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
             updated_at?: unknown;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
             legacy_query?: string | null;
-            type?: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        } | {
-            visualization_settings?: Record<string, never> | null;
-            entity_id?: string | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            id: components["schemas"]["metabase.actions.schema.id"];
-            creator?: components["schemas"]["metabase.users.schema.user"] | null;
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name?: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
+            can_write?: boolean;
             kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type?: components["schemas"]["metabase.actions.schema.type"];
             created_at?: unknown;
             public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
             creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            archived_directly?: boolean;
             public_uuid_prefix?: string | null;
             description?: string | null;
         } | {
             visualization_settings?: Record<string, never> | null;
             entity_id?: string | null;
+            collection?: components["schemas"]["metabase.collections.schema.collection-or-root"] | null;
             dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
             id: components["schemas"]["metabase.actions.schema.id"];
@@ -14512,18 +15402,21 @@ export interface components {
             database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
             updated_at?: unknown;
             legacy_query?: string | null;
+            can_write?: boolean;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type?: components["schemas"]["metabase.actions.schema.type"];
             created_at?: unknown;
             public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
             creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            archived_directly?: boolean;
             public_uuid_prefix?: string | null;
             description?: string | null;
         } | {
             visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
             entity_id?: string | null;
+            collection?: components["schemas"]["metabase.collections.schema.collection-or-root"] | null;
             dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
             id: components["schemas"]["metabase.actions.schema.id"];
@@ -14533,17 +15426,18 @@ export interface components {
             archived?: boolean;
             database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
             updated_at?: unknown;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
             legacy_query?: string | null;
+            can_write?: boolean;
             kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type?: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
             created_at?: unknown;
             public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
             creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            archived_directly?: boolean;
             public_uuid_prefix?: string | null;
             description?: string | null;
         };
@@ -14561,7 +15455,7 @@ export interface components {
          * @description Unsupported action type
          * @enum {string}
          */
-        "metabase.actions.schema.type": "http" | "implicit" | "query";
+        "metabase.actions.schema.type": "implicit" | "query";
         "metabase.actions.types.fk-or-missing-id": components["schemas"]["metabase.actions.types.missing-id"] | number;
         "metabase.actions.types.missing-id": number;
         /**
@@ -15199,15 +16093,55 @@ export interface components {
             description: string | null;
         };
         /** @enum {string} */
-        "metabase.collections.schema.CollectionItemModel": "card" | "dataset" | "metric" | "dashboard" | "snippet" | "collection" | "indexed-entity" | "indexed-entity" | "document" | "exploration" | "table";
+        "metabase.collections.schema.CollectionItemModel": "card" | "dataset" | "metric" | "dashboard" | "snippet" | "collection" | "indexed-entity" | "indexed-entity" | "document" | "exploration" | "table" | "action";
         /** @enum {string} */
-        "metabase.collections.schema.CollectionType": "instance-analytics" | "trash" | "remote-synced" | "library" | "library-models" | "library-metrics";
+        "metabase.collections.schema.CollectionType": "instance-analytics" | "trash" | "remote-synced" | "library" | "library-models" | "library-metrics" | "library-dashboards";
         "metabase.collections.schema.LastEditInfo": {
             email: string | null;
             first_name: string | null;
             id: number | null;
             last_name: string | null;
             timestamp: string | null;
+        };
+        /** @description What an update (or insert) of a Collection accepts: every column of `:collection` except `id`, all optional. */
+        "metabase.collections.schema.collection": {
+            archive_operation_id?: string | null;
+            entity_id?: string | null;
+            authority_level?: (string) | null;
+            is_sample?: boolean | null;
+            id: components["schemas"]["metabase.lib.schema.id.collection"];
+            effective_location?: string | null;
+            is_remote_synced?: boolean | null;
+            name?: string | null;
+            slug?: string | null;
+            archived?: boolean | null;
+            location?: string | null;
+            can_write?: boolean;
+            type?: (string) | null;
+            created_at?: string | null;
+            namespace?: (string) | null;
+            is_personal?: boolean | null;
+            personal_owner_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            archived_directly?: boolean | null;
+            description?: string | null;
+        };
+        /** @description A Collection row, or the Root Collection placeholder. */
+        "metabase.collections.schema.collection-or-root": components["schemas"]["metabase.collections.schema.root-collection"] | components["schemas"]["metabase.collections.schema.collection"];
+        /** @description The placeholder for the Root Collection, which has no row, as `metabase.collections.models.collection.root` builds it. */
+        "metabase.collections.schema.root-collection": {
+            can_delete?: boolean;
+            authority_level?: (string) | null;
+            /** @constant */
+            id?: "root";
+            effective_ancestors?: components["schemas"]["metabase.collections.schema.collection"][];
+            effective_location?: string | null;
+            is_remote_synced?: boolean;
+            name?: string;
+            can_write?: boolean;
+            parent_id?: null;
+            can_restore?: boolean;
+            namespace?: (string) | null;
+            is_personal?: boolean;
         };
         /**
          * @description One node of the ProseMirror/TipTap document a comment is written in, in the shape ProseMirror's `Node.toJSON`
@@ -15222,6 +16156,27 @@ export interface components {
             text?: string;
             type: string;
         };
+        /** @description Emoji must be 1 to 10 Unicode code points. */
+        "metabase.comments.schema.reaction-emoji": string;
+        /**
+         * @description An origin a data app's sandboxed bundle may fetch: scheme, host with an optional `*.` subdomain wildcard, and an
+         *        optional port.
+         */
+        "metabase.data-apps.schema.allowed-host": string;
+        /** @description The origins a data app's sandboxed bundle may fetch, `[]` when nil. */
+        "metabase.data-apps.schema.allowed-hosts": components["schemas"]["metabase.data-apps.schema.allowed-host"][];
+        /** @description The path of a data app's bundle, relative to the app's directory and inside it. */
+        "metabase.data-apps.schema.bundle-path": string;
+        /** @description The text of a data app's bundle file. */
+        "metabase.data-apps.schema.bundle-text": string;
+        /** @description A data app's optional one-line summary, nil when blank. */
+        "metabase.data-apps.schema.description": string | null;
+        /** @description A data app's display name. */
+        "metabase.data-apps.schema.display-name": string;
+        /** @description A data app's slug: lowercase letters and numbers separated by single dashes, at most 100 characters. */
+        "metabase.data-apps.schema.slug": string;
+        /** @description The data app contract version an app was built for, 1 when it declares none. */
+        "metabase.data-apps.schema.version": number;
         /** @description Schema for table info in bulk operations. Matches frontend BulkTableInfo type. */
         "metabase.data-studio.api.table.bulk-table-info": {
             /** @description value must be an integer greater than zero. */
@@ -15262,7 +16217,7 @@ export interface components {
             type: string;
         };
         /** @enum {string} */
-        "metabase.driver.connection.connection-type": "default" | "write-data" | "admin" | "transform";
+        "metabase.driver.connection.connection-type": "default" | "write-data" | "transform";
         /**
          * @description One form field describing how to request an index: the same shape as a [[connection-properties]] descriptor, plus a
          *       `:columns` type for the indexed columns.
@@ -15321,6 +16276,252 @@ export interface components {
             id: number;
             /** Format: date-time */
             last_seen_at: string;
+        };
+        /**
+         * @description Schema for the cancel endpoint response — just the state-bearing fields the FE needs to
+         *       reflect the cancellation. EQ status changes are picked up via the existing `/queries` poll.
+         */
+        "metabase.explorations.api.CanceledThread": {
+            canceled_at: unknown | null;
+            completed_at: unknown | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+        };
+        /** @description Schema for GET /dimensions: metrics referencing dimensions by id, plus the grouped dimension list. */
+        "metabase.explorations.api.DimensionsResponse": {
+            dimension_groups: components["schemas"]["metabase.explorations.api.ExplorationDimensionGroup"][];
+            metrics: components["schemas"]["metabase.explorations.api.ExplorationMetric"][];
+        };
+        /**
+         * @description A block (the FE's sidebar group): a heading plus its pages. `:name` is the computed heading
+         *        (the metric name). `:position` is the block's 0-indexed authoring slot.
+         */
+        "metabase.explorations.api.ExplorationBlockNode": {
+            explore_filters?: ({
+                dimension_name?: string | null;
+                display_value: string;
+                field_ref: components["schemas"]["metabase.lib.schema.parameter.dimension.target"];
+                /** @constant */
+                operator: "=";
+                value: (string | number | boolean) | null;
+            } | {
+                dimension_name?: string | null;
+                display_value: string;
+                field_ref: components["schemas"]["metabase.lib.schema.parameter.dimension.target"];
+                /** @constant */
+                operator: "between";
+                values: [
+                    (string | number | boolean) | null,
+                    (string | number | boolean) | null
+                ];
+            })[] | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            name: string | null;
+            pages: components["schemas"]["metabase.explorations.api.ExplorationPageNode"][];
+            /** @description value must be an integer greater or equal to than zero. */
+            position: number;
+        };
+        /**
+         * @description Schema for a dimension group in the /dimensions response. A group bundles together dimensions that
+         *        refer to the same underlying source (same field/binning) so the FE can show a single user-facing
+         *        entry while still tracking the actual per-metric dimensions needed by `start exploration`.
+         */
+        "metabase.explorations.api.ExplorationDimensionGroup": {
+            dimension_interestingness: number | null;
+            dimensions: components["schemas"]["metabase.metrics.core.dimension"][];
+            name: string;
+        };
+        /** @description Schema for the Summary document attached to an exploration. */
+        "metabase.explorations.api.ExplorationDocument": {
+            is_placeholder: boolean;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            name: string;
+            archived?: boolean;
+            /** Format: date-time */
+            updated_at: string;
+            /** @description value must be an integer greater than zero. */
+            exploration_id: number;
+            /** Format: date-time */
+            created_at: string;
+            /** @description value must be an integer greater than zero. */
+            creator_id: number;
+            content_type: string;
+        };
+        /** @description Schema for a metric in the /dimensions response: dimensions referenced by id only. */
+        "metabase.explorations.api.ExplorationMetric": {
+            dimension_mappings?: components["schemas"]["metabase.metrics.core.dimension-mapping"][] | null;
+            collection?: {
+                id: number | null;
+                name: string;
+            } | null;
+            result_column_name?: string | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            name: string;
+            database_id?: number | null;
+            dimension_ids: unknown[];
+            collection_id: number | null;
+            in_library?: boolean;
+            description: string | null;
+        };
+        /**
+         * @description A page within a block: the bundle of queries for one (card, dimension, query_type) under the
+         *        page's stable id. `:query_ids` reference queries on the same thread, sorted by interestingness.
+         *        `:position` is the page's 0-indexed slot among its block's pages. `:name` is the page's short,
+         *        heading-relative label (e.g. `By Category over time`); `:long_name` is the full
+         *        self-describing name (e.g. `Number of Orders by Category over time`) for use without the block
+         *        heading for context.
+         */
+        "metabase.explorations.api.ExplorationPageNode": {
+            hidden: boolean;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            long_name: string | null;
+            name: string | null;
+            /** @description value must be an integer greater or equal to than zero. */
+            position: number;
+            query_ids: number[];
+            starred: boolean;
+        };
+        /**
+         * @description Schema for `GET /query/:id`. On success the body is a streamed dataset (api/csv/json/xlsx),
+         *        so we describe it as `:any`. On a not-yet-done query we return a 409 with a status payload.
+         */
+        "metabase.explorations.api.ExplorationQueryStreamResponse": unknown | {
+            body: {
+                error_message?: string | null;
+                finished_at?: unknown | null;
+                /** @description value must be an integer greater than zero. */
+                id: number;
+                started_at?: unknown | null;
+                status: string;
+            };
+            /** @constant */
+            status: 409;
+        };
+        /**
+         * @description Schema for a query row in API responses. The result blob and `dataset_query` aren't
+         *        asserted here; `interestingness_score`, `contextual_interestingness_score`, and `row_count`
+         *        are batched-hydrated onto each query in `/:id` — the scores from `exploration_query_result`,
+         *        `row_count` from the linked `stored_result` — and may be nil for pending/errored queries or —
+         *        for the contextual score — when the LLM is unconfigured or the thread had no prompt.
+         */
+        "metabase.explorations.api.ExplorationQuerySummary": {
+            /** @description value must be an integer greater than zero. */
+            exploration_thread_id: number;
+            segment_id?: number | null;
+            dimension_id: string | null;
+            row_count?: number | null;
+            contextual_interestingness_score?: number | null;
+            entity_id?: string | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            interestingness_score?: number | null;
+            started_at?: unknown | null;
+            /** @description value must be an integer greater than zero. */
+            card_id: number;
+            /** @description value must be an integer greater or equal to than zero. */
+            position: number;
+            name?: string | null;
+            status: string;
+            error_message?: string | null;
+            query_type: string;
+            segment_name?: string | null;
+            display?: string | null;
+            dimension_name?: string;
+            finished_at?: unknown | null;
+        };
+        /**
+         * @description Lightweight row for the `GET /mine` list. No threads/queries — just the metadata
+         *       needed to render a list entry, plus `current_user_last_touched_at`, the timestamp the list is
+         *       sorted by (the caller's own most-recent touch of this exploration, composed across the
+         *       exploration's revisions and its creation).
+         */
+        "metabase.explorations.api.ExplorationSummary": {
+            collection?: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+                name: string;
+            } | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            creator?: {
+                email?: string;
+                first_name?: string | null;
+                /** @description value must be an integer greater than zero. */
+                id?: number;
+                last_name?: string | null;
+            } | null;
+            name: string;
+            archived?: boolean;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            current_user_last_touched_at: string;
+            collection_id?: number | null;
+            /** Format: date-time */
+            created_at: string;
+            /** @description value must be an integer greater than zero. */
+            creator_id: number;
+            description?: string | null;
+        };
+        /** @description Schema for an Exploration with hydrated creator and threads. */
+        "metabase.explorations.api.HydratedExploration": {
+            threads?: components["schemas"]["metabase.explorations.api.HydratedThread"][] | null;
+            can_delete?: boolean;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            document?: components["schemas"]["metabase.explorations.api.ExplorationDocument"] | null;
+            creator?: Record<string, never> | null;
+            name: string;
+            archived?: boolean;
+            updated_at?: unknown | null;
+            can_write?: boolean;
+            collection_id?: number | null;
+            created_at?: unknown | null;
+            can_restore?: boolean;
+            /** @description value must be an integer greater than zero. */
+            creator_id: number;
+            description?: string | null;
+        };
+        /** @description Schema for an Exploration thread with hydrated selections and queries. */
+        "metabase.explorations.api.HydratedThread": {
+            queries?: components["schemas"]["metabase.explorations.api.ExplorationQuerySummary"][] | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            started_at?: unknown | null;
+            blocks?: components["schemas"]["metabase.explorations.api.ExplorationBlockNode"][] | null;
+            /** @description value must be an integer greater or equal to than zero. */
+            position: number;
+            /** @enum {string} */
+            status: "pending" | "running" | "canceled" | "empty" | "failed" | "completed" | "forbidden";
+            source_page_id?: number | null;
+            prompt?: string | null;
+            timelines?: {
+                /** @description value must be an integer greater or equal to than zero. */
+                position?: number;
+                timeline?: Record<string, never> | null;
+                /** @description value must be an integer greater than zero. */
+                timeline_id: number;
+            }[] | null;
+            /** @description value must be an integer greater than zero. */
+            exploration_id: number;
+            completed_at?: unknown | null;
+            canceled_at?: unknown | null;
+        };
+        /**
+         * @description Paginated envelope for `GET /mine`, mirroring the collection-items index shape. `:total` is the
+         *       count after the membership, permission, and archived filters; `:limit`/`:offset` echo the
+         *       `offset-paging` middleware (both nil when the request is unpaged).
+         */
+        "metabase.explorations.api.MineResponse": {
+            data: components["schemas"]["metabase.explorations.api.ExplorationSummary"][];
+            limit: number | null;
+            offset: number | null;
+            /** @description value must be an integer greater or equal to than zero. */
+            total: number;
         };
         /** @enum {string} */
         "metabase.frontend-errors.api.frontend-error-type": "component-crash" | "chart-render-error";
@@ -15852,8 +17053,6 @@ export interface components {
         "metabase.lib.schema.id.field": number;
         /** @description Valid Measure ID */
         "metabase.lib.schema.id.measure": number;
-        /** @description Valid Metric ID (metrics are Cards with type :metric) */
-        "metabase.lib.schema.id.metric": number;
         /** @description Valid Pulse ID */
         "metabase.lib.schema.id.pulse": number;
         /** @description Valid Sandbox ID */
@@ -15885,7 +17084,7 @@ export interface components {
          * @description Schema for `info.context`; used for informational purposes to record how a query was executed.
          * @enum {string}
          */
-        "metabase.lib.schema.info.context": "action" | "action-execute" | "ad-hoc" | "agent" | "cache-refresh" | "collection" | "map-tiles" | "metric" | "pulse" | "dashboard-subscription" | "dashboard" | "question" | "csv-download" | "xlsx-download" | "json-download" | "public-action-execute" | "public-dashboard" | "public-question" | "public-csv-download" | "public-xlsx-download" | "public-json-download" | "embedded-dashboard" | "embedded-question" | "embedded-csv-download" | "embedded-xlsx-download" | "embedded-json-download" | "table-grid" | "table-rows-sample" | "transform-inspector" | "slackbot" | "exploration";
+        "metabase.lib.schema.info.context": "action" | "action-execute" | "ad-hoc" | "agent" | "cache-refresh" | "collection" | "map-tiles" | "metabot" | "metric" | "pulse" | "dashboard-subscription" | "dashboard" | "question" | "csv-download" | "xlsx-download" | "json-download" | "public-action-execute" | "public-dashboard" | "public-question" | "public-csv-download" | "public-xlsx-download" | "public-json-download" | "embedded-dashboard" | "embedded-question" | "embedded-csv-download" | "embedded-xlsx-download" | "embedded-json-download" | "table-grid" | "table-rows-sample" | "transform-inspector" | "slackbot" | "exploration";
         /** Format: byte */
         "metabase.lib.schema.info.hash": string;
         /**
@@ -16617,6 +17816,10 @@ export interface components {
             personal_collection_id: number | null;
             tenant_id: number | null;
         };
+        /** @description Value must be a map. */
+        "metabase.mcp.permissions.tool-access": {
+            [key: string]: string;
+        } | unknown;
         /**
          * @description Response schema for dimension remapping endpoint.
          *        Returns [value] if no remapping, or [value, display-name] if remapped.
@@ -16902,6 +18105,7 @@ export interface components {
             })[];
             current_user_time?: string | null;
             default_database_id?: number | null;
+            in_host_app?: boolean | null;
             current_time_with_timezone?: string | null;
         };
         /** @description One of the user's recent views, trimmed to what the model gets told about it. */
@@ -17020,6 +18224,12 @@ export interface components {
             /** @constant */
             type: "in_progress";
         } | {
+            contextWindowFull?: boolean;
+            /** @enum {string} */
+            finishReason: "length" | "content-filter" | "tool-calls";
+            /** @constant */
+            type: "incomplete";
+        } | {
             error: string | {
                 data?: unknown;
                 message?: string | null;
@@ -17066,6 +18276,7 @@ export interface components {
             charts?: {
                 [key: string]: components["schemas"]["metabase.metabot.schema.chart"];
             };
+            "client-ids"?: components["schemas"]["metabase.metabot.schema.state-map-key"][] | components["schemas"]["metabase.metabot.schema.state-map-key"][];
             "link-registry"?: {
                 [key: string]: string;
             };
@@ -17163,6 +18374,16 @@ export interface components {
             unknown,
             string
         ];
+        /**
+         * @description A metric dimension in its internal kebab-case shape, annotated with the rules that convert it to
+         *        and from the snake_case wire shape. See [[metabase.metrics.dimension/dimension]].
+         */
+        "metabase.metrics.core.dimension": components["schemas"]["metabase.metrics.dimension.dimension"];
+        /**
+         * @description A dimension mapping in its internal kebab-case shape, annotated with the rules that convert it to
+         *        and from the snake_case wire shape. See [[metabase.metrics.dimension/dimension-mapping]].
+         */
+        "metabase.metrics.core.dimension-mapping": components["schemas"]["metabase.metrics.dimension.dimension-mapping"];
         /** @description Schema for a persisted dimension definition with status tracking. */
         "metabase.metrics.dimension.dimension": {
             sources?: components["schemas"]["metabase.metrics.dimension.source"][] | null;
@@ -17479,7 +18700,6 @@ export interface components {
                 entity_id?: string | null;
                 /** @description value must be an integer greater than zero. */
                 id: number;
-                is_data_app_group?: boolean | null;
                 is_tenant_group?: boolean | null;
                 magic_group_type?: (string) | null;
                 members?: components["schemas"]["metabase.permissions.schema.permissions-group.member"][];
@@ -17765,7 +18985,6 @@ export interface components {
                 entity_id?: string | null;
                 /** @description value must be an integer greater than zero. */
                 id: number;
-                is_data_app_group?: boolean | null;
                 is_tenant_group?: boolean | null;
                 magic_group_type?: (string) | null;
                 members?: components["schemas"]["metabase.permissions.schema.permissions-group.member"][];
@@ -18025,7 +19244,6 @@ export interface components {
             entity_id?: string | null;
             /** @description value must be an integer greater than zero. */
             id: number;
-            is_data_app_group?: boolean | null;
             is_tenant_group?: boolean | null;
             magic_group_type?: (string) | null;
             members?: {
@@ -18034,6 +19252,8 @@ export interface components {
             }[];
             name?: string | null;
         };
+        /** @description A dashboard subscription email subject: one line, not blank, at most 255 characters. */
+        "metabase.pulse.schema.email-subject": string;
         /**
          * @description Schema for valid export formats for downloading query results.
          * @enum {string}
@@ -18075,6 +19295,8 @@ export interface components {
         };
         /** @description value must be a valid MBQL query with a source table and filters. */
         "metabase.segments.schema.definition": components["schemas"]["metabase.lib-be.schema.maybe-legacy-query"];
+        /** @enum {string} */
+        "metabase.session.schema.end-reason": "admin" | "logout" | "password-change" | "user-deactivated" | "tenant-deactivated" | "sso-logout" | "support-grant-revoked" | "expired" | "timed-out";
         /** @enum {string} */
         "metabase.source-swap.schema.column-error": "column-type-mismatch" | "missing-primary-key" | "missing-foreign-key" | "foreign-key-mismatch";
         /** @description Value must be a map. */
@@ -18430,182 +19652,144 @@ export interface components {
          */
         "metabase.xrays.api.automagic-dashboards.entity-id-or-query": string;
         "metabase.xrays.automagic-dashboards.schema.filter-clause": components["schemas"]["metabase.lib.schema.mbql-clause.clause"] & components["schemas"]["metabase.lib.schema.expression.boolean"];
+        /**
+         * @description What every expectation result carries: which expectation this is, and how it came out.
+         *
+         *       A `:status` of `error` means this one expectation could not be evaluated while the rest of the
+         *       run still reported; `:error` then says why, and nothing else is reported for it.
+         */
+        "metabase-enterprise.transform-testing.schema.expectation-result.base": {
+            columns?: components["schemas"]["metabase-enterprise.transform-testing.schema.result-column"][];
+            error?: {
+                message: string;
+                type: string;
+            };
+            name: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.status"];
+            type: string;
+        };
+        /** @description A check that a SQL query over the transform output returns no rows. */
+        "metabase-enterprise.transform-testing.schema.expectation.empty": {
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            sql: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            /** @constant */
+            type: "empty";
+        };
+        /** @description A check that the transform output holds exactly the declared rows, over exactly the declared columns. */
+        "metabase-enterprise.transform-testing.schema.expectation.equals": {
+            /** @constant */
+            format: "sql";
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            sql: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            /** @constant */
+            type: "equals";
+        } | {
+            columns: components["schemas"]["metabase-enterprise.transform-testing.schema.column"][];
+            /** @constant */
+            format: "rows";
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            rows: components["schemas"]["metabase-enterprise.transform-testing.schema.row"][];
+            /** @constant */
+            type: "equals";
+        };
+        /** @description A persisted execution of a transform test. */
+        "metabase-enterprise.transform-testing.schema.transform-test-run.response": {
+            end_time: string | null;
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            initiated_by: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            initiated_by_user: components["schemas"]["metabase-enterprise.transform-testing.schema.user"] | null;
+            /** Format: date-time */
+            last_heartbeat: string;
+            /** Format: date-time */
+            start_time: string;
+            status: components["schemas"]["metabase-enterprise.transform-testing.schema.run-status"];
+            transform_test_id: number | null;
+        };
+        /** @description A page of transform test runs. */
+        "metabase-enterprise.transform-testing.schema.transform-test-runs.response": {
+            data: components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test-run.response"][];
+            limit: number;
+            offset: number;
+            total: number;
+        };
+        /** @description What a client sends to create a transform test. */
+        "metabase-enterprise.transform-testing.schema.transform-test.create": {
+            description?: string | null;
+            expectations: components["schemas"]["metabase-enterprise.transform-testing.schema.expectations"];
+            inputs: components["schemas"]["metabase-enterprise.transform-testing.schema.inputs"];
+            name: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            transform_id: components["schemas"]["metabase.lib.schema.id.transform"];
+        };
+        /**
+         * @description A saved transform test: the transform it covers, the inputs that stand in for its source
+         *       tables, and the expectations checked against its output.
+         */
+        "metabase-enterprise.transform-testing.schema.transform-test.response": {
+            entity_id: string;
+            last_run: components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test-run"] | null;
+            expectations: components["schemas"]["metabase-enterprise.transform-testing.schema.expectations"];
+            transform_id: components["schemas"]["metabase.lib.schema.id.transform"];
+            /** @description value must be an integer greater than zero. */
+            id: number;
+            name: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            created_at: string;
+            inputs: components["schemas"]["metabase-enterprise.transform-testing.schema.inputs"];
+            creator_id: components["schemas"]["metabase.lib.schema.id.user"];
+            description: string | null;
+        };
+        /** @description What a client sends to update a transform test. Omitted fields are left unchanged. */
+        "metabase-enterprise.transform-testing.schema.transform-test.update": {
+            description?: string | null;
+            expectations?: components["schemas"]["metabase-enterprise.transform-testing.schema.expectations"];
+            inputs?: components["schemas"]["metabase-enterprise.transform-testing.schema.inputs"];
+            name?: components["schemas"]["metabase.lib.schema.common.non-blank-string"];
+            transform_id?: components["schemas"]["metabase.lib.schema.id.transform"];
+        };
         /** @description [[::lens-params]] as the FE echoes them back to the lens endpoints. */
         "metabase-enterprise.transforms-inspector.schema.lens-params.request": components["schemas"]["metabase-enterprise.transforms-inspector.schema.lens-params"];
-        /** @description Schema for inserting a new Action (REST API or internally). */
-        "metabase.actions.schema.action.for-insert": {
+        /** @description Schema for the REST API body that creates an Action, without the columns the server populates. */
+        "metabase.actions.schema.action.create-request": {
             visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            entity_id?: string | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
             name: string;
             archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
+            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
+            archived_directly?: boolean;
             description?: string | null;
         } | {
             visualization_settings?: Record<string, never> | null;
-            entity_id?: string | null;
+            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
             name: string;
             archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type: components["schemas"]["metabase.actions.schema.type"];
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id: components["schemas"]["metabase.lib.schema.id.card"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
+            archived_directly?: boolean;
             description?: string | null;
         } | {
             visualization_settings?: Record<string, never> | null;
-            entity_id?: string | null;
             dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
             name: string;
             archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
+            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
             type: components["schemas"]["metabase.actions.schema.type"];
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id: components["schemas"]["metabase.lib.schema.id.card"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
             parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        } | {
-            visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            entity_id?: string | null;
-            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
-            type: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        };
-        /** @description Schema for updating an Action (REST API or internally). */
-        "metabase.actions.schema.action.for-update": {
-            visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            entity_id?: string | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            id?: components["schemas"]["metabase.actions.schema.id"];
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name?: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            type?: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        } | {
-            visualization_settings?: Record<string, never> | null;
-            entity_id?: string | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            id?: components["schemas"]["metabase.actions.schema.id"];
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name?: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
-            type?: components["schemas"]["metabase.actions.schema.type"];
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        } | {
-            visualization_settings?: Record<string, never> | null;
-            entity_id?: string | null;
-            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            id?: components["schemas"]["metabase.actions.schema.id"];
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name?: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            type?: components["schemas"]["metabase.actions.schema.type"];
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
-            description?: string | null;
-        } | {
-            visualization_settings?: Record<string, never> | null;
-            response_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            entity_id?: string | null;
-            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
-            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
-            id?: components["schemas"]["metabase.actions.schema.id"];
-            made_public_by_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            name?: string;
-            archived?: boolean;
-            database_id?: components["schemas"]["metabase.lib.schema.id.database"] | null;
-            updated_at?: unknown;
-            legacy_query?: string | null;
-            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
-            type?: components["schemas"]["metabase.actions.schema.type"];
-            template?: components["schemas"]["metabase.actions.schema.http-action.template"] | null;
-            error_handle?: components["schemas"]["metabase.actions.schema.http-action.json-query"] | null;
-            created_at?: unknown;
-            public_uuid?: string | null;
-            model_id?: components["schemas"]["metabase.lib.schema.id.card"];
-            disabled?: boolean;
-            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
-            creator_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
-            public_uuid_prefix?: string | null;
+            archived_directly?: boolean;
             description?: string | null;
         };
         /** @description parameter must be a map with :id and :type keys */
@@ -18632,19 +19816,53 @@ export interface components {
             default?: components["schemas"]["metabase.lib.schema.parameter.parameter.value"];
             isMultiSelect?: boolean | null;
         };
+        /** @description Schema for the REST API body that updates an Action, without the columns the server populates. */
+        "metabase.actions.schema.action.update-request": {
+            visualization_settings?: Record<string, never> | null;
+            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
+            id?: components["schemas"]["metabase.actions.schema.id"];
+            name?: string;
+            archived?: boolean;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
+            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
+            type?: components["schemas"]["metabase.actions.schema.type"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
+            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
+            archived_directly?: boolean;
+            description?: string | null;
+        } | {
+            visualization_settings?: Record<string, never> | null;
+            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
+            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
+            id?: components["schemas"]["metabase.actions.schema.id"];
+            name?: string;
+            archived?: boolean;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
+            type?: components["schemas"]["metabase.actions.schema.type"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
+            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
+            archived_directly?: boolean;
+            description?: string | null;
+        } | {
+            visualization_settings?: Record<string, never> | null;
+            dataset_query?: components["schemas"]["metabase.lib-be.schema.maybe-legacy-or-empty-query"] | null;
+            parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
+            id?: components["schemas"]["metabase.actions.schema.id"];
+            name?: string;
+            archived?: boolean;
+            table_id?: components["schemas"]["metabase.lib.schema.id.table"] | null;
+            kind?: components["schemas"]["metabase.actions.schema.implicit-action.kind"] | null;
+            collection_id?: components["schemas"]["metabase.lib.schema.id.collection"] | null;
+            type?: components["schemas"]["metabase.actions.schema.type"];
+            model_id?: components["schemas"]["metabase.lib.schema.id.card"] | null;
+            parameters?: components["schemas"]["metabase.actions.schema.action.parameter"][] | null;
+            archived_directly?: boolean;
+            description?: string | null;
+        };
         /** @description value must map parameter ids to scalar values. */
         "metabase.actions.schema.execute-parameter-values.string-keys": {
             [key: string]: components["schemas"]["metabase.lib.schema.parameter.parameter.value.scalar"] | components["schemas"]["metabase.lib.schema.parameter.parameter.value.scalar"][];
-        };
-        /** @description must be a valid json-query, something like '.item.title' */
-        "metabase.actions.schema.http-action.json-query": string;
-        "metabase.actions.schema.http-action.template": {
-            body?: string | null;
-            headers?: string | null;
-            /** @enum {string} */
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-            parameters?: components["schemas"]["metabase.parameters.schema.parameters"] | null;
-            url: string;
         };
         /**
          * @description Unsupported implicit action kind
@@ -18750,6 +19968,24 @@ export interface components {
             details: components["schemas"]["metabase.channel.schema.slack-details"];
         } | {
             details?: components["schemas"]["metabase.channel.schema.email-details"] | null;
+        };
+        /** @description What an update (or insert) of a Collection accepts: every column of `:collection` except `id`, all optional. */
+        "metabase.collections.schema.collection.update": {
+            archive_operation_id?: string | null;
+            entity_id?: string | null;
+            authority_level?: (string) | null;
+            is_sample?: boolean | null;
+            is_remote_synced?: boolean | null;
+            name?: string | null;
+            slug?: string | null;
+            archived?: boolean | null;
+            location?: string | null;
+            type?: (string) | null;
+            created_at?: string | null;
+            namespace?: (string) | null;
+            personal_owner_id?: components["schemas"]["metabase.lib.schema.id.user"] | null;
+            archived_directly?: boolean | null;
+            description?: string | null;
         };
         /** @description The `:context` column of a Comment, decoded. */
         "metabase.comments.schema.comment.context": {
@@ -18990,6 +20226,23 @@ export interface components {
          *       against the query it was copied from.
          */
         "metabase.lib.schema.query.snapshot": components["schemas"]["metabase.lib.schema.query.map"];
+        /** @description Audit-log details for the sandboxes (row-level restrictions) applied to a query, keyed by the Table ID each one sandboxes. Stashed on the query by the enterprise sandboxing middleware and copied into the results metadata so the restrictions can be recorded in the QueryExecution log. */
+        "metabase.lib.schema.sandboxing.details": {
+            [key: string]: components["schemas"]["metabase.lib.schema.sandboxing.details.entry"];
+        };
+        /** @description Audit-log entry describing one applied sandbox (row-level restriction): which Table it sandboxes, which sandbox/group/Card it came from, and which login attributes were remapped to which Fields. An attribute's `:value` is the user's actual attribute value, recorded only when `analytics-pii-retention-enabled` is set. */
+        "metabase.lib.schema.sandboxing.details.entry": {
+            attributes: {
+                [key: string]: {
+                    field_id: components["schemas"]["metabase.lib.schema.id.field"] | null;
+                    value?: components["schemas"]["metabase.lib.schema.parameter.parameter.value"] | null;
+                };
+            };
+            card_id: components["schemas"]["metabase.lib.schema.id.card"] | null;
+            group_id: number | null;
+            sandbox_id: number | null;
+            table_id: components["schemas"]["metabase.lib.schema.id.table"];
+        };
         /** @description The legacy columns a query was expected to return before sandboxes replaced its source tables, stashed on the query by the enterprise sandboxing middleware and merged into the sandboxed results. */
         "metabase.lib.schema.sandboxing.original-metadata": components["schemas"]["metabase.legacy-mbql.schema.legacy-column-metadata"][];
         "metabase.lib.schema.stage.additional": unknown | unknown;
@@ -19635,7 +20888,6 @@ export interface components {
         /** @description What an update (or insert) of a PermissionsGroup accepts: every column of `:permissions_group` except `id`, all optional. */
         "metabase.permissions.schema.permissions-group.update": {
             entity_id?: string | null;
-            is_data_app_group?: boolean | null;
             is_tenant_group?: boolean | null;
             magic_group_type?: (string) | null;
             name?: string | null;
@@ -19731,6 +20983,7 @@ export interface components {
             "format-rows?"?: boolean;
             is_sandboxed?: boolean;
             cols: components["schemas"]["metabase.query-processor.schema.result-metadata.column"][];
+            sandbox_details?: Record<string, never>[];
             results_timezone?: string;
             rows: unknown[][];
             native_form?: Record<string, never>;
@@ -19785,12 +21038,18 @@ export interface operations {
         parameters: {
             query?: {
                 "model-id"?: components["schemas"]["metabase.lib.schema.id.card"] | null;
+                type?: components["schemas"]["metabase.actions.schema.type"] | null;
+                archived?: boolean;
             };
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -19826,7 +21085,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["metabase.actions.schema.action.for-insert"];
+                "application/json": components["schemas"]["metabase.actions.schema.action.create-request"];
             };
         };
         responses: {
@@ -19899,7 +21158,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -20017,7 +21280,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["metabase.actions.schema.action.for-update"];
+                "application/json": components["schemas"]["metabase.actions.schema.action.update-request"];
             };
         };
         responses: {
@@ -21393,603 +22656,6 @@ export interface operations {
             };
         };
     };
-    "get-api-apps": {
-        parameters: {
-            query?: {
-                available?: boolean | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": ({
-                        has_user_permission_warnings?: boolean;
-                        last_synced_at: unknown | null;
-                        table_ids: number[];
-                        enabled: boolean;
-                        /** @description value must be an integer greater than zero. */
-                        id: number;
-                        name: string;
-                        updated_at: unknown;
-                        display_name: string;
-                        permission_group_id: number | null;
-                        created_at: unknown;
-                        bundle_hash: string | null;
-                        last_synced_sha: string | null;
-                        sync_error: string | null;
-                        allowed_hosts: string[];
-                        resource_collection_id: number | null;
-                        description: string | null;
-                        bundle_path: string;
-                    } | {
-                        display_name: string;
-                        name: string;
-                    })[];
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "get-api-apps-repo-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        configured: boolean;
-                        url: string | null;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "get-api-apps-sandbox-host": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "get-api-apps-slug": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        has_user_permission_warnings?: boolean;
-                        last_synced_at: unknown | null;
-                        table_ids: number[];
-                        enabled: boolean;
-                        /** @description value must be an integer greater than zero. */
-                        id: number;
-                        name: string;
-                        updated_at: unknown;
-                        display_name: string;
-                        permission_group_id: number | null;
-                        created_at: unknown;
-                        bundle_hash: string | null;
-                        last_synced_sha: string | null;
-                        sync_error: string | null;
-                        allowed_hosts: string[];
-                        resource_collection_id: number | null;
-                        description: string | null;
-                        bundle_path: string;
-                    } | {
-                        display_name: string;
-                        name: string;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "put-api-apps-slug": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    enabled: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        has_user_permission_warnings?: boolean;
-                        last_synced_at: unknown | null;
-                        table_ids: number[];
-                        enabled: boolean;
-                        /** @description value must be an integer greater than zero. */
-                        id: number;
-                        name: string;
-                        updated_at: unknown;
-                        display_name: string;
-                        permission_group_id: number | null;
-                        created_at: unknown;
-                        bundle_hash: string | null;
-                        last_synced_sha: string | null;
-                        sync_error: string | null;
-                        allowed_hosts: string[];
-                        resource_collection_id: number | null;
-                        description: string | null;
-                        bundle_path: string;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "delete-api-apps-slug": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "get-api-apps-slug-bundle": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": Record<string, never>;
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "post-api-apps-slug-draft": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        has_user_permission_warnings?: boolean;
-                        last_synced_at: unknown | null;
-                        table_ids: number[];
-                        enabled: boolean;
-                        /** @description value must be an integer greater than zero. */
-                        id: number;
-                        name: string;
-                        updated_at: unknown;
-                        display_name: string;
-                        permission_group_id: number | null;
-                        created_at: unknown;
-                        bundle_hash: string | null;
-                        last_synced_sha: string | null;
-                        sync_error: string | null;
-                        allowed_hosts: string[];
-                        resource_collection_id: number | null;
-                        description: string | null;
-                        bundle_path: string;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "post-api-apps-slug-query": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["metabase-enterprise.data-apps.query-definition.query-definition"];
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description value must be an integer greater than zero. */
-                        database_id: number;
-                        dataset_query: components["schemas"]["metabase.lib-be.schema.maybe-legacy-query"];
-                        metrics: {
-                            visualization_settings: Record<string, never> | null;
-                            dataset_query: components["schemas"]["metabase.lib-be.schema.maybe-legacy-query"];
-                            /** @description value must be an integer greater than zero. */
-                            id: number;
-                            name: string;
-                            /** @description value must be an integer greater than zero. */
-                            database_id: number;
-                            collection_id: number | null;
-                            /** @enum {string} */
-                            type: "metric";
-                            display: (string) | null;
-                            description: string | null;
-                        }[];
-                        table_ids: number[];
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "post-api-apps-slug-query-table-dependencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    dataset_queries: components["schemas"]["metabase.lib-be.schema.maybe-legacy-query"][];
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        table_ids: number[];
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "put-api-apps-slug-table-dependencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    table_ids: number[];
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        has_user_permission_warnings?: boolean;
-                        last_synced_at: unknown | null;
-                        table_ids: number[];
-                        enabled: boolean;
-                        /** @description value must be an integer greater than zero. */
-                        id: number;
-                        name: string;
-                        updated_at: unknown;
-                        display_name: string;
-                        permission_group_id: number | null;
-                        created_at: unknown;
-                        bundle_hash: string | null;
-                        last_synced_sha: string | null;
-                        sync_error: string | null;
-                        allowed_hosts: string[];
-                        resource_collection_id: number | null;
-                        description: string | null;
-                        bundle_path: string;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "post-api-apps-slug-user-permission-warnings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    user_ids: number[];
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        missing_tables: {
-                            /** @description value must be an integer greater than zero. */
-                            database_id: number;
-                            database_name: string;
-                            /** @description value must be an integer greater than zero. */
-                            id: number;
-                            name: string;
-                            schema: string | null;
-                        }[];
-                        /** @description value must be an integer greater than zero. */
-                        user_id: number;
-                    }[];
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "get-api-automagic-dashboards-database-id-candidates": {
         parameters: {
             query?: never;
@@ -22472,7 +23138,7 @@ export interface operations {
                         /** @description value must be an integer greater than zero. */
                         item_id: number;
                         /** @enum {string} */
-                        type: "card" | "dashboard" | "collection" | "document";
+                        type: "card" | "dashboard" | "collection" | "document" | "exploration";
                     }[];
                 };
             };
@@ -22506,7 +23172,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                model: "card" | "dashboard" | "collection" | "document";
+                model: "card" | "dashboard" | "collection" | "document" | "exploration";
                 /** @description value must be an integer greater than zero. */
                 id: number;
             };
@@ -22542,7 +23208,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                model: "card" | "dashboard" | "collection" | "document";
+                model: "card" | "dashboard" | "collection" | "document" | "exploration";
                 /** @description value must be an integer greater than zero. */
                 id: number;
             };
@@ -22863,6 +23529,7 @@ export interface operations {
                     name: string;
                     collection_position?: number | null;
                     result_metadata?: components["schemas"]["metabase.lib.schema.metadata.card.result-metadata"] | null;
+                    source_card_id?: number | null;
                     collection_id?: (number | string) | null;
                     cache_ttl?: number | null;
                     type?: components["schemas"]["metabase.queries.schema.card.type"] | null;
@@ -23061,7 +23728,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -23097,7 +23768,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -23297,7 +23972,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -23502,7 +24181,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -23536,7 +24219,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24042,7 +24729,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24290,7 +24981,7 @@ export interface operations {
                 "show-exploration-documents"?: boolean | null;
                 "include-available-models"?: boolean | null;
                 namespace?: string | null;
-                models?: ("dashboard" | "table" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "action" | "metric" | "card")[] | null;
                 "official-collections-first"?: boolean | null;
                 "sort-column"?: ("model" | "name" | "last_edited_by" | "last_edited_at" | "description") | null;
             };
@@ -24298,7 +24989,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24328,7 +25023,7 @@ export interface operations {
     "get-api-collection-root-items-metadata": {
         parameters: {
             query?: {
-                models?: ("dashboard" | "table" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "action" | "metric" | "card")[] | null;
                 archived?: boolean | null;
                 namespace?: string | null;
                 "pinned-state"?: ("is_not_pinned" | "is_pinned" | "all") | null;
@@ -24457,7 +25152,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24493,7 +25192,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24652,7 +25355,7 @@ export interface operations {
                 "show-dashboard-questions"?: boolean | null;
                 "show-exploration-documents"?: boolean | null;
                 "include-available-models"?: boolean | null;
-                models?: ("dashboard" | "table" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "action" | "metric" | "card")[] | null;
                 "official-collections-first"?: boolean | null;
                 "sort-column"?: ("model" | "name" | "last_edited_by" | "last_edited_at" | "description") | null;
             };
@@ -24662,7 +25365,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -24692,7 +25399,7 @@ export interface operations {
     "get-api-collection-id-items-metadata": {
         parameters: {
             query?: {
-                models?: ("dashboard" | "table" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "no_models" | "timeline" | "snippet" | "collection" | "measure" | "transform" | "document" | "pulse" | "action" | "metric" | "card")[] | null;
                 archived?: boolean | null;
                 "pinned-state"?: ("is_not_pinned" | "is_pinned" | "all") | null;
                 "show-dashboard-questions"?: boolean | null;
@@ -24777,7 +25484,7 @@ export interface operations {
     "get-api-comment": {
         parameters: {
             query: {
-                target_type: "document";
+                target_type: "document" | "exploration";
                 /** @description value must be an integer greater than zero. */
                 target_id: number;
             };
@@ -24831,7 +25538,7 @@ export interface operations {
                     /** @description value must be an integer greater than zero. */
                     target_id: number;
                     /** @enum {string} */
-                    target_type: "document";
+                    target_type: "document" | "exploration";
                 };
             };
         };
@@ -24985,7 +25692,7 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
-                    emoji: string;
+                    emoji: components["schemas"]["metabase.comments.schema.reaction-emoji"];
                 };
             };
         };
@@ -25132,7 +25839,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -25698,7 +26409,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -25962,7 +26677,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -25999,7 +26718,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26035,7 +26758,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26116,7 +26843,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26384,8 +27115,8 @@ export interface operations {
                 include_only_uploadable?: boolean | null;
                 /** @description include must be either empty, 'tables', or 'schemas' */
                 include?: ("tables" | "schemas") | null;
+                include_stubs?: boolean | null;
                 router_database_id?: number | null;
-                "can-write-metadata"?: boolean | null;
                 "can-query"?: boolean | null;
                 exclude_uneditable_details?: boolean | null;
                 include_editable_data_model?: boolean | null;
@@ -26394,7 +27125,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26519,6 +27254,7 @@ export interface operations {
                         details: Record<string, never>;
                         /** @description value must be a valid database engine. */
                         engine: string;
+                        id?: number | null;
                     };
                 };
             };
@@ -26561,7 +27297,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26690,7 +27430,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26728,7 +27472,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -26936,6 +27684,7 @@ export interface operations {
         parameters: {
             query?: {
                 include_hidden?: boolean | null;
+                include_sensitive_fields?: boolean | null;
                 include_editable_data_model?: boolean | null;
                 remove_inactive?: boolean | null;
                 skip_fields?: boolean | null;
@@ -27014,7 +27763,6 @@ export interface operations {
                 include_hidden?: boolean | null;
                 include_editable_data_model?: boolean | null;
                 "can-query"?: boolean | null;
-                "can-write-metadata"?: boolean | null;
                 include_measures?: boolean | null;
             };
             header?: never;
@@ -27024,7 +27772,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -27055,7 +27807,6 @@ export interface operations {
                 include_hidden?: boolean | null;
                 include_editable_data_model?: boolean | null;
                 "can-query"?: boolean | null;
-                "can-write-metadata"?: boolean | null;
                 include_measures?: boolean | null;
             };
             header?: never;
@@ -27066,7 +27817,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -27097,7 +27852,6 @@ export interface operations {
                 include_editable_data_model?: boolean | null;
                 include_hidden?: boolean | null;
                 "can-query"?: boolean | null;
-                "can-write-metadata"?: boolean | null;
             };
             header?: never;
             path: {
@@ -27106,7 +27860,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -27813,6 +28571,7 @@ export interface operations {
                             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
                             name: string;
                             result_metadata?: components["schemas"]["metabase.queries.schema.card.result-metadata"] | null;
+                            source_card_id?: number | null;
                             cache_ttl?: number | null;
                             display: string;
                             parameters?: components["schemas"]["metabase.parameters.schema.parameters"] | null;
@@ -27948,6 +28707,7 @@ export interface operations {
                             parameter_mappings?: components["schemas"]["metabase.parameters.schema.parameter-mappings"] | null;
                             name: string;
                             result_metadata?: components["schemas"]["metabase.queries.schema.card.result-metadata"] | null;
+                            source_card_id?: number | null;
                             cache_ttl?: number | null;
                             display: string;
                             parameters?: components["schemas"]["metabase.parameters.schema.parameters"] | null;
@@ -28444,6 +29204,213 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-ai-controls-mcp-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced: boolean;
+                        permissions: {
+                            /** @description value must be an integer greater than zero. */
+                            group_id: number;
+                            mcp_enabled: boolean;
+                            tool_access: components["schemas"]["metabase.mcp.permissions.tool-access"];
+                        }[];
+                        tools: {
+                            /** @enum {string} */
+                            default_access: "allowed" | "denied";
+                            description: string;
+                            name: string;
+                            scope: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-ee-ai-controls-mcp-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    permissions: {
+                        /** @description value must be an integer greater than zero. */
+                        group_id: number;
+                        mcp_enabled: boolean;
+                        tool_access: components["schemas"]["metabase.mcp.permissions.tool-access"];
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced: boolean;
+                        permissions: {
+                            /** @description value must be an integer greater than zero. */
+                            group_id: number;
+                            mcp_enabled: boolean;
+                            tool_access: components["schemas"]["metabase.mcp.permissions.tool-access"];
+                        }[];
+                        tools: {
+                            /** @enum {string} */
+                            default_access: "allowed" | "denied";
+                            description: string;
+                            name: string;
+                            scope: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-ai-controls-mcp-permissions-advanced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced: boolean;
+                        permissions: {
+                            /** @description value must be an integer greater than zero. */
+                            group_id: number;
+                            mcp_enabled: boolean;
+                            tool_access: components["schemas"]["metabase.mcp.permissions.tool-access"];
+                        }[];
+                        tools: {
+                            /** @enum {string} */
+                            default_access: "allowed" | "denied";
+                            description: string;
+                            name: string;
+                            scope: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-api-ee-ai-controls-mcp-permissions-advanced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced: boolean;
+                        permissions: {
+                            /** @description value must be an integer greater than zero. */
+                            group_id: number;
+                            mcp_enabled: boolean;
+                            tool_access: components["schemas"]["metabase.mcp.permissions.tool-access"];
+                        }[];
+                        tools: {
+                            /** @enum {string} */
+                            default_access: "allowed" | "denied";
+                            description: string;
+                            name: string;
+                            scope: string;
+                        }[];
+                    };
+                };
             };
             /** @description Client error response */
             "4XX": {
@@ -28965,6 +29932,669 @@ export interface operations {
             };
         };
     };
+    "get-api-ee-apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": ({
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        updated_at: unknown;
+                        display_name: string;
+                        /** @description value must be an integer greater than zero. */
+                        version: number;
+                        created_at: unknown;
+                        bundle_hash: string | null;
+                        allowed_hosts: string[];
+                        outdated: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        resource_collection_id: number;
+                        description: string | null;
+                        bundle_path: string;
+                    } | {
+                        display_name: string;
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        outdated: boolean;
+                    })[];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    allowed_hosts?: components["schemas"]["metabase.data-apps.schema.allowed-hosts"];
+                    bundle_path?: components["schemas"]["metabase.data-apps.schema.bundle-path"];
+                    description?: components["schemas"]["metabase.data-apps.schema.description"];
+                    display_name?: components["schemas"]["metabase.data-apps.schema.display-name"];
+                    enabled?: boolean;
+                    name: components["schemas"]["metabase.data-apps.schema.slug"];
+                    version?: components["schemas"]["metabase.data-apps.schema.version"];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        updated_at: unknown;
+                        display_name: string;
+                        /** @description value must be an integer greater than zero. */
+                        version: number;
+                        created_at: unknown;
+                        bundle_hash: string | null;
+                        allowed_hosts: string[];
+                        outdated: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        resource_collection_id: number;
+                        description: string | null;
+                        bundle_path: string;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-repo-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        configured: boolean;
+                        url: string | null;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-sandbox-host": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-slug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        updated_at: unknown;
+                        display_name: string;
+                        /** @description value must be an integer greater than zero. */
+                        version: number;
+                        created_at: unknown;
+                        bundle_hash: string | null;
+                        allowed_hosts: string[];
+                        outdated: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        resource_collection_id: number;
+                        description: string | null;
+                        bundle_path: string;
+                    } | {
+                        display_name: string;
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        outdated: boolean;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-ee-apps-slug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    allowed_hosts?: components["schemas"]["metabase.data-apps.schema.allowed-hosts"];
+                    bundle_path?: components["schemas"]["metabase.data-apps.schema.bundle-path"];
+                    description?: components["schemas"]["metabase.data-apps.schema.description"];
+                    display_name?: components["schemas"]["metabase.data-apps.schema.display-name"];
+                    enabled?: boolean;
+                    version?: components["schemas"]["metabase.data-apps.schema.version"];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        updated_at: unknown;
+                        display_name: string;
+                        /** @description value must be an integer greater than zero. */
+                        version: number;
+                        created_at: unknown;
+                        bundle_hash: string | null;
+                        allowed_hosts: string[];
+                        outdated: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        resource_collection_id: number;
+                        description: string | null;
+                        bundle_path: string;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-api-ee-apps-slug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-slug-bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-ee-apps-slug-bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    bundle: components["schemas"]["metabase.data-apps.schema.bundle-text"];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        name: string;
+                        updated_at: unknown;
+                        display_name: string;
+                        /** @description value must be an integer greater than zero. */
+                        version: number;
+                        created_at: unknown;
+                        bundle_hash: string | null;
+                        allowed_hosts: string[];
+                        outdated: boolean;
+                        /** @description value must be an integer greater than zero. */
+                        resource_collection_id: number;
+                        description: string | null;
+                        bundle_path: string;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-slug-group-permission-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description value must be an integer greater than zero. */
+                        group_id: number;
+                        missing_tables: {
+                            /** @description value must be an integer greater than zero. */
+                            database_id: number;
+                            database_name: string;
+                            /** @description value must be an integer greater than zero. */
+                            id: number;
+                            name: string;
+                            schema: string | null;
+                        }[];
+                    }[];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-slug-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        /** @description value must be an integer greater or equal to than zero. */
+                        member_count: number;
+                        name: string;
+                    }[];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-apps-slug-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    group_ids: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description value must be an integer greater than zero. */
+                        id: number;
+                        /** @description value must be an integer greater or equal to than zero. */
+                        member_count: number;
+                        name: string;
+                    }[];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-api-ee-apps-slug-groups-group-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                /** @description value must be an integer greater than zero. */
+                "group-id": number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-apps-slug-typed-schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "post-api-ee-audit-app-analytics-dev-export": {
         parameters: {
             query?: never;
@@ -29269,6 +30899,423 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-content-diagnostics-duplicated": {
+        parameters: {
+            query?: {
+                "include-personal-collections"?: boolean;
+                "sort-column"?: "detected-at" | "entity-type" | "name" | "created-at" | "created-by" | "collection-name" | "duplicate-count";
+                "sort-direction"?: "desc" | "asc";
+                "entity-types"?: ("transform" | "question" | "dashboard" | "card" | "document" | "collection" | "metric" | "model") | ("transform" | "question" | "dashboard" | "card" | "document" | "collection" | "metric" | "model")[];
+                /** @description value must be an integer greater than zero. */
+                "min-duplicate-count"?: number;
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            entity_display_name: string | null;
+                            collection_name: string | null;
+                            /** Format: date-time */
+                            detected_at: string;
+                            entity_id: number;
+                            id: number;
+                            duplicate_count: number;
+                            finding_type: string;
+                            card_type?: string | null;
+                            can_write: boolean;
+                            details: {
+                                collection: {
+                                    effective_ancestors: {
+                                        id: number | "root";
+                                        name: string | unknown;
+                                    }[];
+                                    id: number | "root";
+                                    name: string | unknown;
+                                    namespace: string | null;
+                                } | null;
+                                creator: {
+                                    id: number;
+                                    name: string | null;
+                                    /** @constant */
+                                    type: "user";
+                                } | null;
+                                description: string | null;
+                                duplicate_entities: {
+                                    card_type?: string | null;
+                                    display?: string | null;
+                                    entity_type: string;
+                                    id: number;
+                                    name: string | null;
+                                    namespace?: string | null;
+                                    view_count?: number;
+                                }[];
+                                normalized_name: string;
+                                owner: {
+                                    email?: string | null;
+                                    id?: number | null;
+                                    name?: string | null;
+                                    type: string;
+                                } | null;
+                                view_count?: number;
+                            };
+                            created_at: string | null;
+                            display?: string | null;
+                            entity_type: string;
+                            entity_kind: string;
+                        }[];
+                        last_scan_at: string | null;
+                        limit: number | null;
+                        offset: number | null;
+                        total: number;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-content-diagnostics-imbalanced": {
+        parameters: {
+            query?: {
+                "include-personal-collections"?: boolean;
+                "sort-column"?: "detected-at" | "entity-type" | "name" | "created-at" | "created-by" | "collection-name" | "content-count" | "finding-type";
+                "sort-direction"?: "desc" | "asc";
+                "entity-types"?: ("transform" | "question" | "dashboard" | "card" | "document" | "collection" | "metric" | "model") | ("transform" | "question" | "dashboard" | "card" | "document" | "collection" | "metric" | "model")[];
+                "finding-types"?: ("crowded" | "empty" | "sparse") | ("crowded" | "empty" | "sparse")[];
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            entity_display_name: string | null;
+                            collection_name: string | null;
+                            /** Format: date-time */
+                            detected_at: string;
+                            entity_id: number;
+                            id: number;
+                            finding_type: string;
+                            card_type?: string | null;
+                            can_write: boolean;
+                            details: {
+                                /** @description value must be a valid date string */
+                                as_of?: string;
+                                collection: {
+                                    effective_ancestors: {
+                                        id: number | "root";
+                                        name: string | unknown;
+                                    }[];
+                                    id: number | "root";
+                                    name: string | unknown;
+                                    namespace: string | null;
+                                } | null;
+                                creator: {
+                                    id: number;
+                                    name: string | null;
+                                    /** @constant */
+                                    type: "user";
+                                } | null;
+                                description: string | null;
+                                owner: {
+                                    email?: string | null;
+                                    id?: number | null;
+                                    name?: string | null;
+                                    type: string;
+                                } | null;
+                                threshold: number;
+                                unit: string;
+                                view_count?: number;
+                            };
+                            created_at: string | null;
+                            display?: string | null;
+                            entity_type: string;
+                            entity_kind: string;
+                            content_count: number;
+                        }[];
+                        last_scan_at: string | null;
+                        limit: number | null;
+                        offset: number | null;
+                        total: number;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-content-diagnostics-invalidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    ids: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invalidated: number[];
+                        skipped: number[];
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-content-diagnostics-slow": {
+        parameters: {
+            query?: {
+                "include-personal-collections"?: boolean;
+                "sort-column"?: "detected-at" | "entity-type" | "name" | "created-at" | "created-by" | "collection-name" | "duration-ms";
+                "sort-direction"?: "desc" | "asc";
+                "entity-types"?: ("transform" | "question" | "dashboard" | "card" | "document" | "metric" | "model") | ("transform" | "question" | "dashboard" | "card" | "document" | "metric" | "model")[];
+                /** @description value must be an integer greater than zero. */
+                "min-duration-ms"?: number;
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            entity_display_name: string | null;
+                            collection_name: string | null;
+                            /** Format: date-time */
+                            detected_at: string;
+                            entity_id: number;
+                            id: number;
+                            finding_type: string;
+                            card_type?: string | null;
+                            can_write: boolean;
+                            duration_ms: number;
+                            details: {
+                                collection: {
+                                    effective_ancestors: {
+                                        id: number | "root";
+                                        name: string | unknown;
+                                    }[];
+                                    id: number | "root";
+                                    name: string | unknown;
+                                    namespace: string | null;
+                                } | null;
+                                creator: {
+                                    id: number;
+                                    name: string | null;
+                                    /** @constant */
+                                    type: "user";
+                                } | null;
+                                description: string | null;
+                                owner: {
+                                    email?: string | null;
+                                    id?: number | null;
+                                    name?: string | null;
+                                    type: string;
+                                } | null;
+                                slow_entities?: {
+                                    card_type?: string | null;
+                                    entity_type: string;
+                                    id: number;
+                                    name: string | null;
+                                    view_count: number;
+                                }[];
+                                threshold_ms?: number;
+                                view_count?: number;
+                            };
+                            created_at: string | null;
+                            display?: string | null;
+                            entity_type: string;
+                            entity_kind: string;
+                        }[];
+                        last_scan_at: string | null;
+                        limit: number | null;
+                        offset: number | null;
+                        total: number;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-content-diagnostics-stale": {
+        parameters: {
+            query?: {
+                "include-personal-collections"?: boolean;
+                "sort-column"?: "detected-at" | "entity-type" | "name" | "created-at" | "created-by" | "collection-name" | "last-active-at";
+                "sort-direction"?: "desc" | "asc";
+                "entity-types"?: ("transform" | "question" | "dashboard" | "card" | "document" | "metric" | "model") | ("transform" | "question" | "dashboard" | "card" | "document" | "metric" | "model")[];
+                /** @description value must be an integer greater than zero. */
+                "threshold-days"?: number;
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            entity_display_name: string | null;
+                            collection_name: string | null;
+                            /** Format: date-time */
+                            detected_at: string;
+                            entity_id: number;
+                            last_active_at: string | null;
+                            id: number;
+                            finding_type: string;
+                            card_type?: string | null;
+                            can_write: boolean;
+                            details: {
+                                collection: {
+                                    effective_ancestors: {
+                                        id: number | "root";
+                                        name: string | unknown;
+                                    }[];
+                                    id: number | "root";
+                                    name: string | unknown;
+                                    namespace: string | null;
+                                } | null;
+                                creator: {
+                                    id: number;
+                                    name: string | null;
+                                    /** @constant */
+                                    type: "user";
+                                } | null;
+                                description: string | null;
+                                owner: {
+                                    email?: string | null;
+                                    id?: number | null;
+                                    name?: string | null;
+                                    type: string;
+                                } | null;
+                                threshold_days?: number;
+                                view_count?: number;
+                            };
+                            created_at: string | null;
+                            display?: string | null;
+                            entity_type: string;
+                            entity_kind: string;
+                        }[];
+                        last_scan_at: string | null;
+                        limit: number | null;
+                        offset: number | null;
+                        total: number;
+                    };
+                };
             };
             /** @description Client error response */
             "4XX": {
@@ -30815,57 +32862,6 @@ export interface operations {
             };
         };
     };
-    "get-api-ee-embedding-hub-checklist": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        checklist: {
-                            "enable-tenants": boolean;
-                            "create-models": boolean;
-                            "sso-configured": boolean;
-                            "configure-row-column-security": boolean;
-                            "create-test-embed": boolean;
-                            "data-permissions-and-enable-tenants": boolean;
-                            "embed-production": boolean;
-                            "create-dashboard": boolean;
-                            "move-dashboard-to-shared": boolean;
-                            "setup-data-segregation-strategy": boolean;
-                            "create-tenants": boolean;
-                            "add-data": boolean;
-                            "sso-auth-manual-tested": boolean;
-                        };
-                        "data-isolation-strategy": ("row-column-level-security" | "connection-impersonation" | "database-routing") | null;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "get-api-ee-erd": {
         parameters: {
             query?: never;
@@ -31843,7 +33839,8 @@ export interface operations {
         parameters: {
             query: {
                 user_id: number;
-                model_id: string;
+                /** @description value must be an integer greater than zero. */
+                model_id: number;
                 action_type: "card/read" | "card/query" | "card/download-data";
             };
             header?: never;
@@ -31980,6 +33977,7 @@ export interface operations {
                         conflicts?: string[] | null;
                         last_progress_report_at?: unknown | null;
                         id: number;
+                        last_heartbeat_at?: unknown | null;
                         started_at: unknown;
                         ended_at?: unknown | null;
                         initiated_by?: number | null;
@@ -31990,6 +33988,12 @@ export interface operations {
                         /** @enum {string} */
                         sync_task_type: "import" | "export";
                         version?: string | null;
+                        initiated_by_user?: {
+                            email: string;
+                            first_name: string | null;
+                            id: number;
+                            last_name: string | null;
+                        } | null;
                         outcome?: Record<string, never> | null;
                     } | null;
                 };
@@ -32030,6 +34034,7 @@ export interface operations {
                         conflicts?: string[] | null;
                         last_progress_report_at?: unknown | null;
                         id: number;
+                        last_heartbeat_at?: unknown | null;
                         started_at: unknown;
                         ended_at?: unknown | null;
                         initiated_by?: number | null;
@@ -32040,6 +34045,12 @@ export interface operations {
                         /** @enum {string} */
                         sync_task_type: "import" | "export";
                         version?: string | null;
+                        initiated_by_user?: {
+                            email: string;
+                            first_name: string | null;
+                            id: number;
+                            last_name: string | null;
+                        } | null;
                         outcome?: Record<string, never> | null;
                     };
                 };
@@ -32081,6 +34092,7 @@ export interface operations {
                             model: string;
                             authority_level?: string | null;
                             id: number;
+                            card_id?: number | null;
                             name: string | null;
                             updated_at?: unknown | null;
                             table_id?: number | null;
@@ -32263,7 +34275,7 @@ export interface operations {
             content: {
                 "application/json": {
                     branch?: string;
-                    expected_branch: string;
+                    expected_branch?: string;
                     force?: boolean;
                     merge?: boolean;
                 };
@@ -33501,7 +35513,7 @@ export interface operations {
     "post-api-ee-serialization-export": {
         parameters: {
             query?: {
-                /** @description name of directory and archive file (default: `<instance-name>-<YYYY-MM-dd_HH-mm>`) */
+                /** @description name of directory and archive file (default: `<instance-name>-<YYYY-MM-dd_HH-mm>`): 1-255 characters from A-Z a-z 0-9 _ - . %, not starting with . or - */
                 dirname?: string | null;
                 /** @description collections' db ids/entity-ids to serialize */
                 collection?: (number | string)[] | null;
@@ -33572,6 +35584,82 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-session-management": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.session-management.api.SessionsResponse"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-session-management-revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["metabase-enterprise.session-management.api.RevokeByCriteriaParams"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.session-management.api.RevokeByCriteriaResult"];
+                };
             };
             /** @description Client error response */
             "4XX": {
@@ -33984,6 +36072,273 @@ export interface operations {
                         /** @description value must be an integer greater than zero. */
                         tenant_collection_id: number;
                     };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-transform-test": {
+        parameters: {
+            query?: {
+                "transform-id"?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test.response"][];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-transform-test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test.create"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-transform-test-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test.response"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-ee-transform-test-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test.update"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-api-ee-transform-test-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-ee-transform-test-id-run": {
+        parameters: {
+            query?: {
+                statuses?: components["schemas"]["metabase-enterprise.transform-testing.schema.run-status"][] | null;
+                "start-time"?: string | null;
+                "end-time"?: string | null;
+            };
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.transform-test-runs.response"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-ee-transform-test-id-run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase-enterprise.transform-testing.schema.run-result"];
                 };
             };
             /** @description Client error response */
@@ -35523,6 +37878,59 @@ export interface operations {
             };
         };
     };
+    "get-api-embedding-hub-checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        checklist: {
+                            "enable-tenants": boolean;
+                            "create-models": boolean;
+                            "sso-configured": boolean;
+                            "configure-row-column-security": boolean;
+                            "create-custom-theme": boolean;
+                            "create-test-embed": boolean;
+                            "data-permissions-and-enable-tenants": boolean;
+                            "embed-production": boolean;
+                            "create-dashboard": boolean;
+                            "move-dashboard-to-shared": boolean;
+                            "configure-ai": boolean;
+                            "setup-data-segregation-strategy": boolean;
+                            "create-tenants": boolean;
+                            "add-data": boolean;
+                            "sso-auth-manual-tested": boolean;
+                        };
+                        "data-isolation-strategy": ("row-column-level-security" | "connection-impersonation" | "database-routing") | null;
+                    };
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "get-api-embedding-sdk-react-18-hosts": {
         parameters: {
             query?: never;
@@ -35575,6 +37983,558 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-exploration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    blocks?: {
+                        dimensions?: {
+                            /** @description value must be a valid UUID. */
+                            "dimension-id": string;
+                            "display-name"?: string | null;
+                            "effective-type"?: string | null;
+                            "semantic-type"?: string | null;
+                        }[] | null;
+                        metrics?: {
+                            /** @description value must be an integer greater than zero. */
+                            card_id: number;
+                            dimension_mappings?: components["schemas"]["metabase.metrics.core.dimension-mapping"][] | null;
+                        }[] | null;
+                    }[] | null;
+                    collection_id?: number | null;
+                    description?: string | null;
+                    name: string;
+                    prompt?: string | null;
+                    timeline_ids?: number[] | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.HydratedExploration"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-exploration-dimensions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.DimensionsResponse"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-exploration-mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.MineResponse"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-exploration-page-id-starred": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    starred: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-exploration-pages-hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                    page_ids: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-exploration-query-id": {
+        parameters: {
+            query?: {
+                format?: "api" | "csv" | "json" | "xlsx";
+            };
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.ExplorationQueryStreamResponse"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-exploration-thread-thread-id-cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                "thread-id": number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.CanceledThread"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-exploration-thread-thread-id-restart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                "thread-id": number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.HydratedExploration"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "get-api-exploration-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.HydratedExploration"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "put-api-exploration-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    archived?: boolean;
+                    collection_id?: number | null;
+                    collection_position?: number | null;
+                    description?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.HydratedExploration"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "delete-api-exploration-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null;
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-exploration-id-explore-further": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    explore_filters: ({
+                        dimension_name?: string | null;
+                        display_value: string;
+                        field_ref: components["schemas"]["metabase.lib.schema.parameter.dimension.target"];
+                        /** @constant */
+                        operator: "=";
+                        value: (string | number | boolean) | null;
+                    } | {
+                        dimension_name?: string | null;
+                        display_value: string;
+                        field_ref: components["schemas"]["metabase.lib.schema.parameter.dimension.target"];
+                        /** @constant */
+                        operator: "between";
+                        values: [
+                            (string | number | boolean) | null,
+                            (string | number | boolean) | null
+                        ];
+                    })[];
+                    /** @description value must be an integer greater than zero. */
+                    page_id: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.HydratedExploration"];
+                };
+            };
+            /** @description Client error response */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server error response */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "post-api-exploration-id-summary-append": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description value must be an integer greater than zero. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    display: string;
+                    exploration_query_ids: number[];
+                    /** @description Value must be a map. */
+                    visualization_settings: Record<string, never>;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            "2XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["metabase.explorations.api.ExplorationDocument"];
                 };
             };
             /** @description Client error response */
@@ -35647,7 +38607,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -35849,7 +38813,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -35888,7 +38856,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -35962,7 +38934,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -35997,7 +38973,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -36032,7 +39012,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -36827,73 +39811,6 @@ export interface operations {
             };
         };
     };
-    "post-api-llm-generate-sql": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    database_id: number;
-                    prompt: string;
-                    referenced_entities?: {
-                        id: number;
-                        model: string;
-                    }[];
-                    source_sql?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        referenced_entities: {
-                            columns: {
-                                database_type?: string | null;
-                                description?: string | null;
-                                fk_target?: {
-                                    field_name: string;
-                                    table_name: string;
-                                };
-                                id: number;
-                                name: string;
-                                semantic_type?: string | null;
-                            }[];
-                            description?: string | null;
-                            display_name?: string | null;
-                            id: number;
-                            model: string;
-                            name: string;
-                            schema?: string | null;
-                        }[];
-                        sql: string;
-                    };
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "get-api-llm-models": {
         parameters: {
             query?: never;
@@ -36957,6 +39874,7 @@ export interface operations {
                         singleton: boolean;
                         default_model: string | null;
                         label: string;
+                        model_fields: string[];
                         type: string;
                         fields: {
                             prefix?: string | null;
@@ -42190,46 +45108,6 @@ export interface operations {
             };
         };
     };
-    "post-api-product-feedback": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    comments?: string | null;
-                    email?: string | null;
-                    source: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "get-api-public-action-uuid": {
         parameters: {
             query?: never;
@@ -43571,7 +46449,7 @@ export interface operations {
             query: {
                 /** @description value must be an integer greater than zero. */
                 id: number;
-                entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform";
+                entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform" | "transform-test";
             };
             header?: never;
             path?: never;
@@ -43613,7 +46491,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform";
+                    entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform" | "transform-test";
                     /** @description value must be an integer greater than zero. */
                     id: number;
                     /** @description value must be an integer greater than zero. */
@@ -43650,7 +46528,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform";
+                entity: "card" | "dashboard" | "document" | "measure" | "segment" | "transform" | "transform-test";
                 /** @description value must be an integer greater than zero. */
                 id: number;
             };
@@ -43700,7 +46578,7 @@ export interface operations {
                 calculate_available_models?: boolean | null;
                 display_type?: string[] | null;
                 created_at?: string | null;
-                models?: ("dashboard" | "table" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "action" | "indexed-entity" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "data-app" | "action" | "indexed-entity" | "metric" | "card")[] | null;
                 last_edited_at?: string | null;
                 search_native_query?: boolean | null;
                 table_db_id?: number | null;
@@ -43713,7 +46591,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -43742,7 +46624,7 @@ export interface operations {
         parameters: {
             query: {
                 vector_search_ef_search?: number | null;
-                expected_result_type: "dashboard" | "table" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "action" | "indexed-entity" | "metric" | "card";
+                expected_result_type: "dashboard" | "table" | "exploration" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "data-app" | "action" | "indexed-entity" | "metric" | "card";
                 q?: string | null;
                 collection?: number | null;
                 vector_search_explain?: boolean | null;
@@ -43761,7 +46643,7 @@ export interface operations {
                 expected_result_id: number;
                 created_at?: string | null;
                 for_user_id?: number | null;
-                models?: ("dashboard" | "table" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "action" | "indexed-entity" | "metric" | "card")[] | null;
+                models?: ("dashboard" | "table" | "exploration" | "dataset" | "segment" | "collection" | "measure" | "transform" | "document" | "database" | "data-app" | "action" | "indexed-entity" | "metric" | "card")[] | null;
                 last_edited_at?: string | null;
                 search_native_query?: boolean | null;
                 table_db_id?: number | null;
@@ -45083,7 +47965,7 @@ export interface operations {
                 "include-transform-targets"?: boolean | null;
                 "owner-user-id"?: number | null;
                 "data-source"?: components["schemas"]["metabase.warehouse-schema-rest.api.table.data-sources"];
-                "can-write"?: boolean | null;
+                "include-editable-data-model"?: boolean | null;
                 "orphan-only"?: boolean | null;
                 "can-query"?: boolean | null;
                 "unused-only"?: boolean | null;
@@ -45136,9 +48018,11 @@ export interface operations {
                     owner_user_id?: number | null;
                     ids: number[];
                     display_name?: string | null;
+                    collection_id?: number | null;
                     data_source?: string | null;
                     caveats?: string | null;
                     entity_type?: unknown | null;
+                    field_order?: ("alphabetical" | "custom" | "database" | "smart") | null;
                     description?: string | null;
                 };
             };
@@ -45212,7 +48096,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -45249,7 +48137,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -45466,7 +48358,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -45505,7 +48401,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -46189,7 +49089,7 @@ export interface operations {
                     archived?: boolean | null;
                     /** @description value must be an integer greater than zero. */
                     timeline_id: number;
-                    source?: ("collections" | "question") | null;
+                    source?: ("collections" | "question" | "dashboard") | null;
                     time_matters?: boolean | null;
                     description?: string | null;
                     icon?: ("star" | "cake" | "mail" | "mail_at" | "warning" | "bell" | "cloud" | "info" | "note" | "event") | null;
@@ -48495,55 +51395,6 @@ export interface operations {
             };
         };
     };
-    "get-api-typed-schemas-v1-typescript": {
-        parameters: {
-            query?: {
-                /** @description Scopes the schema to a database by numeric id or name. */
-                database?: string | null;
-                /** @description Comma-separated library collection ids or entity ids. Limits tables and metrics to those library collections. */
-                "library-collections"?: string | null;
-                /** @description Whether to include the entire data library. */
-                "include-data-library"?: boolean | null;
-                /** @description Whether to include the entire metric library. */
-                "include-metric-library"?: boolean | null;
-                /** @description Include models with actions. Database scope filters models; library scope does not. Without a scope, returns models only. */
-                "include-models"?: boolean | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": Record<string, never>;
-            };
-        };
-        responses: {
-            /** @description Successful response */
-            "2XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Client error response */
-            "4XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Server error response */
-            "5XX": {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     "post-api-upload-csv": {
         parameters: {
             query?: never;
@@ -48727,7 +51578,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
@@ -48808,7 +51663,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
         responses: {
             /** @description Successful response */
             "2XX": {
