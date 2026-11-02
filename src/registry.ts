@@ -25,16 +25,16 @@ export type ToolDef = {
 export const TOOLSET_PRESETS: Record<string, string[]> = {
   all: TOOL_MODULES.map((m) => m.toolset),
   // Explore and query data: what an analyst assistant needs
-  query: ["search", "databases", "tables", "dataset", "cards", "metrics", "measures", "segments", "exports", "activity", "xrays"],
+  query: ["search", "databases", "tables", "dataset", "cards", "metrics", "measures", "segments", "exports", "activity", "xrays", "explorations"],
   // Build and organise content
   content: [
     "search", "collections", "cards", "dashboards", "documents", "snippets", "timelines",
-    "bookmarks", "glossary", "revisions", "moderation", "notifications", "exports",
+    "bookmarks", "glossary", "revisions", "moderation", "notifications", "exports", "content-diagnostics",
   ],
   // Instance administration and data operations
   admin: [
     "users", "permissions", "settings", "databases", "tables", "cache", "persistence",
-    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics",
+    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics", "content-diagnostics",
   ],
 };
 
