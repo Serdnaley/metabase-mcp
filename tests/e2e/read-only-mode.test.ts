@@ -88,7 +88,6 @@ const READ_ONLY_TOOLS = [
   "list_my_explorations",
   "get_exploration",
   "get_exploration_query_result",
-  "list_content_findings",
 ];
 
 const WRITE_TOOLS = [
@@ -196,7 +195,6 @@ const WRITE_TOOLS = [
   "delete_exploration",
   "restart_exploration_thread",
   "cancel_exploration_thread",
-  "dismiss_content_findings",
 ];
 
 const getToolNames = (server: McpServer): string[] => {

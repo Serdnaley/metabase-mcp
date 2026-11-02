@@ -29,12 +29,12 @@ export const TOOLSET_PRESETS: Record<string, string[]> = {
   // Build and organise content
   content: [
     "search", "collections", "cards", "dashboards", "documents", "snippets", "timelines",
-    "bookmarks", "glossary", "revisions", "moderation", "notifications", "exports", "content-diagnostics",
+    "bookmarks", "glossary", "revisions", "moderation", "notifications", "exports",
   ],
   // Instance administration and data operations
   admin: [
     "users", "permissions", "settings", "databases", "tables", "cache", "persistence",
-    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics", "content-diagnostics",
+    "upload", "transforms", "actions", "activity", "eid-translation", "api-keys", "embedding", "diagnostics",
   ],
 };
 

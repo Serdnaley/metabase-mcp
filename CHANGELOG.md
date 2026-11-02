@@ -11,9 +11,7 @@ All notable changes to this project will be documented in this file.
   `update_exploration`, `delete_exploration`, `restart_exploration_thread`, `cancel_exploration_thread`.
   `create_exploration` takes metric card IDs and dimension IDs, sends each metric with its dimension
   mappings (without them Metabase plans no queries), and waits for the queries to finish.
-- **Content diagnostics** (Metabase 0.65+, paid plans): `list_content_findings` (stale, slow, duplicated,
-  imbalanced) and `dismiss_content_findings`. On instances without the feature the error says so plainly.
-- New toolsets `explorations` (in the `query` preset) and `content-diagnostics` (in `content` and `admin`).
+- New toolset `explorations` (in the `query` preset).
 
 ### Changed
 

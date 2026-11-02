@@ -35,7 +35,6 @@ import { registerApiKeyTools } from "./api-keys.js";
 import { registerEmbeddingTools } from "./embedding.js";
 import { registerDiagnosticsTools } from "./diagnostics.js";
 import { registerExplorationTools } from "./explorations.js";
-import { registerContentDiagnosticsTools } from "./content-diagnostics.js";
 
 export type ToolModule = {
   /** Toolset id used in METABASE_TOOLSETS */
@@ -81,7 +80,6 @@ export const TOOL_MODULES: ToolModule[] = [
   { toolset: "embedding", label: "Embedding", register: (s, c, cfg) => registerEmbeddingTools(s, c, cfg) },
   { toolset: "diagnostics", label: "Tasks & Logs", register: (s, c, cfg) => registerDiagnosticsTools(s, c, cfg) },
   { toolset: "explorations", label: "Explorations", register: (s, c, cfg) => registerExplorationTools(s, c, cfg) },
-  { toolset: "content-diagnostics", label: "Content Diagnostics", register: (s, c, cfg) => registerContentDiagnosticsTools(s, c, cfg) },
 ];
 
 /** Registers every tool on the server (no toolset filtering, no annotations). */

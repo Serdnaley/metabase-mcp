@@ -1,5 +1,5 @@
 import { describe, test, expect, afterAll } from "bun:test";
-import { getTestClient, getMetabaseMajor, getTokenFeatures, SAMPLE_DB_ID, testName } from "../helpers.js";
+import { getTestClient, getMetabaseMajor, SAMPLE_DB_ID, testName } from "../helpers.js";
 import {
   listExplorationDimensions,
   listMyExplorations,
@@ -11,7 +11,6 @@ import {
   restartExplorationThread,
   cancelExplorationThread,
 } from "../../src/services/explorations.js";
-import { listContentFindings, dismissContentFindings } from "../../src/services/content-diagnostics.js";
 import { createMetric } from "../../src/services/metrics.js";
 import { getDatabaseMetadata } from "../../src/services/databases.js";
 import { deleteCard } from "../../src/services/cards.js";
@@ -141,27 +140,5 @@ describe("explorations service", () => {
     await deleteExploration(client, explorationId);
     cleanup.explorations = cleanup.explorations.filter((x) => x !== explorationId);
     await expect(getExploration(client, explorationId)).rejects.toThrow();
-  });
-});
-
-describe("content diagnostics service", () => {
-  test("lists findings, or explains it is a paid 0.65+ feature", async () => {
-    const client = await getTestClient();
-    const features = await getTokenFeatures();
-    const paid = MAJOR >= 65 && Object.values(features).some(Boolean);
-    try {
-      const r = await listContentFindings(client, "stale", { entity_types: ["dashboard", "question"] });
-      expect(r).toBeDefined();
-    } catch (e: any) {
-      if (paid) throw e;
-      expect(String(e.message)).toMatch(MAJOR >= 65 ? /paid feature/ : /requires Metabase 0\.65/);
-    }
-  });
-
-  test("dismiss reports the same requirement", async () => {
-    const client = await getTestClient();
-    const features = await getTokenFeatures();
-    if (MAJOR >= 65 && Object.values(features).some(Boolean)) return;
-    await expect(dismissContentFindings(client, [1])).rejects.toThrow(MAJOR >= 65 ? /paid feature/ : /requires Metabase 0\.65/);
   });
 });
