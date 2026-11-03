@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-03
+
 ### Added
 
 - **Explorations** (Metabase 0.65+, every tier, no AI provider needed): `list_exploration_dimensions`,
@@ -15,7 +17,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- API types regenerated from the Metabase 0.65 spec; CI pinned to v0.65.2.5.
+- API types regenerated from the Metabase 0.65 spec; CI pinned to v0.65.2.6.
 
 ## [0.4.0] - 2026-10-26
 
