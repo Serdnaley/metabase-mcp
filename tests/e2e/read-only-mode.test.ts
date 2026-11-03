@@ -84,6 +84,10 @@ const READ_ONLY_TOOLS = [
   "get_server_logs",
   "list_log_presets",
   "get_premium_token_status",
+  "list_exploration_dimensions",
+  "list_my_explorations",
+  "get_exploration",
+  "get_exploration_query_result",
 ];
 
 const WRITE_TOOLS = [
@@ -186,6 +190,11 @@ const WRITE_TOOLS = [
   "set_resource_embedding",
   "set_log_levels",
   "reset_log_levels",
+  "create_exploration",
+  "update_exploration",
+  "delete_exploration",
+  "restart_exploration_thread",
+  "cancel_exploration_thread",
 ];
 
 const getToolNames = (server: McpServer): string[] => {

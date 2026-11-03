@@ -25,7 +25,7 @@ export type ToolDef = {
 export const TOOLSET_PRESETS: Record<string, string[]> = {
   all: TOOL_MODULES.map((m) => m.toolset),
   // Explore and query data: what an analyst assistant needs
-  query: ["search", "databases", "tables", "dataset", "cards", "metrics", "measures", "segments", "exports", "activity", "xrays"],
+  query: ["search", "databases", "tables", "dataset", "cards", "metrics", "measures", "segments", "exports", "activity", "xrays", "explorations"],
   // Build and organise content
   content: [
     "search", "collections", "cards", "dashboards", "documents", "snippets", "timelines",
