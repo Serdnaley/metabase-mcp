@@ -469,7 +469,7 @@ bun test                         # 276 tests
 docker compose down              # Stop Metabase
 ```
 
-Verified against Metabase **v0.65.4.3** (the CI pin; also v0.65.4.1, v0.65.3.1–.4, v0.65.3.6–.7, v0.65.2.2–.6, v0.64.3.4–.6) and **v0.59.6**. To try another release:
+Verified against Metabase **v0.65.4.4** (the CI pin; also v0.65.4.3, v0.65.4.1, v0.65.3.1–.4, v0.65.3.6–.7, v0.65.2.2–.6, v0.64.3.4–.6) and **v0.59.6**. To try another release:
 `MB_IMAGE=metabase/metabase:latest docker compose up -d`. CI also runs the suite weekly on
 `metabase:latest` as a non-blocking job, so upstream API drift shows up before the pin is bumped.
 
